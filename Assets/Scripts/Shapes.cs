@@ -1,7 +1,7 @@
 public enum Shapes
 {
-    S,
-    SR,
+    G,
+    GR,
     T,
     Z,
     ZR,

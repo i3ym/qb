@@ -1,40 +1,50 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public abstract class FieldRendererBase : MonoBehaviour
+{
+    public abstract void UpdateMatrix(bool[, ] GameMatrix, bool[, ] CurrentObject, int X, int Y);
+    public abstract void UpdateColors(bool[, ] GayMatrix, Shapes CurrentShape);
+    public abstract void ShowNextShape(Shapes shape);
+
+    /// <returns> Duration of animation in seconds </returns> 
+    public abstract float RemoveLinesAnimation(List<int> y, bool[, ] GayMatrix, bool[, ] CurrentObject, int X, int Y);
+}
+
+public abstract class FieldRendererBase<T> : FieldRendererBase where T : Component
 {
     [SerializeField]
     IFieldRendererExtension[] Extensions = new IFieldRendererExtension[] { };
     [SerializeField]
     protected GameObject FieldGameObjectPrefab = null;
     [SerializeField]
-    protected Material BaseFieldGOMaterial = null;
+    protected Transform NextObjectsParent = null;
     [SerializeField]
-    protected int FieldX = 0, FieldY = 0, NextX = 0, NextY = 0;
+    protected Material BaseFieldGOMaterial = null;
 
-    protected Renderer[, ] GameObjects = new Renderer[10, 20];
+    protected T[, ] GameObjects = new T[10, 20];
     protected GameObject[] NextObjects = new GameObject[7];
-    protected Dictionary<Shapes, Material> ShapeColors = new Dictionary<Shapes, Material>();
+    protected Dictionary<Shapes, Material> ShapeMaterials = new Dictionary<Shapes, Material>();
 
     void Awake()
     {
+        ShapeMaterials.Add(Shapes.G, GetMaterial(Color.blue));
+        ShapeMaterials.Add(Shapes.GR, GetMaterial(new Color(1f, .5f, 0f)));
+        ShapeMaterials.Add(Shapes.Z, GetMaterial(Color.red));
+        ShapeMaterials.Add(Shapes.ZR, GetMaterial(Color.green));
+        ShapeMaterials.Add(Shapes.I, GetMaterial(new Color(0f, 1f, 1f)));
+        ShapeMaterials.Add(Shapes.T, GetMaterial(new Color(.5f, 0f, 1f)));
+        ShapeMaterials.Add(Shapes.O, GetMaterial(Color.yellow));
+
         for (int y = 0; y < 20; y++)
             for (int x = 0; x < 10; x++)
-                GameObjects[x, y] = GetNewCube(new Vector2(x - 5 + .5f, y - 10 + .5f));
+                GameObjects[x, y] = GetNewCube(new Vector2(x - 5, y - 10)).GetComponent<T>();
 
         for (int i = 0; i < 7; i++) NextObjects[i] = CreateNextObject((Shapes) i);
 
-        ShapeColors.Add(Shapes.S, GetMaterial(Color.blue));
-        ShapeColors.Add(Shapes.SR, GetMaterial(new Color(1f, .5f, 0f)));
-        ShapeColors.Add(Shapes.Z, GetMaterial(Color.red));
-        ShapeColors.Add(Shapes.ZR, GetMaterial(Color.green));
-        ShapeColors.Add(Shapes.I, GetMaterial(new Color(0f, 1f, 1f)));
-        ShapeColors.Add(Shapes.T, GetMaterial(new Color(.5f, 0f, 1f)));
-        ShapeColors.Add(Shapes.O, GetMaterial(Color.yellow));
-
         foreach (var extension in Extensions) extension.Start();
     }
-
     void Update()
     {
         foreach (var extension in Extensions)
@@ -43,32 +53,43 @@ public abstract class FieldRendererBase : MonoBehaviour
 
     //
 
+    protected abstract void SetMaterial(T t, Material material);
+    protected abstract Material GetMaterial(T t);
+
     protected virtual Material GetMaterial(Color color) => new Material(BaseFieldGOMaterial) { color = color };
-    protected virtual Renderer GetNewCube(Vector3 pos)
+    protected virtual GameObject GetNewCube(Vector3 pos)
     {
-        GameObject go = Instantiate(FieldGameObjectPrefab, pos, Quaternion.identity, transform);
+        GameObject go = Instantiate(FieldGameObjectPrefab, pos + new Vector3(.5f, .5f), Quaternion.identity, transform);
         go.SetActive(false);
 
-        return go.GetComponent<Renderer>();
+        return go;
     }
-    protected virtual Renderer GetNewNextCube(Vector3 pos, Transform parent, Material mat)
+    protected virtual GameObject GetNewNextCube(Vector3 pos, Transform parent, Material mat)
     {
         var cube = GetNewCube(pos);
         cube.transform.SetParent(parent, false);
-        cube.sharedMaterial = mat;
+        SetMaterial(cube.GetComponent<T>(), mat);
         return cube;
     }
     protected virtual GameObject CreateNextObject(Shapes shape)
     {
         var go = new GameObject("NEXT_" + shape.ToString());
-        go.transform.position = new Vector3(NextX, NextY);
+        go.transform.SetParent(NextObjectsParent);
+        go.transform.localPosition = new Vector3(.5f, .5f);
+        go.transform.localScale = Vector3.one;
+
+        int addx = 0, addy = 0;
+
+        if (shape == Shapes.I || shape == Shapes.GR || shape == Shapes.G || shape == Shapes.T) addy = -1;
+        if (shape == Shapes.O) addx = 1;
+
 
         for (int x = 0; x < 4; x++)
             for (int y = 0; y < 4; y++)
             {
                 try
                 {
-                    if (Game.ShapeObjects[shape][x, y]) GetNewNextCube(go.transform.position + new Vector3(x, y), go.transform, ShapeColors[shape]);
+                    if (Game.ShapeObjects[shape][x, y]) GetNewNextCube(new Vector3(x + addx, y + addy), go.transform, ShapeMaterials[shape]).SetActive(true);
                 }
                 catch { }
             }
@@ -76,7 +97,7 @@ public abstract class FieldRendererBase : MonoBehaviour
         return go;
     }
 
-    public void UpdateMatrix(bool[, ] GameMatrix, bool[, ] CurrentObject, int X, int Y)
+    public override void UpdateMatrix(bool[, ] GameMatrix, bool[, ] CurrentObject, int X, int Y)
     {
         if (Game.BlindRendering)
         {
@@ -97,9 +118,7 @@ public abstract class FieldRendererBase : MonoBehaviour
                                 break;
                             }
 
-                        if ((y == maxy && GameMatrix[x, y]) || CurrentObject[x - X, y - Y])
-                            GameObjects[x, y]?.gameObject.SetActive(true);
-                        else GameObjects[x, y]?.gameObject.SetActive(false);
+                        GameObjects[x, y]?.gameObject.SetActive((y == maxy && GameMatrix[x, y]) || CurrentObject[x - X, y - Y]);
                     }
                     catch { GameObjects[x, y]?.gameObject.SetActive(false); }
                 }
@@ -113,39 +132,35 @@ public abstract class FieldRendererBase : MonoBehaviour
                 {
                     try
                     {
-                        if (GameMatrix[x, y] || CurrentObject[x - X, y - Y])
-                            GameObjects[x, y]?.gameObject.SetActive(true);
-                        else GameObjects[x, y]?.gameObject.SetActive(false);
+                        GameObjects[x, y]?.gameObject.SetActive(GameMatrix[x, y] || CurrentObject[x - X, y - Y]);
                     }
                     catch { GameObjects[x, y]?.gameObject.SetActive(false); }
                 }
             }
         }
     }
-    public virtual void UpdateColors(bool[, ] GayMatrix, Shapes CurrentShape)
+    public override void UpdateColors(bool[, ] GayMatrix, Shapes CurrentShape)
     {
         for (int y = 0; y < 20; y++)
             for (int x = 0; x < 10; x++)
-                if (!GayMatrix[x, y]) GameObjects[x, y].sharedMaterial = ShapeColors[CurrentShape];
+                if (!GayMatrix[x, y]) SetMaterial(GameObjects[x, y], ShapeMaterials[CurrentShape]);
     }
-    public virtual void ShowNextShape(Shapes shape)
+    public override void ShowNextShape(Shapes shape)
     {
-        for (int i = 0; i < 7; i++)
-            NextObjects[i].SetActive(false);
+        for (int i = 0; i < 7; i++) NextObjects[i].SetActive(false);
         NextObjects[(int) shape].SetActive(true);
     }
 
-    /// <returns> Duration of animation in seconds </returns> 
-    public virtual float RemoveLinesAnimation(List<int> y, bool[, ] GayMatrix, bool[, ] CurrentObject, int X, int Y)
+    public override float RemoveLinesAnimation(List<int> y, bool[, ] GayMatrix, bool[, ] CurrentObject, int X, int Y)
     {
         for (int i = y.Count - 1; i > -1; i--)
             for (int y2 = y[i]; y2 < 19; y2++)
                 for (int x2 = 0; x2 < 10; x2++)
                 {
                     GayMatrix[x2, y2] = GayMatrix[x2, y2 + 1];
-                    GameObjects[x2, y2].sharedMaterial = GameObjects[x2, y2 + 1].sharedMaterial;
+                    SetMaterial(GameObjects[x2, y2], GetMaterial(GameObjects[x2, y2 + 1]));
                 }
-       
+
         for (int x2 = 0; x2 < 10; x2++)
             GayMatrix[x2, 19] = false;
 

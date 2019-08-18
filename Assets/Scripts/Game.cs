@@ -39,13 +39,11 @@ public class Game : MonoBehaviour
     void Awake()
     {
         Camera = Camera.main;
-    }
-    void Start()
-    {
+
         #region AddArrays
 
-        ShapeObjects.Add(Shapes.S, new bool[, ] { { false, true, false }, { false, true, false }, { false, true, true } });
-        ShapeObjects.Add(Shapes.SR, new bool[, ] { { false, true, true }, { false, true, false }, { false, true, false } });
+        ShapeObjects.Add(Shapes.G, new bool[, ] { { false, true, false }, { false, true, false }, { false, true, true } });
+        ShapeObjects.Add(Shapes.GR, new bool[, ] { { false, true, true }, { false, true, false }, { false, true, false } });
         ShapeObjects.Add(Shapes.I, new bool[, ] { { false, true, false, false }, { false, true, false, false }, { false, true, false, false }, { false, true, false, false } });
         ShapeObjects.Add(Shapes.O, new bool[, ] { { true, true }, { true, true } });
         ShapeObjects.Add(Shapes.T, new bool[, ] { { false, true, false }, { false, true, true }, { false, true, false } });
@@ -71,7 +69,9 @@ public class Game : MonoBehaviour
         TetrominoWallKickDataI[7] = new int[, ] { { 0, 0 }, {-1, 0 }, { 2, 0 }, {-1, 2 }, { 2, 1 } };
 
         #endregion
-
+    }
+    void Start()
+    {
         LvlText.text = Lvl.ToString();
         SetLvl(Lvl);
         StartLvl = Lvl;
@@ -259,7 +259,7 @@ public class Game : MonoBehaviour
     void SpawnBlock()
     {
         if (RandomBag.Count == 0)
-            RandomBag.AddRange(new Shapes[] { Shapes.S, Shapes.SR, Shapes.I, Shapes.O, Shapes.T, Shapes.Z, Shapes.ZR });
+            RandomBag.AddRange(new Shapes[] { Shapes.G, Shapes.GR, Shapes.I, Shapes.O, Shapes.T, Shapes.Z, Shapes.ZR });
 
         CurrentX = 4;
         CurrentY = 20;
