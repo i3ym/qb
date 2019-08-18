@@ -82,7 +82,7 @@ public class Game : MonoBehaviour
         fieldRenderer.UpdateMatrix(GameMatrix, CurrentObject, CurrentX, CurrentY);
 
         StartCoroutine(MoveBlockSpeedCoroutine());
-        StartCoroutine(MoveBlockHorizontalCoroutine());
+        StartCoroutine(MoveHorizontalCoroutine());
         StartCoroutine(BlockRotateCoroutine());
         StartCoroutine(TimeTextUpdateCoroutine());
 
@@ -119,60 +119,46 @@ public class Game : MonoBehaviour
     }
     IEnumerator BlockRotateCoroutine()
     {
+        bool rotate = false;
+
         while (true)
         {
             while (isPaused) yield return null;
 
-            if (Input.GetKeyDown(Config.KeyRotate)) RotateBlock();
+            if (Controls.Rotate && !rotate) RotateBlock();
+            else if (Controls.RotateC && !rotate) RotateBlock();
+
+            rotate = Controls.Rotate || Controls.RotateC;
 
             yield return null;
         }
     }
-    IEnumerator MoveBlockHorizontalCoroutine()
+    IEnumerator MoveHorizontalCoroutine()
     {
-        const float firstPause = 16f / 60f;
-        const float nextPause = 6f / 60f;
+        const float firstPause = 6f / 60f;
+        const float nextPause = 3f / 60f;
         WaitForSeconds firstw = new WaitForSeconds(firstPause);
         WaitForSeconds nextw = new WaitForSeconds(nextPause);
 
         bool isStarted = false;
         float time;
+        int horizontal;
 
         while (true)
         {
             while (isPaused) yield return null;
 
-            if ((int) Input.GetAxisRaw("Horizontal") != 0)
+            horizontal = Controls.Horizontal;
+
+            if (horizontal != 0)
             {
-                MoveHorizontal((int) Input.GetAxisRaw("Horizontal"));
+                MoveHorizontal(horizontal);
 
-                if (isStarted)
+                time = Time.time;
+                while (time > Time.time - (isStarted ? nextPause : firstPause))
                 {
-                    time = Time.time;
-                    while (time > Time.time - nextPause)
-                    {
-                        yield return null;
-
-                        if ((int) Input.GetAxisRaw("Horizontal") == 0)
-                        {
-                            StartCoroutine(MoveBlockHorizontalCoroutine());
-                            yield break;
-                        }
-                    }
-                }
-                else
-                {
-                    time = Time.time;
-                    while (time > Time.time - firstPause)
-                    {
-                        yield return null;
-
-                        if ((int) Input.GetAxisRaw("Horizontal") == 0)
-                        {
-                            StartCoroutine(MoveBlockHorizontalCoroutine());
-                            yield break;
-                        }
-                    }
+                    yield return null;
+                    if (horizontal == 0) break;
                 }
 
                 if (!isStarted) isStarted = true;
@@ -237,20 +223,24 @@ public class Game : MonoBehaviour
     {
         MoveBlockCoroutineVariable = StartCoroutine(MoveBlockCoroutine(MoveSpeed));
 
+        bool down = false;
+
         while (true)
         {
             while (isPaused) yield return null;
 
-            if (Input.GetKeyDown(Config.KeyDown))
+            if (Controls.Down > 0 && !down)
             {
                 StopCoroutine(MoveBlockCoroutineVariable);
                 MoveBlockCoroutineVariable = StartCoroutine(MoveBlockCoroutine(FastMoveSpeed));
             }
-            else if (Input.GetKeyUp(Config.KeyDown))
+            else if (Controls.Down == 0 && down)
             {
                 StopCoroutine(MoveBlockCoroutineVariable);
                 MoveBlockCoroutineVariable = StartCoroutine(MoveBlockCoroutine(MoveSpeed));
             }
+
+            down = Controls.Down > 0;
 
             yield return null;
         }
@@ -312,11 +302,13 @@ public class Game : MonoBehaviour
     {
         for (int x = 0; x < CurrentObject.GetLength(0); x++)
             for (int y = 0; y < CurrentObject.GetLength(1); y++)
+            {
                 try
                 {
                     if (CurrentObject[x, y] && (CurrentX + x + add < 0 || CurrentX + x + add > 9 || GameMatrix[CurrentX + x + add, CurrentY + y])) return;
                 }
-        catch { }
+                catch { }
+            }
 
         CurrentX += add;
         fieldRenderer.UpdateMatrix(GameMatrix, CurrentObject, CurrentX, CurrentY);
@@ -329,8 +321,7 @@ public class Game : MonoBehaviour
             for (int y = 0; y < CurrentObject.GetLength(1); y++)
                 newObject[y, CurrentObject.GetLength(0) - 1 - x] = CurrentObject[x, y];
 
-        int cx = 0;
-        int cy = 0;
+        int cx = 0, cy = 0;
         bool rotate = false;
 
         if (CurrentShape == Shapes.I)
