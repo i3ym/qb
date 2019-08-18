@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public abstract class FieldRendererBase : MonoBehaviour
@@ -125,18 +124,14 @@ public abstract class FieldRendererBase<T> : FieldRendererBase where T : Compone
             }
         }
         else
-        {
+        { // TODO ускорить типа обновляя только то что изменилось
             for (int y = 0; y < 20; y++)
-            {
                 for (int x = 0; x < 10; x++)
                 {
-                    try
-                    {
-                        GameObjects[x, y]?.gameObject.SetActive(GameMatrix[x, y] || CurrentObject[x - X, y - Y]);
-                    }
-                    catch { GameObjects[x, y]?.gameObject.SetActive(false); }
+                    if (x - X < 0 || x - X >= CurrentObject.GetLength(0) || y - Y < 0 || y - Y >= CurrentObject.GetLength(1))
+                        GameObjects[x, y].gameObject.SetActive(GameMatrix[x, y]);
+                    else GameObjects[x, y].gameObject.SetActive(GameMatrix[x, y] || CurrentObject[x - X, y - Y]);
                 }
-            }
         }
     }
     public override void UpdateColors(bool[, ] GayMatrix, Shapes CurrentShape)

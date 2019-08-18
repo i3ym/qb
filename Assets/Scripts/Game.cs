@@ -18,7 +18,7 @@ public class Game : MonoBehaviour
     protected int StartLvl;
     protected bool IsLvlReached = false;
     protected bool[, ] GameMatrix = new bool[10, 20];
-    protected bool[, ] CurrentObject;
+    protected bool[, ] CurrentObject = new bool[0, 0];
     protected Shapes CurrentShape, NextShape;
     protected int CurrentRotation = 0, CurrentX = 0, CurrentY = 19;
     protected float MoveSpeed, FastMoveSpeed = 2f / 60f;
@@ -104,17 +104,16 @@ public class Game : MonoBehaviour
     IEnumerator TimeTextUpdateCoroutine()
     {
         WaitForSeconds wff = new WaitForSeconds(1f);
-        TimeSpan temp = new TimeSpan();
-        TimeSpan add = new TimeSpan(0, 0, 1);
-        TimeText.text = temp.Hours + ":" + temp.Minutes + ":" + temp.Seconds;
+
+        var time = new DateTime(0);
 
         while (true)
         {
-            while (isPaused) yield return null;
+            while (isPaused) yield return new WaitWhile(() => isPaused);
             yield return wff;
 
-            temp = temp.Add(add);
-            TimeText.text = temp.Hours + ":" + temp.Minutes + ":" + temp.Seconds;
+            time = time.AddSeconds(1);
+            TimeText.text = time.ToShortTimeString();
         }
     }
     IEnumerator BlockRotateCoroutine()
@@ -123,7 +122,7 @@ public class Game : MonoBehaviour
 
         while (true)
         {
-            while (isPaused) yield return null;
+            while (isPaused) yield return new WaitWhile(() => isPaused);
 
             if (Controls.Rotate && !rotate) RotateBlock();
             else if (Controls.RotateC && !rotate) RotateBlock();
@@ -146,7 +145,7 @@ public class Game : MonoBehaviour
 
         while (true)
         {
-            while (isPaused) yield return null;
+            while (isPaused) yield return new WaitWhile(() => isPaused);
 
             horizontal = Controls.Horizontal;
 
@@ -170,49 +169,42 @@ public class Game : MonoBehaviour
     }
     IEnumerator MoveBlockCoroutine(float speed)
     {
-        bool isStop;
+        bool needStop()
+        {
+            for (int x = 0; x < CurrentObject.GetLength(0); x++)
+                for (int y = 0; y < CurrentObject.GetLength(1); y++)
+                {
+                    if (x + CurrentX > GameMatrix.GetLength(0) ||
+                        y + CurrentY - 1 > GameMatrix.GetLength(0) ||
+                        x + CurrentX < 0) continue;
+
+                    if (CurrentObject[x, y] && (y + CurrentY - 1 < 0 || GameMatrix[x + CurrentX, y + CurrentY - 1]))
+                        return true;
+                }
+
+            return false;
+        }
+
+
         fieldRenderer.UpdateMatrix(GameMatrix, CurrentObject, CurrentX, CurrentY);
 
         while (true)
         {
-            while (isPaused) yield return null;
+            while (isPaused) yield return new WaitWhile(() => isPaused);
 
-            if (speed == FastMoveSpeed) Score++;
+            if (speed == FastMoveSpeed) Score++; // TODO fix
             yield return new WaitForSeconds(speed);
 
-            isStop = false;
-
-            for (int x = 0; x < CurrentObject.GetLength(0); x++)
-                for (int y = 0; y < CurrentObject.GetLength(1); y++)
-                {
-                    try
-                    {
-                        if (CurrentObject[x, y] && (y + CurrentY - 1 < 0 || GameMatrix[x + CurrentX, y + CurrentY - 1]))
-                            isStop = true;
-                    }
-                    catch { }
-                }
-
-            if (isStop) yield return new WaitForSeconds(speed);
-
             if (isPaused) continue;
-            isStop = false;
-
-            for (int x = 0; x < CurrentObject.GetLength(0); x++)
-                for (int y = 0; y < CurrentObject.GetLength(1); y++)
-                {
-                    try
-                    {
-                        if (CurrentObject[x, y] && (y + CurrentY - 1 < 0 || GameMatrix[x + CurrentX, y + CurrentY - 1]))
-                            isStop = true;
-                    }
-                    catch { }
-                }
-
-            if (isStop)
+            if (needStop())
             {
-                SetBlockToField();
-                RemoveLines();
+                yield return new WaitForSeconds(speed);
+
+                if (needStop())
+                {
+                    SetBlockToField();
+                    RemoveLines();
+                }
             }
 
             CurrentY--;
@@ -227,7 +219,7 @@ public class Game : MonoBehaviour
 
         while (true)
         {
-            while (isPaused) yield return null;
+            while (isPaused) yield return new WaitWhile(() => isPaused);
 
             if (Controls.Down > 0 && !down)
             {
