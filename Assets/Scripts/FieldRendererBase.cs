@@ -54,7 +54,7 @@ public abstract class FieldRendererBase<T> : FieldRendererBase where T : Compone
     //
 
     protected abstract void SetMaterial(T t, Material material);
-    protected abstract Material GetMaterial(T t);
+    protected abstract void SetMaterial(T t, T t2);
 
     protected virtual Material GetMaterial(Color color) => new Material(BaseFieldGOMaterial) { color = color };
     protected virtual GameObject GetNewCube(Vector3 pos)
@@ -158,7 +158,7 @@ public abstract class FieldRendererBase<T> : FieldRendererBase where T : Compone
                 for (int x2 = 0; x2 < 10; x2++)
                 {
                     GayMatrix[x2, y2] = GayMatrix[x2, y2 + 1];
-                    SetMaterial(GameObjects[x2, y2], GetMaterial(GameObjects[x2, y2 + 1]));
+                    SetMaterial(GameObjects[x2, y2], GameObjects[x2, y2 + 1]);
                 }
 
         for (int x2 = 0; x2 < 10; x2++)

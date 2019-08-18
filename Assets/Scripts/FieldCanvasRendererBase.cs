@@ -3,8 +3,8 @@ using UnityEngine.UI;
 
 public abstract class FieldCanvasRendererBase : FieldRendererBase<RawImage>
 {
-    protected override void SetMaterial(RawImage t, Material material) => t.material = material;
-    protected override Material GetMaterial(RawImage t) => t.material;
+    protected override void SetMaterial(RawImage t, Material material) => t.color = material.color;
+    protected override void SetMaterial(RawImage t, RawImage t2) => t.color = t2.color;
 
     protected override GameObject GetNewCube(Vector3 pos)
     {
