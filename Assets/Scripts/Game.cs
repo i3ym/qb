@@ -174,8 +174,8 @@ public class Game : MonoBehaviour
             for (int x = 0; x < CurrentObject.GetLength(0); x++)
                 for (int y = 0; y < CurrentObject.GetLength(1); y++)
                 {
-                    if (x + CurrentX > GameMatrix.GetLength(0) ||
-                        y + CurrentY - 1 > GameMatrix.GetLength(0) ||
+                    if (x + CurrentX >= GameMatrix.GetLength(0) ||
+                        y + CurrentY - 1 >= GameMatrix.GetLength(1) ||
                         x + CurrentX < 0) continue;
 
                     if (CurrentObject[x, y] && (y + CurrentY - 1 < 0 || GameMatrix[x + CurrentX, y + CurrentY - 1]))
@@ -198,16 +198,11 @@ public class Game : MonoBehaviour
             if (isPaused) continue;
             if (needStop())
             {
-                yield return new WaitForSeconds(speed);
-
-                if (needStop())
-                {
-                    SetBlockToField();
-                    RemoveLines();
-                }
+                SetBlockToField();
+                RemoveLines();
             }
+            else CurrentY--;
 
-            CurrentY--;
             fieldRenderer.UpdateMatrix(GameMatrix, CurrentObject, CurrentX, CurrentY);
         }
     }
@@ -244,7 +239,7 @@ public class Game : MonoBehaviour
             RandomBag.AddRange(new Shapes[] { Shapes.G, Shapes.GR, Shapes.I, Shapes.O, Shapes.T, Shapes.Z, Shapes.ZR });
 
         CurrentX = 4;
-        CurrentY = 20;
+        CurrentY = 19;
         CurrentRotation = 0;
 
         CurrentObject = ShapeObjects[CurrentShape = NextShape];
@@ -257,11 +252,11 @@ public class Game : MonoBehaviour
         for (int x = 0; x < CurrentObject.GetLength(0); x++)
             for (int y = 0; y < CurrentObject.GetLength(1); y++)
             {
-                try
-                {
-                    if (CurrentObject[x, y] && GameMatrix[x + 4, y + 19]) GameOver();
-                }
-                catch { }
+                if (x + 4 > GameMatrix.GetLength(0) ||
+                    y + 19 > GameMatrix.GetLength(1))
+                    continue;
+
+                if (CurrentObject[x, y] && GameMatrix[x + 4, y + 19]) GameOver();
             }
 
         StopCoroutine(MoveBlockCoroutineVariable);
@@ -275,17 +270,16 @@ public class Game : MonoBehaviour
         for (int x = 0; x < CurrentObject.GetLength(0); x++)
             for (int y = 0; y < CurrentObject.GetLength(1); y++)
             {
-                try
-                {
-                    if (CurrentY + y > 19)
-                    {
-                        GameOver();
-                        return;
-                    }
+                if (CurrentY + y < 0 || CurrentX + x < 0 || CurrentX + x > GameMatrix.GetLength(0))
+                    continue;
 
-                    GameMatrix[CurrentX + x, CurrentY + y] = GameMatrix[CurrentX + x, CurrentY + y] || CurrentObject[x, y];
+                if (CurrentY + y > 19)
+                {
+                    GameOver();
+                    return;
                 }
-                catch { }
+
+                GameMatrix[CurrentX + x, CurrentY + y] = GameMatrix[CurrentX + x, CurrentY + y] || CurrentObject[x, y];
             }
 
         // TODO ????? fieldRenderer.OnBlockPlace(GameMatrix);
@@ -295,11 +289,11 @@ public class Game : MonoBehaviour
         for (int x = 0; x < CurrentObject.GetLength(0); x++)
             for (int y = 0; y < CurrentObject.GetLength(1); y++)
             {
-                try
-                {
-                    if (CurrentObject[x, y] && (CurrentX + x + add < 0 || CurrentX + x + add > 9 || GameMatrix[CurrentX + x + add, CurrentY + y])) return;
-                }
-                catch { }
+                if (CurrentY + y < 0 || CurrentY + y >= GameMatrix.GetLength(1))
+                    continue;
+
+                if (CurrentObject[x, y] && (CurrentX + x + add < 0 || CurrentX + x + add >= GameMatrix.GetLength(0) || GameMatrix[CurrentX + x + add, CurrentY + y]))
+                    return;
             }
 
         CurrentX += add;
@@ -358,11 +352,10 @@ public class Game : MonoBehaviour
     {
         for (int x = 0; x < newObject.GetLength(0); x++)
             for (int y = 0; y < newObject.GetLength(1); y++)
-                try
-                {
-                    if (GameMatrix[x + cx, y + cy] && newObject[x, y]) return false;
-                }
-        catch { return false; }
+                if (x + cx < 0 || x + cx >= GameMatrix.GetLength(0) ||
+                    y + cy < 0 || y + cy >= GameMatrix.GetLength(1) ||
+                    GameMatrix[x + cx, y + cy] && newObject[x, y])
+                    return false;
 
         return true;
     }

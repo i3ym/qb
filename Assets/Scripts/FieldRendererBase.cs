@@ -82,7 +82,6 @@ public abstract class FieldRendererBase<T> : FieldRendererBase where T : Compone
         if (shape == Shapes.I || shape == Shapes.GR || shape == Shapes.G || shape == Shapes.T) addy = -1;
         if (shape == Shapes.O) addx = 1;
 
-
         for (int x = 0; x < 4; x++)
             for (int y = 0; y < 4; y++)
             {
@@ -130,7 +129,8 @@ public abstract class FieldRendererBase<T> : FieldRendererBase where T : Compone
                 {
                     if (x - X < 0 || x - X >= CurrentObject.GetLength(0) || y - Y < 0 || y - Y >= CurrentObject.GetLength(1))
                         GameObjects[x, y].gameObject.SetActive(GameMatrix[x, y]);
-                    else GameObjects[x, y].gameObject.SetActive(GameMatrix[x, y] || CurrentObject[x - X, y - Y]);
+                    else
+                        GameObjects[x, y].gameObject.SetActive(GameMatrix[x, y] || CurrentObject[x - X, y - Y]);
                 }
         }
     }
