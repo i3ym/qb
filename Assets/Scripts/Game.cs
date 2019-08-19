@@ -21,7 +21,8 @@ public class Game : MonoBehaviour
     protected bool[, ] CurrentObject = new bool[0, 0];
     protected Shapes CurrentShape, NextShape;
     protected int CurrentRotation = 0, CurrentX = 0, CurrentY = 19;
-    protected float MoveSpeed, FastMoveSpeed = 2f / 60f;
+    protected float MoveSpeed;
+    protected float FastMoveSpeed => MoveSpeed > 2f / 60f?2f / 60f : MoveSpeed / 2f;
     protected Coroutine MoveBlockCoroutineVariable;
     protected List<Shapes> RandomBag = new List<Shapes>();
     protected bool isPaused = false, isDead = false;
@@ -368,21 +369,17 @@ public class Game : MonoBehaviour
 
     void RemoveLines()
     {
-        bool removeLine = true;
         List<int> indexs = new List<int>();
 
         for (int y = 0; y < 20; y++)
         {
-            removeLine = true;
-
             for (int x = 0; x < 10; x++)
                 if (!GameMatrix[x, y])
-                {
-                    removeLine = false;
-                    break;
-                }
+                    goto End;
 
-            if (removeLine) indexs.Add(y);
+            indexs.Add(y);
+
+            End: ;
         }
 
         if (indexs.Count != 0)
