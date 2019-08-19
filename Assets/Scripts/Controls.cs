@@ -9,5 +9,5 @@ public class Controls
     public static int Horizontal => (int) Input.GetAxisRaw("Horizontal") + (Controller.controller.Right.Pressed ? 1 : 0) - (Controller.controller.Left.Pressed ? 1 : 0);
 
     public static bool Rotate => Input.GetKeyDown(KeyCode.W) || Controller.controller.Rotate.Pressed;
-    public static bool RotateC => Controller.controller.RotateC.Pressed;
+    public static bool RotateC => Input.GetKeyDown(KeyCode.Q) || Controller.controller.RotateC.Pressed;
 }

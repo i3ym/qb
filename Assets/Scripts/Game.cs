@@ -52,21 +52,13 @@ public class Game : MonoBehaviour
 
         TetrominoWallKickData[0] = new int[, ] { { 0, 0 }, {-1, 0 }, {-1, 1 }, { 0, -2 }, {-1, -2 } };
         TetrominoWallKickData[1] = new int[, ] { { 0, 0 }, { 1, 0 }, { 1, -1 }, { 0, 2 }, { 1, 2 } };
-        TetrominoWallKickData[2] = new int[, ] { { 0, 0 }, { 1, 0 }, { 1, -1 }, { 0, 2 }, { 1, 2 } };
-        TetrominoWallKickData[3] = new int[, ] { { 0, 0 }, {-1, 0 }, {-1, 1 }, { 0, -2 }, {-1, -2 } };
-        TetrominoWallKickData[4] = new int[, ] { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, -2 }, { 1, 2 } };
-        TetrominoWallKickData[5] = new int[, ] { { 0, 0 }, {-1, 0 }, {-1, -1 }, { 0, 2 }, {-1, 2 } };
-        TetrominoWallKickData[6] = new int[, ] { { 0, 0 }, {-1, 0 }, {-1, -1 }, { 0, 2 }, {-1, 2 } };
-        TetrominoWallKickData[7] = new int[, ] { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, -2 }, { 1, 2 } };
+        TetrominoWallKickData[2] = new int[, ] { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, -2 }, { 1, 2 } };
+        TetrominoWallKickData[3] = new int[, ] { { 0, 0 }, {-1, 0 }, {-1, -1 }, { 0, 2 }, {-1, 2 } };
 
         TetrominoWallKickDataI[0] = new int[, ] { { 0, 0 }, {-2, 0 }, { 1, 0 }, {-2, -1 }, { 1, 2 } };
-        TetrominoWallKickDataI[1] = new int[, ] { { 0, 0 }, { 2, 0 }, {-1, 0 }, { 2, 1 }, {-1, -2 } };
-        TetrominoWallKickDataI[2] = new int[, ] { { 0, 0 }, {-1, 0 }, { 2, 0 }, {-1, 2 }, { 2, -1 } };
+        TetrominoWallKickDataI[1] = new int[, ] { { 0, 0 }, {-1, 0 }, { 2, 0 }, {-1, 2 }, { 2, -1 } };
+        TetrominoWallKickDataI[2] = new int[, ] { { 0, 0 }, { 2, 0 }, {-1, 0 }, { 2, 1 }, {-1, -2 } };
         TetrominoWallKickDataI[3] = new int[, ] { { 0, 0 }, { 1, 0 }, {-2, 0 }, { 1, -2 }, {-2, 1 } };
-        TetrominoWallKickDataI[4] = new int[, ] { { 0, 0 }, { 2, 0 }, {-1, 0 }, { 2, 1 }, {-1, -2 } };
-        TetrominoWallKickDataI[5] = new int[, ] { { 0, 0 }, {-2, 0 }, { 1, 0 }, {-2, -1 }, { 1, 2 } };
-        TetrominoWallKickDataI[6] = new int[, ] { { 0, 0 }, { 1, 0 }, {-2, 0 }, { 1, -2 }, {-2, 1 } };
-        TetrominoWallKickDataI[7] = new int[, ] { { 0, 0 }, {-1, 0 }, { 2, 0 }, {-1, 2 }, { 2, 1 } };
 
         #endregion
     }
@@ -314,33 +306,19 @@ public class Game : MonoBehaviour
 
         int cx = 0, cy = 0;
         bool rotate = false;
+        int[, ] wkd;
 
-        if (CurrentShape == Shapes.I)
+        for (int i = 0; i < 5; i++)
         {
-            for (int i = 0; i < 5; i++)
-            {
-                cx = CurrentX + TetrominoWallKickDataI[CurrentRotation * 2][i, 0];
-                cy = CurrentY + TetrominoWallKickDataI[CurrentRotation * 2][i, 1];
+            wkd = (CurrentShape == Shapes.I ? TetrominoWallKickDataI : TetrominoWallKickData) [CurrentRotation];
 
-                if (TryWallKick(cx, cy, newObject))
-                {
-                    rotate = true;
-                    break;
-                }
-            }
-        }
-        else
-        {
-            for (int i = 0; i < 5; i++)
-            {
-                cx = CurrentX + TetrominoWallKickData[CurrentRotation * 2][i, 0];
-                cy = CurrentY + TetrominoWallKickData[CurrentRotation * 2][i, 1];
+            cx = CurrentX + (clockwise? wkd[i, 0]: -wkd[i, 0]);
+            cy = CurrentY + (clockwise? wkd[i, 1]: -wkd[i, 1]);
 
-                if (TryWallKick(cx, cy, newObject))
-                {
-                    rotate = true;
-                    break;
-                }
+            if (TryWallKick(cx, cy, newObject))
+            {
+                rotate = true;
+                break;
             }
         }
 
@@ -357,10 +335,12 @@ public class Game : MonoBehaviour
     {
         for (int x = 0; x < newObject.GetLength(0); x++)
             for (int y = 0; y < newObject.GetLength(1); y++)
+            {
                 if (x + cx < 0 || x + cx >= GameMatrix.MaxX ||
                     y + cy < 0 || y + cy >= GameMatrix.MaxY ||
                     GameMatrix[x + cx, y + cy] && newObject[x, y])
                     return false;
+            }
 
         return true;
     }
