@@ -20,6 +20,7 @@ public class Game : MonoBehaviour
     protected GameMatrix GameMatrix = new GameMatrix(10, 20);
     protected bool[, ] CurrentObject = new bool[0, 0];
     protected Shapes CurrentShape, NextShape;
+    [SerializeField]
     protected int CurrentRotation = 0, CurrentX = 0, CurrentY = 19;
     protected float MoveSpeed;
     protected float FastMoveSpeed => MoveSpeed > 2f / 60f?2f / 60f : MoveSpeed / 2f;
@@ -281,13 +282,8 @@ public class Game : MonoBehaviour
     {
         for (int x = 0; x < CurrentObject.GetLength(0); x++)
             for (int y = 0; y < CurrentObject.GetLength(1); y++)
-            {
-                if (CurrentY + y < 0 || CurrentY + y >= GameMatrix.MaxY)
-                    continue;
-
                 if (CurrentObject[x, y] && (CurrentX + x + add < 0 || CurrentX + x + add >= GameMatrix.MaxX || GameMatrix[CurrentX + x + add, CurrentY + y]))
                     return;
-            }
 
         CurrentX += add;
         fieldRenderer.UpdateMatrix(GameMatrix, CurrentObject, CurrentX, CurrentY);
