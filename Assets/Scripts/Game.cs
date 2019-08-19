@@ -17,7 +17,7 @@ public class Game : MonoBehaviour
     public static int Lvl = 0;
     protected int StartLvl;
     protected bool IsLvlReached = false;
-    protected bool[, ] GameMatrix = new bool[10, 20];
+    protected GameMatrix GameMatrix = new GameMatrix(10, 20);
     protected bool[, ] CurrentObject = new bool[0, 0];
     protected Shapes CurrentShape, NextShape;
     protected int CurrentRotation = 0, CurrentX = 0, CurrentY = 19;
@@ -124,8 +124,8 @@ public class Game : MonoBehaviour
         {
             while (isPaused) yield return new WaitWhile(() => isPaused);
 
-            if (Controls.Rotate && !rotate) RotateBlock();
-            else if (Controls.RotateC && !rotate) RotateBlock();
+            if (Controls.Rotate && !rotate) RotateBlock(true);
+            else if (Controls.RotateC && !rotate) RotateBlock(false);
 
             rotate = Controls.Rotate || Controls.RotateC;
 
@@ -174,8 +174,8 @@ public class Game : MonoBehaviour
             for (int x = 0; x < CurrentObject.GetLength(0); x++)
                 for (int y = 0; y < CurrentObject.GetLength(1); y++)
                 {
-                    if (x + CurrentX >= GameMatrix.GetLength(0) ||
-                        y + CurrentY - 1 >= GameMatrix.GetLength(1) ||
+                    if (x + CurrentX >= GameMatrix.MaxX ||
+                        y + CurrentY - 1 >= GameMatrix.MaxY ||
                         x + CurrentX < 0) continue;
 
                     if (CurrentObject[x, y] && (y + CurrentY - 1 < 0 || GameMatrix[x + CurrentX, y + CurrentY - 1]))
@@ -252,8 +252,8 @@ public class Game : MonoBehaviour
         for (int x = 0; x < CurrentObject.GetLength(0); x++)
             for (int y = 0; y < CurrentObject.GetLength(1); y++)
             {
-                if (x + 4 > GameMatrix.GetLength(0) ||
-                    y + 19 > GameMatrix.GetLength(1))
+                if (x + 4 >= GameMatrix.MaxX ||
+                    y + 19 >= GameMatrix.MaxY)
                     continue;
 
                 if (CurrentObject[x, y] && GameMatrix[x + 4, y + 19]) GameOver();
@@ -270,7 +270,7 @@ public class Game : MonoBehaviour
         for (int x = 0; x < CurrentObject.GetLength(0); x++)
             for (int y = 0; y < CurrentObject.GetLength(1); y++)
             {
-                if (CurrentY + y < 0 || CurrentX + x < 0 || CurrentX + x > GameMatrix.GetLength(0))
+                if (CurrentY + y < 0 || CurrentX + x < 0 || CurrentX + x > GameMatrix.MaxX)
                     continue;
 
                 if (CurrentY + y > 19)
@@ -289,23 +289,28 @@ public class Game : MonoBehaviour
         for (int x = 0; x < CurrentObject.GetLength(0); x++)
             for (int y = 0; y < CurrentObject.GetLength(1); y++)
             {
-                if (CurrentY + y < 0 || CurrentY + y >= GameMatrix.GetLength(1))
+                if (CurrentY + y < 0 || CurrentY + y >= GameMatrix.MaxY)
                     continue;
 
-                if (CurrentObject[x, y] && (CurrentX + x + add < 0 || CurrentX + x + add >= GameMatrix.GetLength(0) || GameMatrix[CurrentX + x + add, CurrentY + y]))
+                if (CurrentObject[x, y] && (CurrentX + x + add < 0 || CurrentX + x + add >= GameMatrix.MaxX || GameMatrix[CurrentX + x + add, CurrentY + y]))
                     return;
             }
 
         CurrentX += add;
         fieldRenderer.UpdateMatrix(GameMatrix, CurrentObject, CurrentX, CurrentY);
     }
-    void RotateBlock()
+    void RotateBlock(bool clockwise)
     {
         bool[, ] newObject = new bool[CurrentObject.GetLength(1), CurrentObject.GetLength(0)];
 
-        for (int x = 0; x < CurrentObject.GetLength(0); x++)
-            for (int y = 0; y < CurrentObject.GetLength(1); y++)
-                newObject[y, CurrentObject.GetLength(0) - 1 - x] = CurrentObject[x, y];
+        if (clockwise)
+            for (int x = 0; x < CurrentObject.GetLength(0); x++)
+                for (int y = 0; y < CurrentObject.GetLength(1); y++)
+                    newObject[y, CurrentObject.GetLength(0) - 1 - x] = CurrentObject[x, y];
+        else
+            for (int x = 0; x < CurrentObject.GetLength(0); x++)
+                for (int y = 0; y < CurrentObject.GetLength(1); y++)
+                    newObject[CurrentObject.GetLength(1) - 1 - y, x] = CurrentObject[x, y];
 
         int cx = 0, cy = 0;
         bool rotate = false;
@@ -314,8 +319,8 @@ public class Game : MonoBehaviour
         {
             for (int i = 0; i < 5; i++)
             {
-                cx = CurrentX + TetrominoWallKickData[CurrentRotation * 2][i, 0];
-                cy = CurrentY + TetrominoWallKickData[CurrentRotation * 2][i, 1];
+                cx = CurrentX + TetrominoWallKickDataI[CurrentRotation * 2][i, 0];
+                cy = CurrentY + TetrominoWallKickDataI[CurrentRotation * 2][i, 1];
 
                 if (TryWallKick(cx, cy, newObject))
                 {
@@ -352,8 +357,8 @@ public class Game : MonoBehaviour
     {
         for (int x = 0; x < newObject.GetLength(0); x++)
             for (int y = 0; y < newObject.GetLength(1); y++)
-                if (x + cx < 0 || x + cx >= GameMatrix.GetLength(0) ||
-                    y + cy < 0 || y + cy >= GameMatrix.GetLength(1) ||
+                if (x + cx < 0 || x + cx >= GameMatrix.MaxX ||
+                    y + cy < 0 || y + cy >= GameMatrix.MaxY ||
                     GameMatrix[x + cx, y + cy] && newObject[x, y])
                     return false;
 

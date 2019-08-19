@@ -3,12 +3,12 @@ using UnityEngine;
 
 public abstract class FieldRendererBase : MonoBehaviour
 {
-    public abstract void UpdateMatrix(bool[, ] GameMatrix, bool[, ] CurrentObject, int X, int Y);
-    public abstract void UpdateColors(bool[, ] GayMatrix, Shapes CurrentShape);
+    public abstract void UpdateMatrix(GameMatrix gameMatrix, bool[, ] CurrentObject, int X, int Y);
+    public abstract void UpdateColors(GameMatrix gameMatrix, Shapes CurrentShape);
     public abstract void ShowNextShape(Shapes shape);
 
     /// <returns> Duration of animation in seconds </returns> 
-    public abstract float RemoveLinesAnimation(List<int> y, bool[, ] GayMatrix, bool[, ] CurrentObject, int X, int Y);
+    public abstract float RemoveLinesAnimation(List<int> y, GameMatrix GayMatrix, bool[, ] CurrentObject, int X, int Y);
 }
 
 public abstract class FieldRendererBase<T> : FieldRendererBase where T : Component
@@ -95,7 +95,7 @@ public abstract class FieldRendererBase<T> : FieldRendererBase where T : Compone
         return go;
     }
 
-    public override void UpdateMatrix(bool[, ] GameMatrix, bool[, ] CurrentObject, int X, int Y)
+    public override void UpdateMatrix(GameMatrix gameMatrix, bool[, ] CurrentObject, int currentX, int currentY)
     {
         if (Game.BlindRendering)
         {
@@ -110,35 +110,35 @@ public abstract class FieldRendererBase<T> : FieldRendererBase where T : Compone
                         maxy = -1;
 
                         for (int i = 19; i > -1; i--)
-                            if (GameMatrix[x, i])
+                            if (gameMatrix[x, i])
                             {
                                 maxy = i;
                                 break;
                             }
 
-                        GameObjects[x, y]?.gameObject.SetActive((y == maxy && GameMatrix[x, y]) || CurrentObject[x - X, y - Y]);
+                        GameObjects[x, y]?.gameObject.SetActive((y == maxy && gameMatrix[x, y]) || CurrentObject[x - currentX, y - currentY]);
                     }
                     catch { GameObjects[x, y]?.gameObject.SetActive(false); }
                 }
             }
         }
         else
-        { // TODO ускорить типа обновляя только то что изменилось
+        {
             for (int y = 0; y < 20; y++)
                 for (int x = 0; x < 10; x++)
                 {
-                    if (x - X < 0 || x - X >= CurrentObject.GetLength(0) || y - Y < 0 || y - Y >= CurrentObject.GetLength(1))
-                        GameObjects[x, y].gameObject.SetActive(GameMatrix[x, y]);
+                    if (x - currentX < 0 || x - currentX >= CurrentObject.GetLength(0) || y - currentY < 0 || y - currentY >= CurrentObject.GetLength(1))
+                        GameObjects[x, y].gameObject.SetActive(gameMatrix[x, y]);
                     else
-                        GameObjects[x, y].gameObject.SetActive(GameMatrix[x, y] || CurrentObject[x - X, y - Y]);
+                        GameObjects[x, y].gameObject.SetActive(gameMatrix[x, y] || CurrentObject[x - currentX, y - currentY]);
                 }
         }
     }
-    public override void UpdateColors(bool[, ] GayMatrix, Shapes CurrentShape)
+    public override void UpdateColors(GameMatrix gameMatrix, Shapes currentShape)
     {
         for (int y = 0; y < 20; y++)
             for (int x = 0; x < 10; x++)
-                if (!GayMatrix[x, y]) SetMaterial(GameObjects[x, y], ShapeMaterials[CurrentShape]);
+                if (!gameMatrix[x, y]) SetMaterial(GameObjects[x, y], ShapeMaterials[currentShape]);
     }
     public override void ShowNextShape(Shapes shape)
     {
@@ -146,20 +146,20 @@ public abstract class FieldRendererBase<T> : FieldRendererBase where T : Compone
         NextObjects[(int) shape].SetActive(true);
     }
 
-    public override float RemoveLinesAnimation(List<int> y, bool[, ] GayMatrix, bool[, ] CurrentObject, int X, int Y)
+    public override float RemoveLinesAnimation(List<int> y, GameMatrix gameMatrix, bool[, ] currentObject, int X, int Y)
     {
         for (int i = y.Count - 1; i > -1; i--)
             for (int y2 = y[i]; y2 < 19; y2++)
                 for (int x2 = 0; x2 < 10; x2++)
                 {
-                    GayMatrix[x2, y2] = GayMatrix[x2, y2 + 1];
+                    gameMatrix[x2, y2] = gameMatrix[x2, y2 + 1];
                     SetMaterial(GameObjects[x2, y2], GameObjects[x2, y2 + 1]);
                 }
 
         for (int x2 = 0; x2 < 10; x2++)
-            GayMatrix[x2, 19] = false;
+            gameMatrix[x2, 19] = false;
 
-        UpdateMatrix(GayMatrix, CurrentObject, X, Y);
+        UpdateMatrix(gameMatrix, currentObject, X, Y);
         return .1f;
     }
 }
