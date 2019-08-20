@@ -3,12 +3,12 @@ using UnityEngine;
 
 public abstract class FieldRendererBase : MonoBehaviour
 {
-    public abstract void UpdateMatrix(GameMatrix gameMatrix, bool[, ] CurrentObject, int X, int Y);
-    public abstract void UpdateColors(GameMatrix gameMatrix, Shapes CurrentShape);
+    public abstract void UpdateMatrix(GameMatrix gameMatrix, GameMatrix currentObject, int currentX, int currentY);
+    public abstract void UpdateColors(GameMatrix gameMatrix, Shapes currentShape);
     public abstract void ShowNextShape(Shapes shape);
 
     /// <returns> Duration of animation in seconds </returns> 
-    public abstract float RemoveLinesAnimation(List<int> y, GameMatrix GayMatrix, bool[, ] CurrentObject, int X, int Y);
+    public abstract float RemoveLinesAnimation(List<int> y, GameMatrix gameMatrix, GameMatrix currentObject, int currentX, int currentY);
 }
 
 public abstract class FieldRendererBase<T> : FieldRendererBase where T : Component
@@ -95,44 +95,30 @@ public abstract class FieldRendererBase<T> : FieldRendererBase where T : Compone
         return go;
     }
 
-    public override void UpdateMatrix(GameMatrix gameMatrix, bool[, ] CurrentObject, int currentX, int currentY)
+    public override void UpdateMatrix(GameMatrix gameMatrix, GameMatrix CurrentObject, int currentX, int currentY)
     {
         if (Game.BlindRendering)
         {
-            int maxy = -1;
-
-            for (int y = 0; y < 20; y++)
-            {
-                for (int x = 0; x < 10; x++)
+            for (int x = 0; x < 10; x++)
+                for (int y = 19; y >= 0; y--)
                 {
-                    try
+                    GameObjects[x, y].gameObject.SetActive(CurrentObject[x - currentX, y - currentY]);
+
+                    if (gameMatrix[x, y])
                     {
-                        maxy = -1;
+                        GameObjects[x, y].gameObject.SetActive(true);
 
-                        for (int i = 19; i > -1; i--)
-                            if (gameMatrix[x, i])
-                            {
-                                maxy = i;
-                                break;
-                            }
+                        for (int yy = y - 1; yy >= 0; yy--)
+                            GameObjects[x, yy].gameObject.SetActive(CurrentObject[x - currentX, yy - currentY]);
 
-                        GameObjects[x, y]?.gameObject.SetActive((y == maxy && gameMatrix[x, y]) || CurrentObject[x - currentX, y - currentY]);
+                        break;
                     }
-                    catch { GameObjects[x, y]?.gameObject.SetActive(false); }
                 }
-            }
         }
         else
-        {
             for (int y = 0; y < 20; y++)
                 for (int x = 0; x < 10; x++)
-                {
-                    if (x - currentX < 0 || x - currentX >= CurrentObject.GetLength(0) || y - currentY < 0 || y - currentY >= CurrentObject.GetLength(1))
-                        GameObjects[x, y].gameObject.SetActive(gameMatrix[x, y]);
-                    else
-                        GameObjects[x, y].gameObject.SetActive(gameMatrix[x, y] || CurrentObject[x - currentX, y - currentY]);
-                }
-        }
+                    GameObjects[x, y].gameObject.SetActive(gameMatrix[x, y] || CurrentObject[x - currentX, y - currentY]);
     }
     public override void UpdateColors(GameMatrix gameMatrix, Shapes currentShape)
     {
@@ -146,7 +132,7 @@ public abstract class FieldRendererBase<T> : FieldRendererBase where T : Compone
         NextObjects[(int) shape].SetActive(true);
     }
 
-    public override float RemoveLinesAnimation(List<int> y, GameMatrix gameMatrix, bool[, ] currentObject, int X, int Y)
+    public override float RemoveLinesAnimation(List<int> y, GameMatrix gameMatrix, GameMatrix currentObject, int X, int Y)
     {
         for (int i = y.Count - 1; i > -1; i--)
             for (int y2 = y[i]; y2 < 19; y2++)

@@ -8,13 +8,13 @@ public class FieldRenderer1 : FieldCanvasRendererBase
 
     void Start() => StartCameraColor = Game.Camera.backgroundColor;
 
-    public override float RemoveLinesAnimation(List<int> y, GameMatrix gameMatrix, bool[, ] currentObject, int X, int Y)
+    public override float RemoveLinesAnimation(List<int> y, GameMatrix gameMatrix, GameMatrix currentObject, int X, int Y)
     {
         StartCoroutine(RemoveLinesAnimationCoroutine(y, gameMatrix, currentObject, X, Y));
         return 1f;
     }
 
-    IEnumerator RemoveLinesAnimationCoroutine(List<int> y, GameMatrix gameMatrix, bool[, ] currentObject, int X, int Y)
+    IEnumerator RemoveLinesAnimationCoroutine(List<int> y, GameMatrix gameMatrix, GameMatrix currentObject, int X, int Y)
     {
         float speed = 0f;
 

@@ -23,4 +23,8 @@ public class GameMatrix
     }
 
     public void Clear() => Matrix = new bool[MaxX, MaxY];
+
+    //
+
+    public static implicit operator GameMatrix(bool[, ] matrix) => new GameMatrix(matrix.GetLength(0), matrix.GetLength(1)) { Matrix = matrix };
 }

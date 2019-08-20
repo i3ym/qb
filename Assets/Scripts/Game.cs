@@ -8,7 +8,7 @@ using UnityEngine;
 public class Game : MonoBehaviour
 {
     public static Camera Camera;
-    public static bool BlindRendering = false;
+    public static bool BlindRendering = true;
     public static int Lvl = 0;
 
     public static Dictionary<Shapes, bool[, ]> ShapeObjects = new Dictionary<Shapes, bool[, ]>();
@@ -16,23 +16,23 @@ public class Game : MonoBehaviour
 
     int StartLvl;
     bool IsLvlReached, IsPaused;
-    GameMatrix GameMatrix;
-    bool[, ] CurrentObject;
+    GameMatrix GameMatrix, CurrentObject;
     Shapes CurrentShape, NextShape;
     int CurrentRotation, CurrentX, CurrentY;
     float MoveDownSpeed;
-    float FastMoveDownSpeed => MoveDownSpeed > 2f / 60f ? 2f / 60f : MoveDownSpeed / 2f;
     List<Shapes> RandomBag = new List<Shapes>();
+
+    float FastMoveDownSpeed => MoveDownSpeed > 2f / 60f ? 2f / 60f : MoveDownSpeed / 2f;
     int Score { get => _score; set { _score = value; ScoreText.text = value.ToString(); } }
     int Lines { get => _lines; set { _lines = value; LinesText.text = value.ToString(); } }
     int _score, _lines;
 
     [SerializeField]
-    TextMeshPro ScoreText, TimeText, LvlText, LinesText;
+    TextMeshPro ScoreText = null, TimeText = null, LvlText = null, LinesText = null;
     [SerializeField]
-    GameObject GameOverOverlay;
+    GameObject GameOverOverlay = null;
     [SerializeField]
-    FieldRendererBase FieldRenderer;
+    FieldRendererBase FieldRenderer = null;
 
     void Awake()
     {
@@ -75,7 +75,7 @@ public class Game : MonoBehaviour
     {
         IsPaused = IsLvlReached = false;
         GameMatrix = new GameMatrix(10, 20);
-        CurrentObject = new bool[0, 0];
+        CurrentObject = new GameMatrix(0, 0);
         CurrentRotation = 0;
         CurrentX = 0;
         CurrentY = 19;
@@ -177,13 +177,12 @@ public class Game : MonoBehaviour
             yield return null;
         }
     }
-
     IEnumerator MoveBlockVerticalCoroutine()
     {
         bool needStop()
         {
-            for (int x = 0; x < CurrentObject.GetLength(0); x++)
-                for (int y = 0; y < CurrentObject.GetLength(1); y++)
+            for (int x = 0; x < CurrentObject.MaxX; x++)
+                for (int y = 0; y < CurrentObject.MaxY; y++)
                 {
                     if (x + CurrentX >= GameMatrix.MaxX ||
                         y + CurrentY - 1 >= GameMatrix.MaxY ||
@@ -224,6 +223,8 @@ public class Game : MonoBehaviour
                 Score++;
             }
 
+            if (IsPaused) continue;
+
             FieldRenderer.UpdateMatrix(GameMatrix, CurrentObject, CurrentX, CurrentY);
         }
     }
@@ -236,7 +237,6 @@ public class Game : MonoBehaviour
         CurrentX = 4;
         CurrentY = 19;
         CurrentRotation = 0;
-
         CurrentObject = ShapeObjects[CurrentShape = NextShape];
 
         int take = new System.Random().Next(RandomBag.Count);
@@ -244,42 +244,27 @@ public class Game : MonoBehaviour
         RandomBag.RemoveAt(take);
         FieldRenderer.ShowNextShape(NextShape);
 
-        for (int x = 0; x < CurrentObject.GetLength(0); x++)
-            for (int y = 0; y < CurrentObject.GetLength(1); y++)
-            {
-                if (x + 4 >= GameMatrix.MaxX ||
-                    y + 19 >= GameMatrix.MaxY)
-                    continue;
-
-                if (CurrentObject[x, y] && GameMatrix[x + 4, y + 19]) GameOver();
-            }
+        for (int x = 0; x < CurrentObject.MaxX; x++)
+            for (int y = 0; y < CurrentObject.MaxY; y++)
+                if (CurrentObject[x, y] && GameMatrix[x + CurrentX, y + CurrentY])
+                {
+                    GameOver();
+                    return;
+                }
 
         FieldRenderer.UpdateColors(GameMatrix, CurrentShape);
         FieldRenderer.UpdateMatrix(GameMatrix, CurrentObject, CurrentX, CurrentY);
     }
     void SetBlockToField()
     {
-        for (int x = 0; x < CurrentObject.GetLength(0); x++)
-            for (int y = 0; y < CurrentObject.GetLength(1); y++)
-            {
-                if (CurrentY + y < 0 || CurrentX + x < 0 || CurrentX + x > GameMatrix.MaxX)
-                    continue;
-
-                if (CurrentY + y > 19)
-                {
-                    GameOver();
-                    return;
-                }
-
-                GameMatrix[CurrentX + x, CurrentY + y] = GameMatrix[CurrentX + x, CurrentY + y] || CurrentObject[x, y];
-            }
-
-        // TODO ????? fieldRenderer.OnBlockPlace(GameMatrix);
+        for (int x = 0; x < CurrentObject.MaxX; x++)
+            for (int y = 0; y < CurrentObject.MaxY; y++)
+                GameMatrix[CurrentX + x, CurrentY + y] |= CurrentObject[x, y];
     }
     void MoveHorizontal(int add)
     {
-        for (int x = 0; x < CurrentObject.GetLength(0); x++)
-            for (int y = 0; y < CurrentObject.GetLength(1); y++)
+        for (int x = 0; x < CurrentObject.MaxX; x++)
+            for (int y = 0; y < CurrentObject.MaxY; y++)
                 if (CurrentObject[x, y] && (CurrentX + x + add < 0 || CurrentX + x + add >= GameMatrix.MaxX || GameMatrix[CurrentX + x + add, CurrentY + y]))
                     return;
 
@@ -288,16 +273,16 @@ public class Game : MonoBehaviour
     }
     void RotateBlock(bool clockwise)
     {
-        bool[, ] newObject = new bool[CurrentObject.GetLength(1), CurrentObject.GetLength(0)];
+        bool[, ] newObject = new bool[CurrentObject.MaxY, CurrentObject.MaxX];
 
         if (clockwise)
-            for (int x = 0; x < CurrentObject.GetLength(0); x++)
-                for (int y = 0; y < CurrentObject.GetLength(1); y++)
-                    newObject[y, CurrentObject.GetLength(0) - 1 - x] = CurrentObject[x, y];
+            for (int x = 0; x < CurrentObject.MaxX; x++)
+                for (int y = 0; y < CurrentObject.MaxY; y++)
+                    newObject[y, CurrentObject.MaxX - 1 - x] = CurrentObject[x, y];
         else
-            for (int x = 0; x < CurrentObject.GetLength(0); x++)
-                for (int y = 0; y < CurrentObject.GetLength(1); y++)
-                    newObject[CurrentObject.GetLength(1) - 1 - y, x] = CurrentObject[x, y];
+            for (int x = 0; x < CurrentObject.MaxX; x++)
+                for (int y = 0; y < CurrentObject.MaxY; y++)
+                    newObject[CurrentObject.MaxY - 1 - y, x] = CurrentObject[x, y];
 
         int cx = 0, cy = 0;
         bool rotate = false;
@@ -396,15 +381,19 @@ public class Game : MonoBehaviour
     {
         IsPaused = true;
         GameOverOverlay.gameObject.SetActive(true);
+
+        if (BlindRendering)
+        {
+            BlindRendering = false;
+            FieldRenderer.UpdateMatrix(GameMatrix, CurrentObject, CurrentX, CurrentY);
+            BlindRendering = true;
+        }
+
         StopAllCoroutines();
     }
     public void RestartGame()
     {
-        GameMatrix.Clear();
         Lvl = StartLvl;
-
-
-        IsPaused = false;
         StartGame();
     }
 }
