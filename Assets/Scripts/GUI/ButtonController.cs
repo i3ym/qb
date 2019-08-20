@@ -50,6 +50,11 @@ public abstract class ButtonController : MonoBehaviour
 
     protected static void UpdateButtonDesign()
     {
-        if (ActiveController != null) ButtonDesign.Design.transform.SetParent(ActiveButton.transform, false);
+        if (ActiveController != null)
+        {
+            ActiveButton.OnDeselect();
+            ButtonDesign.Design.transform.SetParent(ActiveButton.transform, false);
+            ActiveButton.OnSelect();
+        }
     }
 }

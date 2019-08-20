@@ -2,6 +2,16 @@
 {
     protected override void Init()
     {
+        Buttons[0].OnSelect += () =>
+        {
+            Game.BlindRendering = false;
+        };
+
+        Buttons[0].OnSelect += () =>
+        {
+            Game.BlindRendering = true;
+        };
+
         Buttons[0].OnClick += () =>
         {
             Game.BlindRendering = false;

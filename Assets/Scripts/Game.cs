@@ -91,8 +91,6 @@ public class Game : MonoBehaviour
         SetDefaults();
         IsPaused = false;
 
-        FieldRenderer.UpdateMatrix(GameMatrix, CurrentObject, CurrentX, CurrentY);
-
         StartCoroutine(MoveBlockVerticalCoroutine());
         StartCoroutine(MoveHorizontalCoroutine());
         StartCoroutine(BlockRotateCoroutine());
