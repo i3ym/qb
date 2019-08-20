@@ -20,9 +20,8 @@ public class Game : MonoBehaviour
     bool[, ] CurrentObject;
     Shapes CurrentShape, NextShape;
     int CurrentRotation, CurrentX, CurrentY;
-    float MoveSpeed;
-    float FastMoveSpeed => MoveSpeed > 2f / 60f ? 2f / 60f : MoveSpeed / 2f;
-    Coroutine MoveBlockCoroutineVariable;
+    float MoveDownSpeed;
+    float FastMoveDownSpeed => MoveDownSpeed > 2f / 60f ? 2f / 60f : MoveDownSpeed / 2f;
     List<Shapes> RandomBag = new List<Shapes>();
     int Score { get => _score; set { _score = value; ScoreText.text = value.ToString(); } }
     int Lines { get => _lines; set { _lines = value; LinesText.text = value.ToString(); } }
@@ -90,7 +89,7 @@ public class Game : MonoBehaviour
         FieldRenderer.UpdateMatrix(GameMatrix, CurrentObject, CurrentX, CurrentY);
         GameOverOverlay.SetActive(false);
 
-        StartCoroutine(MoveBlockSpeedCoroutine());
+        StartCoroutine(MoveBlockVerticalCoroutine());
         StartCoroutine(MoveHorizontalCoroutine());
         StartCoroutine(BlockRotateCoroutine());
         StartCoroutine(TimeTextUpdateCoroutine());
@@ -178,7 +177,8 @@ public class Game : MonoBehaviour
             yield return null;
         }
     }
-    IEnumerator MoveBlockCoroutine(float speed)
+
+    IEnumerator MoveBlockVerticalCoroutine()
     {
         bool needStop()
         {
@@ -196,12 +196,21 @@ public class Game : MonoBehaviour
             return false;
         }
 
+
+        float time;
+        float speed = MoveDownSpeed;
+
         while (true)
         {
             while (IsPaused) yield return new WaitWhile(() => IsPaused);
 
-            if (speed == FastMoveSpeed) Score++; // TODO fix
-            yield return new WaitForSeconds(speed);
+            time = Time.time;
+
+            while (time + speed > Time.time)
+            {
+                speed = Controls.Down ? FastMoveDownSpeed : MoveDownSpeed;
+                yield return null;
+            }
 
             if (IsPaused) continue;
             if (needStop())
@@ -209,35 +218,13 @@ public class Game : MonoBehaviour
                 SetBlockToField();
                 RemoveLines();
             }
-            else CurrentY--;
+            else
+            {
+                CurrentY--;
+                Score++;
+            }
 
             FieldRenderer.UpdateMatrix(GameMatrix, CurrentObject, CurrentX, CurrentY);
-        }
-    }
-    IEnumerator MoveBlockSpeedCoroutine()
-    {
-        MoveBlockCoroutineVariable = StartCoroutine(MoveBlockCoroutine(MoveSpeed));
-
-        bool down = false;
-
-        while (true)
-        {
-            while (IsPaused) yield return new WaitWhile(() => IsPaused);
-
-            if (Controls.Down > 0 && !down)
-            {
-                StopCoroutine(MoveBlockCoroutineVariable);
-                MoveBlockCoroutineVariable = StartCoroutine(MoveBlockCoroutine(FastMoveSpeed));
-            }
-            else if (Controls.Down == 0 && down)
-            {
-                StopCoroutine(MoveBlockCoroutineVariable);
-                MoveBlockCoroutineVariable = StartCoroutine(MoveBlockCoroutine(MoveSpeed));
-            }
-
-            down = Controls.Down > 0;
-
-            yield return null;
         }
     }
 
@@ -266,9 +253,6 @@ public class Game : MonoBehaviour
 
                 if (CurrentObject[x, y] && GameMatrix[x + 4, y + 19]) GameOver();
             }
-
-        StopCoroutine(MoveBlockCoroutineVariable);
-        MoveBlockCoroutineVariable = StartCoroutine(MoveBlockCoroutine(MoveSpeed));
 
         FieldRenderer.UpdateColors(GameMatrix, CurrentShape);
         FieldRenderer.UpdateMatrix(GameMatrix, CurrentObject, CurrentX, CurrentY);
@@ -360,21 +344,21 @@ public class Game : MonoBehaviour
         Lvl = lvl;
         LvlText.text = Lvl.ToString();
 
-        if (Lvl == 0) MoveSpeed = 48f / 60f;
-        else if (Lvl == 1) MoveSpeed = 43f / 60f;
-        else if (Lvl == 2) MoveSpeed = 38f / 60f;
-        else if (Lvl == 3) MoveSpeed = 33f / 60f;
-        else if (Lvl == 4) MoveSpeed = 28f / 60f;
-        else if (Lvl == 5) MoveSpeed = 23f / 60f;
-        else if (Lvl == 6) MoveSpeed = 18f / 60f;
-        else if (Lvl == 7) MoveSpeed = 13f / 60f;
-        else if (Lvl == 8) MoveSpeed = 8f / 60f;
-        else if (Lvl == 9) MoveSpeed = 6f / 60f;
-        else if (Lvl > 10 && Lvl < 13) MoveSpeed = 5f / 60f;
-        else if (Lvl > 12 && Lvl < 16) MoveSpeed = 4f / 60f;
-        else if (Lvl > 15 && Lvl < 19) MoveSpeed = 3f / 60f;
-        else if (Lvl > 18 && Lvl < 29) MoveSpeed = 2f / 60f;
-        else if (Lvl > 28) MoveSpeed = 1f / 60f;
+        if (Lvl == 0) MoveDownSpeed = 48f / 60f;
+        else if (Lvl == 1) MoveDownSpeed = 43f / 60f;
+        else if (Lvl == 2) MoveDownSpeed = 38f / 60f;
+        else if (Lvl == 3) MoveDownSpeed = 33f / 60f;
+        else if (Lvl == 4) MoveDownSpeed = 28f / 60f;
+        else if (Lvl == 5) MoveDownSpeed = 23f / 60f;
+        else if (Lvl == 6) MoveDownSpeed = 18f / 60f;
+        else if (Lvl == 7) MoveDownSpeed = 13f / 60f;
+        else if (Lvl == 8) MoveDownSpeed = 8f / 60f;
+        else if (Lvl == 9) MoveDownSpeed = 6f / 60f;
+        else if (Lvl > 10 && Lvl < 13) MoveDownSpeed = 5f / 60f;
+        else if (Lvl > 12 && Lvl < 16) MoveDownSpeed = 4f / 60f;
+        else if (Lvl > 15 && Lvl < 19) MoveDownSpeed = 3f / 60f;
+        else if (Lvl > 18 && Lvl < 29) MoveDownSpeed = 2f / 60f;
+        else if (Lvl > 28) MoveDownSpeed = 1f / 60f;
     }
 
     void RemoveLines()
