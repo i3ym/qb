@@ -9,34 +9,31 @@ public class Game : MonoBehaviour
 {
     public static Camera Camera;
     public static bool BlindRendering = false;
+    public static int Lvl = 0;
 
     public static Dictionary<Shapes, bool[, ]> ShapeObjects = new Dictionary<Shapes, bool[, ]>();
-    protected static int[][, ] TetrominoWallKickData = new int[8][, ]; //0R R0 R2 2R 2L L2 L0 0L // TODO mb remove anti-clockwise?    
-    protected static int[][, ] TetrominoWallKickDataI = new int[8][, ];
+    static int[][, ] TetrominoWallKickData, TetrominoWallKickDataI; //0R R0 R2 2R 2L L2 L0 0L
 
-    public static int Lvl = 0;
-    protected int StartLvl;
-    protected bool IsLvlReached = false;
-    protected GameMatrix GameMatrix = new GameMatrix(10, 20);
-    protected bool[, ] CurrentObject = new bool[0, 0];
-    protected Shapes CurrentShape, NextShape;
-    [SerializeField]
-    protected int CurrentRotation = 0, CurrentX = 0, CurrentY = 19;
-    protected float MoveSpeed;
-    protected float FastMoveSpeed => MoveSpeed > 2f / 60f?2f / 60f : MoveSpeed / 2f;
-    protected Coroutine MoveBlockCoroutineVariable;
-    protected List<Shapes> RandomBag = new List<Shapes>();
-    protected bool isPaused = false, isDead = false;
-    protected int _score = 0, _lines = 0;
-    protected int Score { get { return _score; } set { _score = value; ScoreText.text = value.ToString(); } }
-    protected int Lines { get { return _lines; } set { _lines = value; LinesText.text = value.ToString(); } }
+    int StartLvl;
+    bool IsLvlReached, IsPaused;
+    GameMatrix GameMatrix;
+    bool[, ] CurrentObject;
+    Shapes CurrentShape, NextShape;
+    int CurrentRotation, CurrentX, CurrentY;
+    float MoveSpeed;
+    float FastMoveSpeed => MoveSpeed > 2f / 60f ? 2f / 60f : MoveSpeed / 2f;
+    Coroutine MoveBlockCoroutineVariable;
+    List<Shapes> RandomBag = new List<Shapes>();
+    int Score { get => _score; set { _score = value; ScoreText.text = value.ToString(); } }
+    int Lines { get => _lines; set { _lines = value; LinesText.text = value.ToString(); } }
+    int _score, _lines;
 
     [SerializeField]
-    protected TextMeshPro ScoreText, TimeText, LvlText, LinesText;
+    TextMeshPro ScoreText, TimeText, LvlText, LinesText;
     [SerializeField]
-    protected Canvas canvasDead;
+    GameObject GameOverOverlay;
     [SerializeField]
-    protected FieldRendererBase fieldRenderer;
+    FieldRendererBase FieldRenderer;
 
     void Awake()
     {
@@ -44,6 +41,7 @@ public class Game : MonoBehaviour
 
         #region AddArrays
 
+        ShapeObjects.Clear();
         ShapeObjects.Add(Shapes.G, new bool[, ] { { false, true, false }, { false, true, false }, { false, true, true } });
         ShapeObjects.Add(Shapes.GR, new bool[, ] { { false, true, true }, { false, true, false }, { false, true, false } });
         ShapeObjects.Add(Shapes.I, new bool[, ] { { false, true, false, false }, { false, true, false, false }, { false, true, false, false }, { false, true, false, false } });
@@ -52,11 +50,13 @@ public class Game : MonoBehaviour
         ShapeObjects.Add(Shapes.Z, new bool[, ] { { true, false, false }, { true, true, false }, { false, true, false } });
         ShapeObjects.Add(Shapes.ZR, new bool[, ] { { false, true, false }, { true, true, false }, { true, false, false } });
 
+        TetrominoWallKickData = new int[4][, ];
         TetrominoWallKickData[0] = new int[, ] { { 0, 0 }, {-1, 0 }, {-1, 1 }, { 0, -2 }, {-1, -2 } };
         TetrominoWallKickData[1] = new int[, ] { { 0, 0 }, { 1, 0 }, { 1, -1 }, { 0, 2 }, { 1, 2 } };
         TetrominoWallKickData[2] = new int[, ] { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, -2 }, { 1, 2 } };
         TetrominoWallKickData[3] = new int[, ] { { 0, 0 }, {-1, 0 }, {-1, -1 }, { 0, 2 }, {-1, 2 } };
 
+        TetrominoWallKickDataI = new int[4][, ];
         TetrominoWallKickDataI[0] = new int[, ] { { 0, 0 }, {-2, 0 }, { 1, 0 }, {-2, -1 }, { 1, 2 } };
         TetrominoWallKickDataI[1] = new int[, ] { { 0, 0 }, {-1, 0 }, { 2, 0 }, {-1, 2 }, { 2, -1 } };
         TetrominoWallKickDataI[2] = new int[, ] { { 0, 0 }, { 2, 0 }, {-1, 0 }, { 2, 1 }, {-1, -2 } };
@@ -66,14 +66,29 @@ public class Game : MonoBehaviour
     }
     void Start()
     {
-        LvlText.text = Lvl.ToString();
-        SetLvl(Lvl);
+        if (FieldRenderer == null) FieldRenderer = GetComponent<FieldRendererBase>();
+
         StartLvl = Lvl;
+        StartGame();
+    }
 
+    void StartGame()
+    {
+        IsPaused = IsLvlReached = false;
+        GameMatrix = new GameMatrix(10, 20);
+        CurrentObject = new bool[0, 0];
+        CurrentRotation = 0;
+        CurrentX = 0;
+        CurrentY = 19;
+        RandomBag.Clear();
+        Score = 0;
+        Lines = 0;
+        TimeText.text = new DateTime(0).ToLongTimeString();
         NextShape = (Shapes) new System.Random().Next(7);
-        if (fieldRenderer == null) fieldRenderer = GetComponent<FieldRendererBase>();
+        SetLvl(Lvl);
 
-        fieldRenderer.UpdateMatrix(GameMatrix, CurrentObject, CurrentX, CurrentY);
+        FieldRenderer.UpdateMatrix(GameMatrix, CurrentObject, CurrentX, CurrentY);
+        GameOverOverlay.SetActive(false);
 
         StartCoroutine(MoveBlockSpeedCoroutine());
         StartCoroutine(MoveHorizontalCoroutine());
@@ -82,17 +97,18 @@ public class Game : MonoBehaviour
 
         SpawnBlock();
     }
-    protected virtual void Update() { }
+
+    //
 
     IEnumerator RemoveLineAnimation(List<int> y)
     {
         CurrentX = 4;
         CurrentY = 25;
-        isPaused = true;
+        IsPaused = true;
 
-        yield return new WaitForSeconds(fieldRenderer.RemoveLinesAnimation(y, GameMatrix, CurrentObject, CurrentX, CurrentY));
+        yield return new WaitForSeconds(FieldRenderer.RemoveLinesAnimation(y, GameMatrix, CurrentObject, CurrentX, CurrentY));
 
-        isPaused = false;
+        IsPaused = false;
         SpawnBlock();
     }
     IEnumerator TimeTextUpdateCoroutine()
@@ -103,11 +119,12 @@ public class Game : MonoBehaviour
 
         while (true)
         {
-            while (isPaused) yield return new WaitWhile(() => isPaused);
-            yield return wff;
+            while (IsPaused) yield return new WaitWhile(() => IsPaused);
 
             time = time.AddSeconds(1);
-            TimeText.text = time.ToShortTimeString();
+            TimeText.text = time.ToLongTimeString();
+
+            yield return wff;
         }
     }
     IEnumerator BlockRotateCoroutine()
@@ -116,7 +133,7 @@ public class Game : MonoBehaviour
 
         while (true)
         {
-            while (isPaused) yield return new WaitWhile(() => isPaused);
+            while (IsPaused) yield return new WaitWhile(() => IsPaused);
 
             if (Controls.Rotate && !rotate) RotateBlock(true);
             else if (Controls.RotateC && !rotate) RotateBlock(false);
@@ -139,7 +156,7 @@ public class Game : MonoBehaviour
 
         while (true)
         {
-            while (isPaused) yield return new WaitWhile(() => isPaused);
+            while (IsPaused) yield return new WaitWhile(() => IsPaused);
 
             horizontal = Controls.Horizontal;
 
@@ -179,17 +196,14 @@ public class Game : MonoBehaviour
             return false;
         }
 
-
-        fieldRenderer.UpdateMatrix(GameMatrix, CurrentObject, CurrentX, CurrentY);
-
         while (true)
         {
-            while (isPaused) yield return new WaitWhile(() => isPaused);
+            while (IsPaused) yield return new WaitWhile(() => IsPaused);
 
             if (speed == FastMoveSpeed) Score++; // TODO fix
             yield return new WaitForSeconds(speed);
 
-            if (isPaused) continue;
+            if (IsPaused) continue;
             if (needStop())
             {
                 SetBlockToField();
@@ -197,7 +211,7 @@ public class Game : MonoBehaviour
             }
             else CurrentY--;
 
-            fieldRenderer.UpdateMatrix(GameMatrix, CurrentObject, CurrentX, CurrentY);
+            FieldRenderer.UpdateMatrix(GameMatrix, CurrentObject, CurrentX, CurrentY);
         }
     }
     IEnumerator MoveBlockSpeedCoroutine()
@@ -208,7 +222,7 @@ public class Game : MonoBehaviour
 
         while (true)
         {
-            while (isPaused) yield return new WaitWhile(() => isPaused);
+            while (IsPaused) yield return new WaitWhile(() => IsPaused);
 
             if (Controls.Down > 0 && !down)
             {
@@ -241,7 +255,7 @@ public class Game : MonoBehaviour
         int take = new System.Random().Next(RandomBag.Count);
         NextShape = RandomBag[take];
         RandomBag.RemoveAt(take);
-        fieldRenderer.ShowNextShape(NextShape);
+        FieldRenderer.ShowNextShape(NextShape);
 
         for (int x = 0; x < CurrentObject.GetLength(0); x++)
             for (int y = 0; y < CurrentObject.GetLength(1); y++)
@@ -256,8 +270,8 @@ public class Game : MonoBehaviour
         StopCoroutine(MoveBlockCoroutineVariable);
         MoveBlockCoroutineVariable = StartCoroutine(MoveBlockCoroutine(MoveSpeed));
 
-        fieldRenderer.UpdateColors(GameMatrix, CurrentShape);
-        fieldRenderer.UpdateMatrix(GameMatrix, CurrentObject, CurrentX, CurrentY);
+        FieldRenderer.UpdateColors(GameMatrix, CurrentShape);
+        FieldRenderer.UpdateMatrix(GameMatrix, CurrentObject, CurrentX, CurrentY);
     }
     void SetBlockToField()
     {
@@ -286,7 +300,7 @@ public class Game : MonoBehaviour
                     return;
 
         CurrentX += add;
-        fieldRenderer.UpdateMatrix(GameMatrix, CurrentObject, CurrentX, CurrentY);
+        FieldRenderer.UpdateMatrix(GameMatrix, CurrentObject, CurrentX, CurrentY);
     }
     void RotateBlock(bool clockwise)
     {
@@ -326,7 +340,7 @@ public class Game : MonoBehaviour
         CurrentObject = newObject;
         if (++CurrentRotation == 4) CurrentRotation = 0;
 
-        fieldRenderer.UpdateMatrix(GameMatrix, CurrentObject, CurrentX, CurrentY);
+        FieldRenderer.UpdateMatrix(GameMatrix, CurrentObject, CurrentX, CurrentY);
     }
     bool TryWallKick(int cx, int cy, bool[, ] newObject)
     {
@@ -396,9 +410,17 @@ public class Game : MonoBehaviour
     }
     void GameOver()
     {
-        isPaused = true;
-        isDead = true;
-        canvasDead.gameObject.SetActive(true);
+        IsPaused = true;
+        GameOverOverlay.gameObject.SetActive(true);
         StopAllCoroutines();
+    }
+    public void RestartGame()
+    {
+        GameMatrix.Clear();
+        Lvl = StartLvl;
+
+
+        IsPaused = false;
+        StartGame();
     }
 }

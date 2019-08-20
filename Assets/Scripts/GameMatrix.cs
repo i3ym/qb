@@ -21,4 +21,6 @@ public class GameMatrix
             Matrix[x, y] = value;
         }
     }
+
+    public void Clear() => Matrix = new bool[MaxX, MaxY];
 }
