@@ -92,6 +92,7 @@ public abstract class FieldRendererBase<T> : FieldRendererBase where T : Compone
                 catch { }
             }
 
+        go.SetActive(false);
         return go;
     }
 

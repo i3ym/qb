@@ -8,6 +8,7 @@ using UnityEngine;
 public class Game : MonoBehaviour
 {
     public static Camera Camera;
+    public static Game game;
     public static bool BlindRendering = true;
     public static int Lvl = 0;
 
@@ -30,13 +31,14 @@ public class Game : MonoBehaviour
     [SerializeField]
     TextMeshPro ScoreText = null, TimeText = null, LvlText = null, LinesText = null;
     [SerializeField]
-    GameObject GameOverOverlay = null;
-    [SerializeField]
     FieldRendererBase FieldRenderer = null;
 
     void Awake()
     {
         Camera = Camera.main;
+        game = this;
+
+        if (FieldRenderer == null) FieldRenderer = GetComponent<FieldRendererBase>();
 
         #region AddArrays
 
@@ -62,18 +64,14 @@ public class Game : MonoBehaviour
         TetrominoWallKickDataI[3] = new int[, ] { { 0, 0 }, { 1, 0 }, {-2, 0 }, { 1, -2 }, {-2, 1 } };
 
         #endregion
-    }
-    void Start()
-    {
-        if (FieldRenderer == null) FieldRenderer = GetComponent<FieldRendererBase>();
 
-        StartLvl = Lvl;
-        StartGame();
+        SetDefaults();
     }
 
-    void StartGame()
+    public void SetDefaults()
     {
-        IsPaused = IsLvlReached = false;
+        IsPaused = true;
+        IsLvlReached = false;
         GameMatrix = new GameMatrix(10, 20);
         CurrentObject = new GameMatrix(0, 0);
         CurrentRotation = 0;
@@ -87,7 +85,13 @@ public class Game : MonoBehaviour
         SetLvl(Lvl);
 
         FieldRenderer.UpdateMatrix(GameMatrix, CurrentObject, CurrentX, CurrentY);
-        GameOverOverlay.SetActive(false);
+    }
+    public void StartGame()
+    {
+        SetDefaults();
+        IsPaused = false;
+
+        FieldRenderer.UpdateMatrix(GameMatrix, CurrentObject, CurrentX, CurrentY);
 
         StartCoroutine(MoveBlockVerticalCoroutine());
         StartCoroutine(MoveHorizontalCoroutine());
@@ -380,7 +384,7 @@ public class Game : MonoBehaviour
     void GameOver()
     {
         IsPaused = true;
-        GameOverOverlay.gameObject.SetActive(true);
+        Menu.SetMenu<GameOverMenu>();
 
         if (BlindRendering)
         {
