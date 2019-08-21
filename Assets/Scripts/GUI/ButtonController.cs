@@ -17,9 +17,9 @@ public abstract class ButtonController : MonoBehaviour
     {
         if (ActiveController != this || !enabled || !gameObject.activeSelf) return;
 
-        _Down = Controls.Down;
-        _Up = Controls.Up;
-        _Select = Controls.Rotate;
+        _Down = PlayerControls.Down;
+        _Up = PlayerControls.Up;
+        _Select = PlayerControls.Rotate;
 
         if (!Select && _Select) ActiveButton.OnClick();
 

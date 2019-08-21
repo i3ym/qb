@@ -5,23 +5,26 @@
         Buttons[0].OnSelect += () =>
         {
             Game.BlindRendering = false;
+            Game.UpdateMatrix();
         };
-
-        Buttons[0].OnSelect += () =>
+        Buttons[1].OnSelect += () =>
         {
             Game.BlindRendering = true;
+            Game.UpdateMatrix();
         };
 
         Buttons[0].OnClick += () =>
         {
             Game.BlindRendering = false;
-            Game.game.StartGame();
+            Game.IsAutomatic = false;
+            Game.Instance.RestartGame();
             SetMenu(null);
         };
         Buttons[1].OnClick += () =>
         {
             Game.BlindRendering = true;
-            Game.game.StartGame();
+            Game.IsAutomatic = false;
+            Game.Instance.RestartGame();
             SetMenu(null);
         };
 

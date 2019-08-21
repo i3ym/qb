@@ -4,12 +4,14 @@
     {
         Buttons[0].OnClick += () =>
         {
-            Game.game.RestartGame();
+            Game.Instance.RestartGame();
             SetMenu(null);
         };
         Buttons[1].OnClick += () =>
         {
-            Game.game.SetDefaults();
+            Game.Instance.SetDefaults();
+            Game.IsAutomatic = true;
+            Game.Instance.StartGame();
             SetMenu<MainMenu>();
         };
     }

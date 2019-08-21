@@ -1,47 +1,53 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using TMPro;
 using UnityEngine;
 
 public class Game : MonoBehaviour
 {
     public static Camera Camera;
-    public static Game game;
-    public static bool BlindRendering = true;
-    public static int Lvl = 0;
+    public static Game Instance;
+    public static bool BlindRendering = false;
+    public static bool IsAutomatic
+    {
+        get => _IsAutomatic;
+        set
+        {
+            Instance.Controls = value ?
+                (ITetrisControlsProvider) new AITetrisPlayerControlsProvider(Instance) :
+                (ITetrisControlsProvider) new TetrisPlayerControlsProvider();
+
+            _IsAutomatic = value;
+        }
+    }
+    static bool _IsAutomatic = false;
 
     public static Dictionary<Shapes, bool[, ]> ShapeObjects = new Dictionary<Shapes, bool[, ]>();
-    static int[][, ] TetrominoWallKickData, TetrominoWallKickDataI; //0R R0 R2 2R 2L L2 L0 0L
+    protected static int[][, ] TetrominoWallKickData, TetrominoWallKickDataI; //0R R0 R2 2R 2L L2 L0 0L
 
-    int StartLvl;
-    bool IsLvlReached, IsPaused;
-    GameMatrix GameMatrix, CurrentObject;
-    Shapes CurrentShape, NextShape;
-    int CurrentRotation, CurrentX, CurrentY;
-    float MoveDownSpeed;
-    List<Shapes> RandomBag = new List<Shapes>();
+    public int Lvl = 0;
+    protected ITetrisControlsProvider Controls;
+    protected int StartLvl;
+    protected bool IsLvlReached, IsPaused;
+    protected GameMatrix GameMatrix, CurrentObject;
+    protected Shapes CurrentShape, NextShape;
+    protected int CurrentRotation, CurrentX, CurrentY;
+    protected float MoveDownSpeed;
+    protected List<Shapes> RandomBag = new List<Shapes>();
 
-    float FastMoveDownSpeed => MoveDownSpeed > 2f / 60f ? 2f / 60f : MoveDownSpeed / 2f;
-    int Score { get => _score; set { _score = value; ScoreText.text = value.ToString(); } }
-    int Lines { get => _lines; set { _lines = value; LinesText.text = value.ToString(); } }
-    int _score, _lines;
+    protected float FastMoveDownSpeed => MoveDownSpeed > 2f / 60f ? 2f / 60f : MoveDownSpeed / 2f;
+    protected int Score { get => _score; set { _score = value; ScoreText.text = value.ToString(); } }
+    protected int Lines { get => _lines; set { _lines = value; LinesText.text = value.ToString(); } }
+    protected int _score, _lines;
 
     [SerializeField]
-    TextMeshPro ScoreText = null, TimeText = null, LvlText = null, LinesText = null;
+    protected TextMeshPro ScoreText = null, TimeText = null, LvlText = null, LinesText = null;
     [SerializeField]
-    FieldRendererBase FieldRenderer = null;
+    protected FieldRendererBase FieldRenderer = null;
 
-    void Awake()
+    static Game()
     {
-        Camera = Camera.main;
-        game = this;
-
-        if (FieldRenderer == null) FieldRenderer = GetComponent<FieldRendererBase>();
-
-        #region AddArrays
-
         ShapeObjects.Clear();
         ShapeObjects.Add(Shapes.G, new bool[, ] { { false, true, false }, { false, true, false }, { false, true, true } });
         ShapeObjects.Add(Shapes.GR, new bool[, ] { { false, true, true }, { false, true, false }, { false, true, false } });
@@ -62,10 +68,18 @@ public class Game : MonoBehaviour
         TetrominoWallKickDataI[1] = new int[, ] { { 0, 0 }, {-1, 0 }, { 2, 0 }, {-1, 2 }, { 2, -1 } };
         TetrominoWallKickDataI[2] = new int[, ] { { 0, 0 }, { 2, 0 }, {-1, 0 }, { 2, 1 }, {-1, -2 } };
         TetrominoWallKickDataI[3] = new int[, ] { { 0, 0 }, { 1, 0 }, {-2, 0 }, { 1, -2 }, {-2, 1 } };
+    }
 
-        #endregion
+    void Awake()
+    {
+        Camera = Camera.main;
+        Instance = this;
+        IsAutomatic = true;
+
+        if (FieldRenderer == null) FieldRenderer = GetComponent<FieldRendererBase>();
 
         SetDefaults();
+        StartGame();
     }
 
     public void SetDefaults()
@@ -88,6 +102,7 @@ public class Game : MonoBehaviour
     }
     public void StartGame()
     {
+        StopAllCoroutines();
         SetDefaults();
         IsPaused = false;
 
@@ -101,7 +116,7 @@ public class Game : MonoBehaviour
 
     //
 
-    IEnumerator RemoveLineAnimation(List<int> y)
+    protected IEnumerator RemoveLineAnimation(List<int> y)
     {
         CurrentX = 4;
         CurrentY = 25;
@@ -112,7 +127,7 @@ public class Game : MonoBehaviour
         IsPaused = false;
         SpawnBlock();
     }
-    IEnumerator TimeTextUpdateCoroutine()
+    protected IEnumerator TimeTextUpdateCoroutine()
     {
         WaitForSeconds wff = new WaitForSeconds(1f);
 
@@ -122,13 +137,13 @@ public class Game : MonoBehaviour
         {
             while (IsPaused) yield return new WaitWhile(() => IsPaused);
 
-            time = time.AddSeconds(1);
             TimeText.text = time.ToLongTimeString();
 
             yield return wff;
+            time = time.AddSeconds(1);
         }
     }
-    IEnumerator BlockRotateCoroutine()
+    protected IEnumerator BlockRotateCoroutine()
     {
         bool rotate = false;
 
@@ -144,7 +159,7 @@ public class Game : MonoBehaviour
             yield return null;
         }
     }
-    IEnumerator MoveHorizontalCoroutine()
+    protected IEnumerator MoveHorizontalCoroutine()
     {
         const float firstPause = 6f / 60f;
         const float nextPause = 3f / 60f;
@@ -179,7 +194,7 @@ public class Game : MonoBehaviour
             yield return null;
         }
     }
-    IEnumerator MoveBlockVerticalCoroutine()
+    protected IEnumerator MoveBlockVerticalCoroutine()
     {
         bool needStop()
         {
@@ -207,11 +222,8 @@ public class Game : MonoBehaviour
 
             time = Time.time;
 
-            while (time + speed > Time.time)
-            {
-                speed = Controls.Down ? FastMoveDownSpeed : MoveDownSpeed;
+            while (time + (Controls.Down ? FastMoveDownSpeed : MoveDownSpeed) > Time.time)
                 yield return null;
-            }
 
             if (IsPaused) continue;
             if (needStop())
@@ -231,7 +243,7 @@ public class Game : MonoBehaviour
         }
     }
 
-    void SpawnBlock()
+    protected void SpawnBlock()
     {
         if (RandomBag.Count == 0)
             RandomBag.AddRange(new Shapes[] { Shapes.G, Shapes.GR, Shapes.I, Shapes.O, Shapes.T, Shapes.Z, Shapes.ZR });
@@ -257,13 +269,13 @@ public class Game : MonoBehaviour
         FieldRenderer.UpdateColors(GameMatrix, CurrentShape);
         FieldRenderer.UpdateMatrix(GameMatrix, CurrentObject, CurrentX, CurrentY);
     }
-    void SetBlockToField()
+    protected void SetBlockToField()
     {
         for (int x = 0; x < CurrentObject.MaxX; x++)
             for (int y = 0; y < CurrentObject.MaxY; y++)
                 GameMatrix[CurrentX + x, CurrentY + y] |= CurrentObject[x, y];
     }
-    void MoveHorizontal(int add)
+    protected void MoveHorizontal(int add)
     {
         for (int x = 0; x < CurrentObject.MaxX; x++)
             for (int y = 0; y < CurrentObject.MaxY; y++)
@@ -273,7 +285,7 @@ public class Game : MonoBehaviour
         CurrentX += add;
         FieldRenderer.UpdateMatrix(GameMatrix, CurrentObject, CurrentX, CurrentY);
     }
-    void RotateBlock(bool clockwise)
+    protected void RotateBlock(bool clockwise)
     {
         bool[, ] newObject = new bool[CurrentObject.MaxY, CurrentObject.MaxX];
 
@@ -313,7 +325,7 @@ public class Game : MonoBehaviour
 
         FieldRenderer.UpdateMatrix(GameMatrix, CurrentObject, CurrentX, CurrentY);
     }
-    bool TryWallKick(int cx, int cy, bool[, ] newObject)
+    protected bool TryWallKick(int cx, int cy, bool[, ] newObject)
     {
         for (int x = 0; x < newObject.GetLength(0); x++)
             for (int y = 0; y < newObject.GetLength(1); y++)
@@ -326,7 +338,7 @@ public class Game : MonoBehaviour
 
         return true;
     }
-    void SetLvl(int lvl)
+    protected void SetLvl(int lvl)
     {
         Lvl = lvl;
         LvlText.text = Lvl.ToString();
@@ -347,8 +359,7 @@ public class Game : MonoBehaviour
         else if (Lvl > 18 && Lvl < 29) MoveDownSpeed = 2f / 60f;
         else if (Lvl > 28) MoveDownSpeed = 1f / 60f;
     }
-
-    void RemoveLines()
+    protected void RemoveLines()
     {
         List<int> indexs = new List<int>();
 
@@ -370,17 +381,27 @@ public class Game : MonoBehaviour
             if (!IsLvlReached && (Lines >= StartLvl * 10 + 10 || StartLvl * 10 >= 150)) IsLvlReached = true;
             if (IsLvlReached && (Lines - indexs.Count) % 10 + indexs.Count > 9) SetLvl(++Lvl);
 
-            if (indexs.Count == 1) Score += (indexs[0] + 1) * 40 * Game.Lvl;
-            else if (indexs.Count == 2) Score += (indexs[0] + 1) * 100 * Game.Lvl;
-            else if (indexs.Count == 3) Score += (indexs[0] + 1) * 300 * Game.Lvl;
-            else if (indexs.Count == 4) Score += (indexs[0] + 1) * 1200 * Game.Lvl;
+            if (indexs.Count == 1) Score += (indexs[0] + 1) * 40 * Lvl;
+            else if (indexs.Count == 2) Score += (indexs[0] + 1) * 100 * Lvl;
+            else if (indexs.Count == 3) Score += (indexs[0] + 1) * 300 * Lvl;
+            else if (indexs.Count == 4) Score += (indexs[0] + 1) * 1200 * Lvl;
 
             StartCoroutine(RemoveLineAnimation(indexs));
         }
         else SpawnBlock();
     }
-    void GameOver()
+
+    public static void UpdateMatrix() => Instance.FieldRenderer.UpdateMatrix(Instance.GameMatrix, Instance.CurrentObject, Instance.CurrentX, Instance.CurrentY);
+
+    public void GameOver()
     {
+        if (IsAutomatic)
+        {
+            StartGame();
+            return;
+        }
+
+        StopAllCoroutines();
         IsPaused = true;
         Menu.SetMenu<GameOverMenu>();
 
@@ -390,8 +411,6 @@ public class Game : MonoBehaviour
             FieldRenderer.UpdateMatrix(GameMatrix, CurrentObject, CurrentX, CurrentY);
             BlindRendering = true;
         }
-
-        StopAllCoroutines();
     }
     public void RestartGame()
     {

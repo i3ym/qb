@@ -18,9 +18,9 @@ public class TetrisPlayerControlsProvider : ITetrisControlsProvider
 
 public class AITetrisPlayerControlsProvider : ITetrisControlsProvider
 {
-    FieldController FieldController;
+    Game Game;
 
-    public AITetrisPlayerControlsProvider(FieldController fc) => FieldController = fc;
+    public AITetrisPlayerControlsProvider(Game game) => Game = game;
 
     public bool Down => UnityEngine.Random.value >.8f;
     public int Horizontal => UnityEngine.Random.value >.5f ? 1 : -1;
