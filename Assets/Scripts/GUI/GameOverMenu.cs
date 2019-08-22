@@ -10,8 +10,6 @@
         Buttons[1].OnClick += () =>
         {
             Game.Instance.SetDefaults();
-            Game.IsAutomatic = true;
-            Game.Instance.StartGame();
             SetMenu<MainMenu>();
         };
     }

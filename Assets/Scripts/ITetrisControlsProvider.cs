@@ -18,13 +18,13 @@ public class TetrisPlayerControlsProvider : ITetrisControlsProvider
 
 public class AITetrisPlayerControlsProvider : ITetrisControlsProvider
 {
-    Game Game;
+    FieldController FieldController;
 
-    public AITetrisPlayerControlsProvider(Game game) => Game = game;
+    public AITetrisPlayerControlsProvider(FieldController fc) => FieldController = fc;
 
     public bool Down => UnityEngine.Random.value >.8f;
     public int Horizontal => UnityEngine.Random.value >.5f ? 1 : -1;
 
-    public bool Rotate => PlayerControls.Rotate;
-    public bool RotateC => PlayerControls.RotateC;
+    public bool Rotate => UnityEngine.Random.value >.9f;
+    public bool RotateC => false;
 }

@@ -28,12 +28,13 @@ public class FieldRenderer1 : FieldCanvasRendererBase
         {
             temp = new Vector3(0, speed -= .01f);
 
-            for (int yy = 0; yy < 20; yy++)
+            for (int yy = 0; yy < MaxY; yy++)
             {
                 if (y.Contains(yy))
                 {
-                    for (int xx = 0; xx < 10; xx++)
-                        (GameObjects[xx, yy].transform as RectTransform).anchoredPosition = Vector2.Lerp((GameObjects[xx, yy].transform as RectTransform).anchoredPosition, new Vector2(xx + .5f - 5f, -1 + .5f - 10f), -speed);
+                    for (int xx = 0; xx < MaxX; xx++)
+                        (GameObjects[xx, yy].transform as RectTransform).anchoredPosition = Vector2.Lerp((GameObjects[xx, yy].transform as RectTransform).anchoredPosition,
+                            new Vector2(xx + .5f - MaxX / 2f, -1 + .5f - MaxY / 2f), -speed);
                 }
                 else if (yy > y[0])
                 {
@@ -42,8 +43,9 @@ public class FieldRenderer1 : FieldCanvasRendererBase
                         if (y[i] < yy) count++;
                         else break;
 
-                    for (int xx = 0; xx < 10; xx++)
-                        (GameObjects[xx, yy].transform as RectTransform).anchoredPosition = Vector2.Lerp((GameObjects[xx, yy].transform as RectTransform).anchoredPosition, new Vector2(xx + .5f - 5f, yy - count + .5f - 10f), -speed);
+                    for (int xx = 0; xx < MaxX; xx++)
+                        (GameObjects[xx, yy].transform as RectTransform).anchoredPosition = Vector2.Lerp((GameObjects[xx, yy].transform as RectTransform).anchoredPosition,
+                            new Vector2(xx + .5f - MaxX / 2f, yy - count + .5f - MaxY / 2f), -speed);
                 }
             }
 
@@ -58,9 +60,9 @@ public class FieldRenderer1 : FieldCanvasRendererBase
         TetrisEffectParticle.emission.SetBurst(0, burst);
         TetrisEffectParticle.Play();*/
 
-        for (int yy = 0; yy < 20; yy++)
-            for (int xx = 0; xx < 10; xx++)
-                (GameObjects[xx, yy].transform as RectTransform).anchoredPosition = new Vector2(xx + .5f - 5f, yy + .5f - 10f); // TODO check if this is working in canvas
+        for (int yy = 0; yy < MaxY; yy++)
+            for (int xx = 0; xx < MaxX; xx++)
+                (GameObjects[xx, yy].transform as RectTransform).anchoredPosition = new Vector2(xx + .5f - MaxX / 2f, yy + .5f - MaxY / 2f); // TODO check if this is working in canvas
 
         base.RemoveLinesAnimation(y, gameMatrix, currentObject, X, Y);
 

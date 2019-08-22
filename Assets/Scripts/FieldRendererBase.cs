@@ -3,6 +3,7 @@ using UnityEngine;
 
 public abstract class FieldRendererBase : MonoBehaviour
 {
+    public abstract void SetMaxs(int maxx, int maxy);
     public abstract void UpdateMatrix(GameMatrix gameMatrix, GameMatrix currentObject, int currentX, int currentY);
     public abstract void UpdateColors(GameMatrix gameMatrix, Shapes currentShape);
     public abstract void ShowNextShape(Shapes shape);
@@ -22,7 +23,9 @@ public abstract class FieldRendererBase<T> : FieldRendererBase where T : Compone
     [SerializeField]
     protected Material BaseFieldGOMaterial = null;
 
-    protected T[, ] GameObjects = new T[10, 20];
+    protected int MaxX, MaxY;
+
+    protected T[, ] GameObjects;
     protected GameObject[] NextObjects = new GameObject[7];
     protected Dictionary<Shapes, Material> ShapeMaterials = new Dictionary<Shapes, Material>();
 
@@ -36,10 +39,6 @@ public abstract class FieldRendererBase<T> : FieldRendererBase where T : Compone
         ShapeMaterials.Add(Shapes.T, GetMaterial(new Color(.5f, 0f, 1f)));
         ShapeMaterials.Add(Shapes.O, GetMaterial(Color.yellow));
 
-        for (int y = 0; y < 20; y++)
-            for (int x = 0; x < 10; x++)
-                GameObjects[x, y] = GetNewCube(new Vector2(x - 5, y - 10)).GetComponent<T>();
-
         for (int i = 0; i < 7; i++) NextObjects[i] = CreateNextObject((Shapes) i);
 
         foreach (var extension in Extensions) extension.Start();
@@ -51,6 +50,18 @@ public abstract class FieldRendererBase<T> : FieldRendererBase where T : Compone
     }
 
     //
+
+    public override void SetMaxs(int maxx, int maxy)
+    {
+        MaxX = maxx;
+        MaxY = maxy;
+
+        GameObjects = new T[maxx, maxy];
+
+        for (int y = 0; y < maxy; y++)
+            for (int x = 0; x < maxx; x++)
+                GameObjects[x, y] = GetNewCube(new Vector2(x - MaxX / 2f, y - MaxY / 2f)).GetComponent<T>();
+    }
 
     protected abstract void SetMaterial(T t, Material material);
     protected abstract void SetMaterial(T t, T t2);
@@ -100,8 +111,8 @@ public abstract class FieldRendererBase<T> : FieldRendererBase where T : Compone
     {
         if (Game.BlindRendering)
         {
-            for (int x = 0; x < 10; x++)
-                for (int y = 19; y >= 0; y--)
+            for (int x = 0; x < MaxX; x++)
+                for (int y = MaxY - 1; y >= 0; y--)
                 {
                     GameObjects[x, y].gameObject.SetActive(CurrentObject[x - currentX, y - currentY]);
 
@@ -117,14 +128,14 @@ public abstract class FieldRendererBase<T> : FieldRendererBase where T : Compone
                 }
         }
         else
-            for (int y = 0; y < 20; y++)
-                for (int x = 0; x < 10; x++)
+            for (int y = 0; y < MaxY; y++)
+                for (int x = 0; x < MaxX; x++)
                     GameObjects[x, y].gameObject.SetActive(gameMatrix[x, y] || CurrentObject[x - currentX, y - currentY]);
     }
     public override void UpdateColors(GameMatrix gameMatrix, Shapes currentShape)
     {
-        for (int y = 0; y < 20; y++)
-            for (int x = 0; x < 10; x++)
+        for (int y = 0; y < MaxY; y++)
+            for (int x = 0; x < MaxX; x++)
                 if (!gameMatrix[x, y]) SetMaterial(GameObjects[x, y], ShapeMaterials[currentShape]);
     }
     public override void ShowNextShape(Shapes shape)
@@ -136,15 +147,15 @@ public abstract class FieldRendererBase<T> : FieldRendererBase where T : Compone
     public override float RemoveLinesAnimation(List<int> y, GameMatrix gameMatrix, GameMatrix currentObject, int X, int Y)
     {
         for (int i = y.Count - 1; i > -1; i--)
-            for (int y2 = y[i]; y2 < 19; y2++)
-                for (int x2 = 0; x2 < 10; x2++)
+            for (int y2 = y[i]; y2 < MaxY - 1; y2++)
+                for (int x2 = 0; x2 < MaxX; x2++)
                 {
                     gameMatrix[x2, y2] = gameMatrix[x2, y2 + 1];
                     SetMaterial(GameObjects[x2, y2], GameObjects[x2, y2 + 1]);
                 }
 
-        for (int x2 = 0; x2 < 10; x2++)
-            gameMatrix[x2, 19] = false;
+        for (int x2 = 0; x2 < MaxX; x2++)
+            gameMatrix[x2, MaxY - 1] = false;
 
         UpdateMatrix(gameMatrix, currentObject, X, Y);
         return .1f;
