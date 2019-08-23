@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public abstract class FieldCanvasRendererBase : FieldRendererBase<RawImage>
+public abstract class FieldCanvasRendererBase : FieldObjectRendererBase<RawImage>
 {
     protected override void SetMaterial(RawImage t, Material material) => t.color = material.color;
     protected override void SetMaterial(RawImage t, RawImage t2) => t.color = t2.color;

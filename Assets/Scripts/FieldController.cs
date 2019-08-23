@@ -64,6 +64,7 @@ public abstract class FieldController : MonoBehaviour
 
         if (FieldRenderer == null) FieldRenderer = GetComponent<FieldRendererBase>();
 
+        FieldRenderer.Initialize();
         FieldRenderer.SetMaxs(GetMaxX(), GetMaxY());
 
         SetDefaults();
@@ -113,6 +114,16 @@ public abstract class FieldController : MonoBehaviour
         IsPaused = true;
 
         yield return new WaitForSeconds(FieldRenderer.RemoveLinesAnimation(y, GameMatrix, CurrentObject, CurrentX, CurrentY));
+
+        for (int i = y.Count - 1; i > -1; i--)
+            for (int y2 = y[i]; y2 < MaxY - 1; y2++)
+                for (int x2 = 0; x2 < MaxX; x2++)
+                    GameMatrix[x2, y2] = GameMatrix[x2, y2 + 1];
+
+        for (int x2 = 0; x2 < MaxX; x2++)
+            GameMatrix[x2, MaxY - 1] = false;
+
+        FieldRenderer.UpdateMatrix(GameMatrix, CurrentObject, CurrentX, CurrentY);
 
         IsPaused = false;
         SpawnBlock();

@@ -3,6 +3,33 @@ using UnityEngine;
 
 public abstract class FieldRendererBase : MonoBehaviour
 {
+    [SerializeField]
+    protected IFieldRendererExtension[] Extensions = new IFieldRendererExtension[] { };
+
+    protected Dictionary<Shapes, Color> ShapeColors = new Dictionary<Shapes, Color>();
+    protected int MaxX, MaxY;
+
+
+    public virtual void Initialize()
+    {
+        foreach (var extension in Extensions) extension.Start();
+
+        ShapeColors.Add(Shapes.G, Color.blue);
+        ShapeColors.Add(Shapes.GR, new Color(1f, .5f, 0f));
+        ShapeColors.Add(Shapes.Z, Color.red);
+        ShapeColors.Add(Shapes.ZR, Color.green);
+        ShapeColors.Add(Shapes.I, new Color(0f, 1f, 1f));
+        ShapeColors.Add(Shapes.T, new Color(.5f, 0f, 1f));
+        ShapeColors.Add(Shapes.O, Color.yellow);
+    }
+
+    protected virtual void Update()
+    {
+        foreach (var extension in Extensions)
+            extension.Update();
+    }
+
+
     public abstract void SetMaxs(int maxx, int maxy);
     public abstract void UpdateMatrix(GameMatrix gameMatrix, GameMatrix currentObject, int currentX, int currentY);
     public abstract void UpdateColors(GameMatrix gameMatrix, Shapes currentShape);
@@ -10,154 +37,4 @@ public abstract class FieldRendererBase : MonoBehaviour
 
     /// <returns> Duration of animation in seconds </returns> 
     public abstract float RemoveLinesAnimation(List<int> y, GameMatrix gameMatrix, GameMatrix currentObject, int currentX, int currentY);
-}
-
-public abstract class FieldRendererBase<T> : FieldRendererBase where T : Component
-{
-    [SerializeField]
-    IFieldRendererExtension[] Extensions = new IFieldRendererExtension[] { };
-    [SerializeField]
-    protected GameObject FieldGameObjectPrefab = null;
-    [SerializeField]
-    protected Transform NextObjectsParent = null;
-    [SerializeField]
-    protected Material BaseFieldGOMaterial = null;
-
-    protected int MaxX, MaxY;
-
-    protected T[, ] GameObjects;
-    protected GameObject[] NextObjects = new GameObject[7];
-    protected Dictionary<Shapes, Material> ShapeMaterials = new Dictionary<Shapes, Material>();
-
-    void Awake()
-    {
-        ShapeMaterials.Add(Shapes.G, GetMaterial(Color.blue));
-        ShapeMaterials.Add(Shapes.GR, GetMaterial(new Color(1f, .5f, 0f)));
-        ShapeMaterials.Add(Shapes.Z, GetMaterial(Color.red));
-        ShapeMaterials.Add(Shapes.ZR, GetMaterial(Color.green));
-        ShapeMaterials.Add(Shapes.I, GetMaterial(new Color(0f, 1f, 1f)));
-        ShapeMaterials.Add(Shapes.T, GetMaterial(new Color(.5f, 0f, 1f)));
-        ShapeMaterials.Add(Shapes.O, GetMaterial(Color.yellow));
-
-        for (int i = 0; i < 7; i++) NextObjects[i] = CreateNextObject((Shapes) i);
-
-        foreach (var extension in Extensions) extension.Start();
-    }
-    void Update()
-    {
-        foreach (var extension in Extensions)
-            extension.Update();
-    }
-
-    //
-
-    public override void SetMaxs(int maxx, int maxy)
-    {
-        MaxX = maxx;
-        MaxY = maxy;
-
-        GameObjects = new T[maxx, maxy];
-
-        for (int y = 0; y < maxy; y++)
-            for (int x = 0; x < maxx; x++)
-                GameObjects[x, y] = GetNewCube(new Vector2(x - MaxX / 2f, y - MaxY / 2f)).GetComponent<T>();
-    }
-
-    protected abstract void SetMaterial(T t, Material material);
-    protected abstract void SetMaterial(T t, T t2);
-
-    protected virtual Material GetMaterial(Color color) => new Material(BaseFieldGOMaterial) { color = color };
-    protected virtual GameObject GetNewCube(Vector3 pos)
-    {
-        GameObject go = Instantiate(FieldGameObjectPrefab, pos + new Vector3(.5f, .5f), Quaternion.identity, transform);
-        go.SetActive(false);
-
-        return go;
-    }
-    protected virtual GameObject GetNewNextCube(Vector3 pos, Transform parent, Material mat)
-    {
-        var cube = GetNewCube(pos);
-        cube.transform.SetParent(parent, false);
-        SetMaterial(cube.GetComponent<T>(), mat);
-        return cube;
-    }
-    protected virtual GameObject CreateNextObject(Shapes shape)
-    {
-        var go = new GameObject("NEXT_" + shape.ToString());
-        go.transform.SetParent(NextObjectsParent);
-        go.transform.localPosition = new Vector3(.5f, .5f);
-        go.transform.localScale = Vector3.one;
-
-        int addx = 0, addy = 0;
-
-        if (shape == Shapes.I || shape == Shapes.GR || shape == Shapes.G || shape == Shapes.T) addy = -1;
-        if (shape == Shapes.O) addx = 1;
-
-        for (int x = 0; x < 4; x++)
-            for (int y = 0; y < 4; y++)
-            {
-                try
-                {
-                    if (Game.ShapeObjects[shape][x, y]) GetNewNextCube(new Vector3(x + addx, y + addy), go.transform, ShapeMaterials[shape]).SetActive(true);
-                }
-                catch { }
-            }
-
-        go.SetActive(false);
-        return go;
-    }
-
-    public override void UpdateMatrix(GameMatrix gameMatrix, GameMatrix CurrentObject, int currentX, int currentY)
-    {
-        if (Game.BlindRendering)
-        {
-            for (int x = 0; x < MaxX; x++)
-                for (int y = MaxY - 1; y >= 0; y--)
-                {
-                    GameObjects[x, y].gameObject.SetActive(CurrentObject[x - currentX, y - currentY]);
-
-                    if (gameMatrix[x, y])
-                    {
-                        GameObjects[x, y].gameObject.SetActive(true);
-
-                        for (int yy = y - 1; yy >= 0; yy--)
-                            GameObjects[x, yy].gameObject.SetActive(CurrentObject[x - currentX, yy - currentY]);
-
-                        break;
-                    }
-                }
-        }
-        else
-            for (int y = 0; y < MaxY; y++)
-                for (int x = 0; x < MaxX; x++)
-                    GameObjects[x, y].gameObject.SetActive(gameMatrix[x, y] || CurrentObject[x - currentX, y - currentY]);
-    }
-    public override void UpdateColors(GameMatrix gameMatrix, Shapes currentShape)
-    {
-        for (int y = 0; y < MaxY; y++)
-            for (int x = 0; x < MaxX; x++)
-                if (!gameMatrix[x, y]) SetMaterial(GameObjects[x, y], ShapeMaterials[currentShape]);
-    }
-    public override void ShowNextShape(Shapes shape)
-    {
-        for (int i = 0; i < 7; i++) NextObjects[i].SetActive(false);
-        NextObjects[(int) shape].SetActive(true);
-    }
-
-    public override float RemoveLinesAnimation(List<int> y, GameMatrix gameMatrix, GameMatrix currentObject, int X, int Y)
-    {
-        for (int i = y.Count - 1; i > -1; i--)
-            for (int y2 = y[i]; y2 < MaxY - 1; y2++)
-                for (int x2 = 0; x2 < MaxX; x2++)
-                {
-                    gameMatrix[x2, y2] = gameMatrix[x2, y2 + 1];
-                    SetMaterial(GameObjects[x2, y2], GameObjects[x2, y2 + 1]);
-                }
-
-        for (int x2 = 0; x2 < MaxX; x2++)
-            gameMatrix[x2, MaxY - 1] = false;
-
-        UpdateMatrix(gameMatrix, currentObject, X, Y);
-        return .1f;
-    }
 }
