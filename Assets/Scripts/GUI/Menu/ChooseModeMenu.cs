@@ -21,8 +21,6 @@ public class ChooseModeMenu : Menu
 
         Types.Add(new RenderingType("Normal", () => Game.BlindRendering = false));
         Types.Add(new RenderingType("Blind", () => Game.BlindRendering = true));
-        Types.Add(new RenderingType("TESTNormal", () => Game.BlindRendering = false));
-        Types.Add(new RenderingType("TESTBlind", () => Game.BlindRendering = true));
 
         Buttons = new Button[Types.Count];
 
