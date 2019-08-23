@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
@@ -11,6 +12,8 @@ public class ChooseModeMenu : Menu
 
     new RectTransform transform;
     List<RenderingType> Types = new List<RenderingType>();
+
+    protected override Type PreviousMenuType => typeof(MainMenu);
 
     protected override void Init()
     {
@@ -55,7 +58,7 @@ public class ChooseModeMenu : Menu
             {
                 Types[index].OnClick();
                 Game.Instance.RestartGame();
-                SetMenu(null);
+                SetMenu(null as Menu);
             };
 
             Buttons[i] = btn;

@@ -1,17 +1,23 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 
 public abstract class Menu : ButtonController
 {
-    [SerializeField]
-    public static Menu[] eEEE;
     static List<Menu> Menus = new List<Menu>();
+
+    protected abstract Type PreviousMenuType { get; }
 
     void Awake()
     {
         Menus.Add(this);
         gameObject.SetActive(false);
+
+        Controller.controller.RotateC.OnMouseDownAction += () =>
+        {
+            if (enabled && gameObject.activeSelf && ActiveController == this)
+                SetMenu(PreviousMenuType);
+        };
 
         Init();
     }
@@ -26,5 +32,6 @@ public abstract class Menu : ButtonController
         ActiveController = menu;
         UpdateButtonDesign();
     }
-    public static void SetMenu<T>() where T : Menu => SetMenu(Menus.First(x => x.GetType() == typeof(T)));
+    public static void SetMenu(Type type) => SetMenu(Menus.First(x => x.GetType() == type));
+    public static void SetMenu<T>() where T : Menu => SetMenu(typeof(T));
 }
