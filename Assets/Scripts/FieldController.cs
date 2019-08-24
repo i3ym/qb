@@ -179,7 +179,8 @@ public abstract class FieldController : MonoBehaviour
 
             if (horizontal != 0)
             {
-                MoveHorizontal(horizontal);
+                if (horizontal < 0) MoveRight();
+                else MoveLeft();
 
                 time = Time.time;
                 while (time > Time.time - (isStarted ? nextPause : firstPause))
@@ -276,14 +277,24 @@ public abstract class FieldController : MonoBehaviour
             for (int y = 0; y < CurrentObject.MaxY; y++)
                 GameMatrix[CurrentX + x, CurrentY + y] |= CurrentObject[x, y];
     }
-    protected void MoveHorizontal(int add)
+    protected void MoveLeft()
     {
-        for (int x = 0; x < CurrentObject.MaxX; x++)
-            for (int y = 0; y < CurrentObject.MaxY; y++)
-                if (CurrentObject[x, y] && (CurrentX + x + add < 0 || CurrentX + x + add >= GameMatrix.MaxX || GameMatrix[CurrentX + x + add, CurrentY + y]))
+        for (int y = 0; y < CurrentObject.MaxY; y++)
+            for (int x = 0; x < CurrentObject.MaxX; x++)
+                if (CurrentObject.GetWithoutChecks(x, y) && (CurrentX + x + 1 >= GameMatrix.MaxX || GameMatrix[CurrentX + x + 1, CurrentY + y]))
                     return;
 
-        CurrentX += add;
+        CurrentX++;
+        FieldRenderer.UpdateMatrixFast(GameMatrix, CurrentObject, CurrentX, CurrentY);
+    }
+    protected void MoveRight()
+    {
+        for (int y = 0; y < CurrentObject.MaxY; y++)
+            for (int x = 0; x < CurrentObject.MaxX; x++)
+                if (CurrentObject.GetWithoutChecks(x, y) && (CurrentX + x - 1 < 0 || GameMatrix[CurrentX + x - 1, CurrentY + y]))
+                    return;
+
+        CurrentX--;
         FieldRenderer.UpdateMatrixFast(GameMatrix, CurrentObject, CurrentX, CurrentY);
     }
     protected void RotateBlock(bool clockwise)
