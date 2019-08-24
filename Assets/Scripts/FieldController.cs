@@ -169,29 +169,34 @@ public abstract class FieldController : MonoBehaviour
 
         bool isStarted = false;
         float time;
-        int horizontal;
+        bool right, left;
 
         while (true)
         {
             while (IsPaused) yield return new WaitWhile(() => IsPaused);
 
-            horizontal = Controls.Horizontal;
+            right = Controls.Right;
+            left = Controls.Left;
 
-            if (horizontal != 0)
+            if (!right && !left)
             {
-                if (horizontal < 0) MoveRight();
-                else MoveLeft();
+                isStarted = false;
 
-                time = Time.time;
-                while (time > Time.time - (isStarted ? nextPause : firstPause))
-                {
-                    yield return null;
-                    if (horizontal == 0) break;
-                }
-
-                if (!isStarted) isStarted = true;
+                yield return null;
+                continue;
             }
-            else isStarted = false;
+
+            if (right) MoveRight();
+            else if (left) MoveLeft();
+
+            time = Time.time;
+            while (time > Time.time - (isStarted ? nextPause : firstPause))
+            {
+                yield return null;
+                if (!right && !left) break;
+            }
+
+            if (!isStarted) isStarted = true;
 
             yield return null;
         }
@@ -277,7 +282,7 @@ public abstract class FieldController : MonoBehaviour
             for (int y = 0; y < CurrentObject.MaxY; y++)
                 GameMatrix[CurrentX + x, CurrentY + y] |= CurrentObject[x, y];
     }
-    protected void MoveLeft()
+    protected void MoveRight()
     {
         for (int y = 0; y < CurrentObject.MaxY; y++)
             for (int x = 0; x < CurrentObject.MaxX; x++)
@@ -287,7 +292,7 @@ public abstract class FieldController : MonoBehaviour
         CurrentX++;
         FieldRenderer.UpdateMatrixFast(GameMatrix, CurrentObject, CurrentX, CurrentY);
     }
-    protected void MoveRight()
+    protected void MoveLeft()
     {
         for (int y = 0; y < CurrentObject.MaxY; y++)
             for (int x = 0; x < CurrentObject.MaxX; x++)
