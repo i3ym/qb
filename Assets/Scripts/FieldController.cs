@@ -240,7 +240,7 @@ public abstract class FieldController : MonoBehaviour
 
             if (IsPaused) continue;
 
-            FieldRenderer.UpdateMatrix(GameMatrix, CurrentObject, CurrentX, CurrentY);
+            FieldRenderer.UpdateMatrixFast(GameMatrix, CurrentObject, CurrentX, CurrentY);
         }
     }
 
@@ -284,7 +284,7 @@ public abstract class FieldController : MonoBehaviour
                     return;
 
         CurrentX += add;
-        FieldRenderer.UpdateMatrix(GameMatrix, CurrentObject, CurrentX, CurrentY);
+        FieldRenderer.UpdateMatrixFast(GameMatrix, CurrentObject, CurrentX, CurrentY);
     }
     protected void RotateBlock(bool clockwise)
     {

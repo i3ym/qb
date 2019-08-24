@@ -84,21 +84,21 @@ public abstract class FieldObjectRendererBase<T> : FieldRendererBase where T : C
         return go;
     }
 
-    public override void UpdateMatrix(GameMatrix gameMatrix, GameMatrix CurrentObject, int currentX, int currentY)
+    protected override void _UpdateMatrix(GameMatrix gameMatrix, GameMatrix currentObject, int currentX, int currentY)
     {
         if (Game.BlindRendering)
         {
             for (int x = 0; x < MaxX; x++)
                 for (int y = MaxY - 1; y >= 0; y--)
                 {
-                    GameObjects[x, y].gameObject.SetActive(CurrentObject[x - currentX, y - currentY]);
+                    GameObjects[x, y].gameObject.SetActive(currentObject[x - currentX, y - currentY]);
 
                     if (gameMatrix[x, y])
                     {
                         GameObjects[x, y].gameObject.SetActive(true);
 
                         for (int yy = y - 1; yy >= 0; yy--)
-                            GameObjects[x, yy].gameObject.SetActive(CurrentObject[x - currentX, yy - currentY]);
+                            GameObjects[x, yy].gameObject.SetActive(currentObject[x - currentX, yy - currentY]);
 
                         break;
                     }
@@ -107,7 +107,39 @@ public abstract class FieldObjectRendererBase<T> : FieldRendererBase where T : C
         else
             for (int y = 0; y < MaxY; y++)
                 for (int x = 0; x < MaxX; x++)
-                    GameObjects[x, y].gameObject.SetActive(gameMatrix[x, y] || CurrentObject[x - currentX, y - currentY]);
+                    GameObjects[x, y].gameObject.SetActive(gameMatrix[x, y] || currentObject[x - currentX, y - currentY]);
+    }
+    protected override void _UpdateMatrixFast(GameMatrix gameMatrix, GameMatrix currentObject, int currentX, int currentY)
+    {
+        if (Game.BlindRendering)
+        {
+            for (int x = 0; x < MaxX; x++)
+                for (int y = MaxY - 1; y >= 0; y--)
+                {
+                    GameObjects[x, y].gameObject.SetActive(currentObject[x - currentX, y - currentY]);
+
+                    if (gameMatrix[x, y])
+                    {
+                        GameObjects[x, y].gameObject.SetActive(true);
+
+                        for (int yy = y - 1; yy >= 0; yy--)
+                            GameObjects[x, yy].gameObject.SetActive(currentObject[x - currentX, yy - currentY]);
+
+                        break;
+                    }
+                }
+        }
+        else
+            for (int y = 0; y < MaxY; y++)
+                for (int x = 0; x < MaxX; x++)
+                {
+                    if (!gameMatrix.IsInBounds(x, y)) continue;
+
+                    if (currentObject[x - currentX, y - currentY])
+                        GameObjects[x, y].gameObject.SetActive(true);
+                    else if (!gameMatrix[x, y])
+                        GameObjects[x, y].gameObject.SetActive(false);
+                }
     }
     public override void UpdateColors(GameMatrix gameMatrix, Shapes currentShape)
     {

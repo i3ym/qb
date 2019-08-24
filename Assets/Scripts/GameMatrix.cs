@@ -1,7 +1,6 @@
 public class GameMatrix
 {
-    public int MaxX { get; private set; }
-    public int MaxY { get; private set; }
+    readonly public int MaxX, MaxY;
     bool[, ] Matrix;
 
     public GameMatrix(int maxx, int maxy)
@@ -14,13 +13,15 @@ public class GameMatrix
 
     public bool this [int x, int y]
     {
-        get => (x < 0 || y < 0 || x >= MaxX || y >= MaxY) ? false : Matrix[x, y];
+        get => IsInBounds(x, y) ? Matrix[x, y] : false;
         set
         {
-            if (x < 0 || y < 0 || x >= MaxX || y >= MaxY) return;
-            Matrix[x, y] = value;
+            if (IsInBounds(x, y)) Matrix[x, y] = value;
         }
     }
+
+    public bool GetWithoutChecks(int x, int y) => Matrix[x, y];
+    public bool IsInBounds(int x, int y) => !(x < 0 || y < 0 || x >= MaxX || y >= MaxY);
 
     public void Clear() => Matrix = new bool[MaxX, MaxY];
 

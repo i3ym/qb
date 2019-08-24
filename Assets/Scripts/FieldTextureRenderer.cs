@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,6 +13,8 @@ public class FieldTextureRenderer : FieldRendererBase
     Texture2D FieldTexture, NextObjectTexture;
     Color CurrentColor;
     Color black = Color.black;
+
+    Color[] CurrentState;
 
     public override void Initialize()
     {
@@ -26,18 +29,27 @@ public class FieldTextureRenderer : FieldRendererBase
         NextObjectRawImage.color = Color.white;
     }
 
+    //
+
+    [MethodImpl(256)]
+    void SetState(int x, int y, Color color) => CurrentState[x + (y * MaxX)] = color;
+
+    [MethodImpl(256)]
+    Color GetState(int x, int y) => CurrentState[x + (y * MaxX)];
 
     public override void SetMaxs(int maxx, int maxy)
     {
-        FieldRawImage = GetComponent<RawImage>();
-        if (FieldRawImage == null) FieldRawImage = gameObject.AddComponent<RawImage>();
-
         MaxX = maxx;
         MaxY = maxy;
 
+        FieldRawImage = GetComponent<RawImage>();
+        if (FieldRawImage == null) FieldRawImage = gameObject.AddComponent<RawImage>();
+
+        CurrentState = Enumerable.Repeat(black, MaxX * MaxY).ToArray();
+
         FieldTexture = new Texture2D(maxx, maxy, TextureFormat.RGB24, 0, true);
         FieldTexture.filterMode = FilterMode.Point;
-        FieldTexture.SetPixels(Enumerable.Repeat(black, MaxX * MaxY).ToArray());
+        FieldTexture.SetPixels(CurrentState);
         FieldTexture.Apply();
 
         FieldRawImage.texture = FieldTexture;
@@ -49,8 +61,9 @@ public class FieldTextureRenderer : FieldRendererBase
         for (int i = y.Count - 1; i > -1; i--)
             for (int y2 = y[i]; y2 < MaxY - 1; y2++)
                 for (int x2 = 0; x2 < MaxX; x2++)
-                    FieldTexture.SetPixel(x2, y2, FieldTexture.GetPixel(x2, y2 + 1));
+                    SetState(x2, y2, GetState(x2, y2 + 1));
 
+        FieldTexture.SetPixels(CurrentState);
         FieldTexture.Apply();
         FieldRawImage.texture = FieldTexture;
 
@@ -80,7 +93,7 @@ public class FieldTextureRenderer : FieldRendererBase
         NextObjectRawImage.texture = NextObjectTexture;
     }
     public override void UpdateColors(GameMatrix gameMatrix, Shapes currentShape) => CurrentColor = ShapeColors[currentShape];
-    public override void UpdateMatrix(GameMatrix gameMatrix, GameMatrix currentObject, int currentX, int currentY)
+    protected override void _UpdateMatrix(GameMatrix gameMatrix, GameMatrix currentObject, int currentX, int currentY)
     {
         if (Game.BlindRendering)
         {
@@ -101,15 +114,56 @@ public class FieldTextureRenderer : FieldRendererBase
                 }
         }
         else
+        {
             for (int y = 0; y < MaxY; y++)
                 for (int x = 0; x < MaxX; x++)
                 {
                     if (currentObject[x - currentX, y - currentY])
-                        FieldTexture.SetPixel(x, y, CurrentColor);
+                        SetState(x, y, CurrentColor);
                     else if (!gameMatrix[x, y])
-                        FieldTexture.SetPixel(x, y, black);
+                        SetState(x, y, black);
                 }
+        }
 
+        FieldTexture.SetPixels(CurrentState);
+        FieldTexture.Apply();
+        FieldRawImage.texture = FieldTexture;
+    }
+    protected override void _UpdateMatrixFast(GameMatrix gameMatrix, GameMatrix currentObject, int currentX, int currentY)
+    {
+        if (Game.BlindRendering)
+        { // TODO
+            for (int x = 0; x < MaxX; x++)
+                for (int y = MaxY - 1; y >= 0; y--)
+                {
+                    FieldTexture.SetPixel(x, y, currentObject[x - currentX, y - currentY] ? CurrentColor : black);
+
+                    if (gameMatrix[x, y])
+                    {
+                        FieldTexture.SetPixel(x, y, CurrentColor);
+
+                        for (int yy = y - 1; yy >= 0; yy--)
+                            FieldTexture.SetPixel(x, yy, currentObject[x - currentX, yy - currentY] ? CurrentColor : black);
+
+                        break;
+                    }
+                }
+        }
+        else
+        {
+            for (int y = currentY; y < currentY + currentObject.MaxY + 1; y++)
+                for (int x = currentX - 1; x < currentX + currentObject.MaxX + 1; x++)
+                {
+                    if (x < 0 || y < 0 || x >= MaxX || y >= MaxY) continue;
+
+                    if (currentObject[x - currentX, y - currentY])
+                        CurrentState[x + (y * MaxX)] = CurrentColor; // SetState(x, y, CurrentColor); copied for performance reasons
+                    else if (!gameMatrix.GetWithoutChecks(x, y))
+                        CurrentState[x + (y * MaxX)] = black; // SetState(x, y, black); copied for performance reasons
+                }
+        }
+
+        FieldTexture.SetPixels(CurrentState);
         FieldTexture.Apply();
         FieldRawImage.texture = FieldTexture;
     }

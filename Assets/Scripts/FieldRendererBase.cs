@@ -9,6 +9,9 @@ public abstract class FieldRendererBase : MonoBehaviour
     protected Dictionary<Shapes, Color> ShapeColors = new Dictionary<Shapes, Color>();
     protected int MaxX, MaxY;
 
+    GameMatrix UpdateGameMatrix, UpdateCurrentObject;
+    int UpdateCurrentX, UpdateCurrentY;
+    bool DoUpdateMatrix = false, DoUpdateMatrixFast = false;
 
     public virtual void Initialize()
     {
@@ -22,16 +25,48 @@ public abstract class FieldRendererBase : MonoBehaviour
         ShapeColors.Add(Shapes.T, new Color(.5f, 0f, 1f));
         ShapeColors.Add(Shapes.O, Color.yellow);
     }
-
     protected virtual void Update()
     {
         foreach (var extension in Extensions)
             extension.Update();
     }
+    void LateUpdate()
+    {
+        if (DoUpdateMatrix)
+        {
+            _UpdateMatrix(UpdateGameMatrix, UpdateCurrentObject, UpdateCurrentX, UpdateCurrentY);
+            DoUpdateMatrix = false;
+            DoUpdateMatrixFast = false;
+        }
+        else if (DoUpdateMatrixFast)
+        {
+            _UpdateMatrixFast(UpdateGameMatrix, UpdateCurrentObject, UpdateCurrentX, UpdateCurrentY);
+            DoUpdateMatrixFast = false;
+        }
+    }
 
 
     public abstract void SetMaxs(int maxx, int maxy);
-    public abstract void UpdateMatrix(GameMatrix gameMatrix, GameMatrix currentObject, int currentX, int currentY);
+    public void UpdateMatrix(GameMatrix gameMatrix, GameMatrix currentObject, int currentX, int currentY)
+    {
+        UpdateGameMatrix = gameMatrix;
+        UpdateCurrentObject = currentObject;
+        UpdateCurrentX = currentX;
+        UpdateCurrentY = currentY;
+
+        DoUpdateMatrix = true;
+    }
+    public void UpdateMatrixFast(GameMatrix gameMatrix, GameMatrix currentObject, int currentX, int currentY)
+    {
+        UpdateGameMatrix = gameMatrix;
+        UpdateCurrentObject = currentObject;
+        UpdateCurrentX = currentX;
+        UpdateCurrentY = currentY;
+
+        DoUpdateMatrixFast = true;
+    }
+    protected abstract void _UpdateMatrix(GameMatrix gameMatrix, GameMatrix currentObject, int currentX, int currentY);
+    protected abstract void _UpdateMatrixFast(GameMatrix gameMatrix, GameMatrix currentObject, int currentX, int currentY);
     public abstract void UpdateColors(GameMatrix gameMatrix, Shapes currentShape);
     public abstract void ShowNextShape(Shapes shape);
 
