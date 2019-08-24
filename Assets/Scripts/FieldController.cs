@@ -324,7 +324,7 @@ public abstract class FieldController : MonoBehaviour
         CurrentObject = newObject;
         if (++CurrentRotation == 4) CurrentRotation = 0;
 
-        FieldRenderer.UpdateMatrix(GameMatrix, CurrentObject, CurrentX, CurrentY);
+        FieldRenderer.UpdateMatrixFast(GameMatrix, CurrentObject, CurrentX, CurrentY);
     }
     protected bool TryWallKick(int cx, int cy, bool[, ] newObject)
     {

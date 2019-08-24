@@ -100,17 +100,16 @@ public class FieldTextureRenderer : FieldRendererBase
             for (int x = 0; x < MaxX; x++)
                 for (int y = MaxY - 1; y >= 0; y--)
                 {
-                    FieldTexture.SetPixel(x, y, currentObject[x - currentX, y - currentY] ? CurrentColor : black);
-
                     if (gameMatrix[x, y])
                     {
-                        FieldTexture.SetPixel(x, y, CurrentColor);
+                        SetState(x, y, CurrentColor);
 
                         for (int yy = y - 1; yy >= 0; yy--)
-                            FieldTexture.SetPixel(x, yy, currentObject[x - currentX, yy - currentY] ? CurrentColor : black);
+                            SetState(x, yy, currentObject[x - currentX, yy - currentY] ? CurrentColor : black);
 
                         break;
                     }
+                    else SetState(x, y, currentObject[x - currentX, y - currentY] ? CurrentColor : black);
                 }
         }
         else
@@ -131,37 +130,18 @@ public class FieldTextureRenderer : FieldRendererBase
     }
     protected override void _UpdateMatrixFast(GameMatrix gameMatrix, GameMatrix currentObject, int currentX, int currentY)
     {
-        if (Game.BlindRendering)
-        { // TODO
-            for (int x = 0; x < MaxX; x++)
-                for (int y = MaxY - 1; y >= 0; y--)
-                {
-                    FieldTexture.SetPixel(x, y, currentObject[x - currentX, y - currentY] ? CurrentColor : black);
-
-                    if (gameMatrix[x, y])
-                    {
-                        FieldTexture.SetPixel(x, y, CurrentColor);
-
-                        for (int yy = y - 1; yy >= 0; yy--)
-                            FieldTexture.SetPixel(x, yy, currentObject[x - currentX, yy - currentY] ? CurrentColor : black);
-
-                        break;
-                    }
-                }
-        }
+        if (Game.BlindRendering) _UpdateMatrix(gameMatrix, currentObject, currentX, currentY);
         else
-        {
             for (int y = currentY; y < currentY + currentObject.MaxY + 1; y++)
                 for (int x = currentX - 1; x < currentX + currentObject.MaxX + 1; x++)
                 {
-                    if (x < 0 || y < 0 || x >= MaxX || y >= MaxY) continue;
+                    if (x < 0 || y < 0 || x >= MaxX || y >= MaxY) continue; // gameMatrix.IsInBounds(x, y); copied for performance resons
 
                     if (currentObject[x - currentX, y - currentY])
                         CurrentState[x + (y * MaxX)] = CurrentColor; // SetState(x, y, CurrentColor); copied for performance reasons
                     else if (!gameMatrix.GetWithoutChecks(x, y))
                         CurrentState[x + (y * MaxX)] = black; // SetState(x, y, black); copied for performance reasons
                 }
-        }
 
         FieldTexture.SetPixels(CurrentState);
         FieldTexture.Apply();
