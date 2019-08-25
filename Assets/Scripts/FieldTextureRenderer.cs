@@ -143,6 +143,8 @@ public class FieldTextureRenderer : FieldRendererBase
                         CurrentState[x + (y * MaxX)] = black; // SetState(x, y, black); copied for performance reasons
                 }
 
+        // TODO fix pixels when moving more that 1 pixel in one frame
+
         FieldTexture.SetPixels(CurrentState);
         FieldTexture.Apply();
         FieldRawImage.texture = FieldTexture;
