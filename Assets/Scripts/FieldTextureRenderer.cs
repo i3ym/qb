@@ -7,10 +7,10 @@ using UnityEngine.UI;
 public class FieldTextureRenderer : FieldRendererBase
 {
     [SerializeField]
-    RawImage NextObjectRawImage = null;
+    RawImage BloomImage = null, NextObjectRawImage = null;
 
     RawImage FieldRawImage;
-    Texture2D FieldTexture, NextObjectTexture;
+    Texture2D FieldTexture, BloomTexture, NextObjectTexture;
     Color CurrentColor;
     Color black = Color.black;
 
@@ -20,6 +20,9 @@ public class FieldTextureRenderer : FieldRendererBase
     {
         base.Initialize();
 
+        FieldRawImage = GetComponent<RawImage>();
+        if (FieldRawImage == null) FieldRawImage = gameObject.AddComponent<RawImage>();
+
         NextObjectTexture = new Texture2D(4, 4, TextureFormat.RGB24, 0, true);
         NextObjectTexture.filterMode = FilterMode.Point;
         NextObjectTexture.SetPixels(Enumerable.Repeat(black, 4 * 4).ToArray());
@@ -27,6 +30,8 @@ public class FieldTextureRenderer : FieldRendererBase
 
         NextObjectRawImage.texture = NextObjectTexture;
         NextObjectRawImage.color = Color.white;
+
+        BloomImage.color = new Color(1f, 1f, 1f, .5f);
     }
 
     //
@@ -42,9 +47,6 @@ public class FieldTextureRenderer : FieldRendererBase
         MaxX = maxx;
         MaxY = maxy;
 
-        FieldRawImage = GetComponent<RawImage>();
-        if (FieldRawImage == null) FieldRawImage = gameObject.AddComponent<RawImage>();
-
         CurrentState = Enumerable.Repeat(black, MaxX * MaxY).ToArray();
 
         FieldTexture = new Texture2D(maxx, maxy, TextureFormat.RGB24, 0, true);
@@ -54,6 +56,12 @@ public class FieldTextureRenderer : FieldRendererBase
 
         FieldRawImage.texture = FieldTexture;
         FieldRawImage.color = Color.white;
+
+        BloomTexture = new Texture2D(maxx, maxy, TextureFormat.RGB24, 0, true);
+        BloomTexture.filterMode = FilterMode.Bilinear;
+        BloomTexture.wrapMode = TextureWrapMode.Clamp;
+        BloomTexture.SetPixels(CurrentState);
+        BloomTexture.Apply();
     }
 
     public override float RemoveLinesAnimation(List<int> y, GameMatrix gameMatrix, GameMatrix currentObject, int currentX, int currentY)
@@ -127,9 +135,17 @@ public class FieldTextureRenderer : FieldRendererBase
         FieldTexture.SetPixels(CurrentState);
         FieldTexture.Apply();
         FieldRawImage.texture = FieldTexture;
+        
+        BloomTexture.SetPixels(CurrentState);
+        BloomTexture.Apply();
+        BloomImage.texture = BloomTexture;
     }
     protected override void _UpdateMatrixFast(GameMatrix gameMatrix, GameMatrix currentObject, int currentX, int currentY)
     {
+        _UpdateMatrix(gameMatrix, currentObject, currentX, currentY);
+
+        return;
+
         if (Game.BlindRendering) _UpdateMatrix(gameMatrix, currentObject, currentX, currentY);
         else
             for (int y = currentY; y < currentY + currentObject.MaxY + 1; y++)
@@ -148,5 +164,9 @@ public class FieldTextureRenderer : FieldRendererBase
         FieldTexture.SetPixels(CurrentState);
         FieldTexture.Apply();
         FieldRawImage.texture = FieldTexture;
+        
+        BloomTexture.SetPixels(CurrentState);
+        BloomTexture.Apply();
+        BloomImage.texture = BloomTexture;
     }
 }
