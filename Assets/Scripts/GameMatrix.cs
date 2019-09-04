@@ -24,6 +24,16 @@ public class GameMatrix
     public bool IsInBounds(int x, int y) => !(x < 0 || y < 0 || x >= MaxX || y >= MaxY);
 
     public void Clear() => Matrix = new bool[MaxX, MaxY];
+    public GameMatrix Clone()
+    {
+        GameMatrix matrix = new GameMatrix(MaxX, MaxY);
+
+        for (int y = 0; y < MaxY; y++)
+            for (int x = 0; x < MaxX; x++)
+                matrix.Matrix[x, y] = Matrix[x, y];
+
+        return matrix;
+    }
 
     //
 
