@@ -8,10 +8,17 @@ public class GameOverMenu : Menu
     {
         Buttons[0].OnClick += () =>
         {
-            Game.Instance.RestartGame();
+            // TODO рекламу и как то подтверждение или нет
+
+            Game.Instance.ContinueGameWithAd();
             SetMenu(null as Menu);
         };
         Buttons[1].OnClick += () =>
+        {
+            Game.Instance.RestartGame();
+            SetMenu(null as Menu);
+        };
+        Buttons[2].OnClick += () =>
         {
             Game.Instance.SetDefaults();
             SetMenu<MainMenu>();

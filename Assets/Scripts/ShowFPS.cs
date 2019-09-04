@@ -2,7 +2,6 @@
 using TMPro;
 using UnityEngine;
 
-
 public class ShowFPS : MonoBehaviour
 {
     TextMeshProUGUI Text;

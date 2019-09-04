@@ -105,8 +105,6 @@ public abstract class FieldController : MonoBehaviour
         SpawnBlock();
     }
 
-    //
-
     protected IEnumerator RemoveLineAnimation(List<int> y)
     {
         CurrentX = 4;
@@ -407,10 +405,18 @@ public abstract class FieldController : MonoBehaviour
         }
         else SpawnBlock();
     }
+    protected void RemoveTopLines(int count)
+    {
+        for (int y = 0; y < count; y++)
+            for (int x = 0; x < GameMatrix.MaxX; x++)
+                GameMatrix[x, GameMatrix.MaxY - 1 - y] = false;
+
+        FieldRenderer.UpdateMatrix(GameMatrix, CurrentObject, CurrentX, CurrentY);
+    }
 
     public virtual void GameOver()
     {
-        StopAllCoroutines();
+        // StopAllCoroutines();
         IsPaused = true;
         Menu.SetMenu<GameOverMenu>();
 
@@ -425,6 +431,11 @@ public abstract class FieldController : MonoBehaviour
     {
         Lvl = StartLvl;
         StartGame();
+    }
+    public void ContinueGameWithAd()
+    {
+        IsPaused = false;
+        RemoveTopLines(7);
     }
 
     protected abstract int GetMaxX();
