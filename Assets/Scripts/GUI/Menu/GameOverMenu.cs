@@ -1,4 +1,5 @@
 ﻿using System;
+using GoogleMobileAds.Api;
 
 public class GameOverMenu : Menu
 {
@@ -8,10 +9,17 @@ public class GameOverMenu : Menu
     {
         Buttons[0].OnClick += () =>
         {
-            // TODO рекламу и как то подтверждение или нет
+            var ad = new InterstitialAd("ca-app-pub-6291991022802883/4758993198");
+            var request = new AdRequest.Builder().Build();
+            ad.LoadAd(request);
 
-            Game.Instance.ContinueGameWithAd();
-            SetMenu(null as Menu);
+            if (ad.IsLoaded()) ad.Show();
+
+            ad.OnAdClosed += (obj, e) =>
+            {
+                Game.Instance.ContinueGameWithAd();
+                SetMenu(null as Menu);
+            };
         };
         Buttons[1].OnClick += () =>
         {
