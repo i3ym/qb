@@ -15,6 +15,8 @@ public abstract class FieldController : MonoBehaviour
     public int MaxX, MaxY;
 
     public int Lvl = 0;
+    public bool IsAdContinued;
+
     protected ITetrisControlsProvider Controls;
     protected int StartLvl;
     protected bool IsLvlReached, IsPaused;
@@ -77,6 +79,7 @@ public abstract class FieldController : MonoBehaviour
 
         IsPaused = true;
         IsLvlReached = false;
+        IsAdContinued = false;
         GameMatrix = new GameMatrix(MaxX, MaxY);
         CurrentObject = new GameMatrix(0, 0);
         CurrentRotation = 0;
@@ -411,6 +414,7 @@ public abstract class FieldController : MonoBehaviour
             for (int x = 0; x < GameMatrix.MaxX; x++)
                 GameMatrix[x, GameMatrix.MaxY - 1 - y] = false;
 
+        FieldRenderer.UpdateColors(GameMatrix, CurrentShape);
         FieldRenderer.UpdateMatrix(GameMatrix, CurrentObject, CurrentX, CurrentY);
     }
 
@@ -434,6 +438,13 @@ public abstract class FieldController : MonoBehaviour
     }
     public void ContinueGameWithAd()
     {
+        if (IsAdContinued)
+        {
+            RestartGame();
+            return;
+        }
+
+        IsAdContinued = true;
         IsPaused = false;
         RemoveTopLines(7);
     }

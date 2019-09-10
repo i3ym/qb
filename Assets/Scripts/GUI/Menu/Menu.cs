@@ -13,7 +13,7 @@ public abstract class Menu : MonoBehaviour
     [SerializeField]
     protected Button[] Buttons;
 
-    int ActiveButtonIndex = 0;
+    protected int ActiveButtonIndex = 0;
 
     protected abstract Type PreviousMenuType { get; }
 
@@ -24,6 +24,10 @@ public abstract class Menu : MonoBehaviour
             if (ActiveController == null || !ActiveController.enabled || !ActiveController.gameObject.activeSelf) return;
 
             ActiveController.ActiveButtonIndex--;
+
+            while (!ActiveController.Buttons[ActiveController.ActiveButtonIndex].gameObject.activeSelf)
+                ActiveController.ActiveButtonIndex--;
+
             if (ActiveController.ActiveButtonIndex < 0) ActiveController.ActiveButtonIndex = ActiveController.Buttons.Length - 1;
             UpdateButtonDesign();
         };
@@ -32,6 +36,10 @@ public abstract class Menu : MonoBehaviour
             if (ActiveController == null || !ActiveController.enabled || !ActiveController.gameObject.activeSelf) return;
 
             ActiveController.ActiveButtonIndex = (ActiveController.ActiveButtonIndex + 1) % ActiveController.Buttons.Length;
+
+            while (!ActiveController.Buttons[ActiveController.ActiveButtonIndex].gameObject.activeSelf)
+                ActiveController.ActiveButtonIndex = (ActiveController.ActiveButtonIndex + 1) % ActiveController.Buttons.Length;
+
             UpdateButtonDesign();
         };
         PlayerControls.OnRotate += () =>
@@ -55,6 +63,7 @@ public abstract class Menu : MonoBehaviour
     }
 
     protected abstract void Init();
+    protected virtual void OnShow() { }
 
     public static void SetMenu(Menu menu)
     {
@@ -67,7 +76,11 @@ public abstract class Menu : MonoBehaviour
     public static void SetMenu(Type type) => SetMenu(Menus.First(x => x.GetType() == type));
     public static void SetMenu<T>() where T : Menu => SetMenu(typeof(T));
 
-    protected void Enable() => gameObject.SetActive(true);
+    protected void Enable()
+    {
+        gameObject.SetActive(true);
+        OnShow();
+    }
 
     protected static void UpdateButtonDesign()
     {
