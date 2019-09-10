@@ -42,9 +42,6 @@ public class PlayerControls : MonoBehaviour
         Controller.controller.Right.OnMouseDownAction += () => OnRight();
         Controller.controller.Rotate.OnMouseDownAction += () => OnRotate();
         Controller.controller.RotateC.OnMouseDownAction += () => OnRotateC();
-
-
-    //    OnUp += () => Up = true;
     }
 
 
