@@ -11,7 +11,7 @@ public class GameOverMenu : Menu
     {
         Advertisement.AddListener(new UnityAdListener());
 
-        if (Advertisement.isSupported) Advertisement.Initialize("3286329", false);
+        if (Advertisement.isSupported) Advertisement.Initialize("3286669", false);
         else Debug.Log("Unity Ads is not supported");
 
         Buttons[0].OnClick += async() =>
