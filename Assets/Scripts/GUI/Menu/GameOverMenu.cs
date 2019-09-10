@@ -1,18 +1,21 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using GoogleMobileAds.Api;
+// using GoogleMobileAds.Api;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Advertisements;
 
 public class GameOverMenu : Menu
 {
     protected override Type PreviousMenuType => typeof(MainMenu);
-    static InterstitialAd Ad;
 
     protected override void Init()
     {
-        Ad = new InterstitialAd("ca-app-pub-6291991022802883/4758993198");
+
+        
+
+    /*    Ad = new InterstitialAd("ca-app-pub-6291991022802883/4758993198");
 
         Ad.OnAdClosed += (obj, e) =>
         {
@@ -27,26 +30,43 @@ public class GameOverMenu : Menu
             Buttons[0].GetComponent<TextMeshProUGUI>().text = "f " + e.Message;
         };
 
-        Ad.LoadAd(new AdRequest.Builder().AddTestDevice("B6994A4369B1E37C").Build());
+        Ad.LoadAd(new AdRequest.Builder().AddTestDevice("B6994A4369B1E37C").Build()); 
+        
+     */
 
         Buttons[0].OnClick += async() =>
         {
-            try
+
+            if (Advertisement.isSupported)
             {
-                Buttons[0].GetComponent<TextMeshProUGUI>().text = "ad isnt lod";
-
-                while (!Ad.IsLoaded()) await Task.Delay(1000);
-
-                Buttons[0].GetComponent<TextMeshProUGUI>().text = "ad loded";
-
-                Ad.Show();
-
-                Buttons[0].GetComponent<TextMeshProUGUI>().text = "ad showd";
+                Advertisement.Initialize("3286329", false);
             }
-            catch (Exception ex)
+            else
             {
-                Buttons[0].GetComponent<TextMeshProUGUI>().text = ex.Message;
+                Debug.Log("not supported");
             }
+
+            if (Advertisement.IsReady())
+            {
+                Advertisement.Show();
+            }
+
+            /*    try
+                {
+                    Buttons[0].GetComponent<TextMeshProUGUI>().text = "ad isnt lod";
+
+                    while (!Ad.IsLoaded()) await Task.Delay(1000);
+
+                    Buttons[0].GetComponent<TextMeshProUGUI>().text = "ad loded";
+
+                    Ad.Show();
+
+                    Buttons[0].GetComponent<TextMeshProUGUI>().text = "ad showd";
+                }
+                catch (Exception ex)
+                {
+                    Buttons[0].GetComponent<TextMeshProUGUI>().text = ex.Message;
+                } */
         };
         Buttons[1].OnClick += () =>
         {
