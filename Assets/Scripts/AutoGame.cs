@@ -8,8 +8,14 @@ public class AutoGame : FieldController
         Controls = new AITetrisPlayerControlsProvider(this);
     }
 
-    protected override int GetMaxX() => ChooseModeMenu.MaxX;
-    protected override int GetMaxY() => ChooseModeMenu.MaxY;
+    protected override int GetMaxX() => MaxX;
+    protected override int GetMaxY() => MaxY;
+
+    public void SetMax(int x, int y)
+    {
+        MaxX = x;
+        MaxY = y;
+    }
 
     public void StopGame()
     {
