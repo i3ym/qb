@@ -24,7 +24,7 @@ public class AutoGame : FieldController
 
         GameMatrix.Clear();
         CurrentObject.Clear();
-        FieldRenderer.UpdateMatrix(GameMatrix, CurrentObject, CurrentX, CurrentY);
+        FieldRenderer.UpdateMatrix();
     }
     public override void GameOver()
     {

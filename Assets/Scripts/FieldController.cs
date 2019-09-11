@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-public abstract class FieldController : MonoBehaviour
+public abstract class FieldController : MonoBehaviour, IFieldController
 {
     public static Camera Camera;
     public static bool BlindRendering = false;
@@ -23,15 +23,25 @@ public abstract class FieldController : MonoBehaviour
     protected ITetrisControlsProvider Controls;
     protected int StartLvl;
     protected bool IsLvlReached, IsPaused;
-    protected GameMatrix GameMatrix, CurrentObject;
-    protected Shapes CurrentShape, NextShape;
-    protected int CurrentRotation, CurrentX, CurrentY;
     protected float MoveDownSpeed;
     protected List<Shapes> RandomBag = new List<Shapes>();
+
+    protected GameMatrix GameMatrix, CurrentObject;
+    protected int CurrentX, CurrentY, CurrentRotation;
+    protected Shapes CurrentShape, NextShape;
 
     protected float FastMoveDownSpeed => MoveDownSpeed > 2f / 60f ? 2f / 60f : MoveDownSpeed / 2f;
     protected int Score { get => _score; set { _score = value; ScoreText.text = value.ToString(); } }
     protected int Lines { get => _lines; set { _lines = value; LinesText.text = value.ToString(); } }
+
+    GameMatrix IFieldController.GameMatrix => GameMatrix;
+    GameMatrix IFieldController.CurrentObject => CurrentObject;
+    int IFieldController.CurrentX => CurrentX;
+    int IFieldController.CurrentY => CurrentY;
+    Shapes IFieldController.CurrentShape => CurrentShape;
+    Shapes IFieldController.NextShape => NextShape;
+    int IFieldController.CurrentRotation => CurrentRotation;
+
     protected int _score, _lines;
 
     [SerializeField]
@@ -69,7 +79,7 @@ public abstract class FieldController : MonoBehaviour
 
         if (FieldRenderer == null) FieldRenderer = GetComponent<FieldRendererBase>();
 
-        FieldRenderer.Initialize();
+        FieldRenderer.Initialize(this);
         FieldRenderer.SetMaxs(GetMaxX(), GetMaxY());
 
         SetDefaults();
@@ -95,7 +105,7 @@ public abstract class FieldController : MonoBehaviour
         NextShape = (Shapes) new System.Random().Next(7);
         SetLvl(Lvl);
 
-        FieldRenderer.UpdateMatrix(GameMatrix, CurrentObject, CurrentX, CurrentY);
+        FieldRenderer.UpdateMatrix();
     }
     public void StartGame()
     {
@@ -127,7 +137,7 @@ public abstract class FieldController : MonoBehaviour
         for (int x2 = 0; x2 < MaxX; x2++)
             GameMatrix[x2, MaxY - 1] = false;
 
-        FieldRenderer.UpdateMatrix(GameMatrix, CurrentObject, CurrentX, CurrentY);
+        FieldRenderer.UpdateMatrix();
 
         IsPaused = false;
         SpawnBlock();
@@ -250,7 +260,7 @@ public abstract class FieldController : MonoBehaviour
 
             if (IsPaused) continue;
 
-            FieldRenderer.UpdateMatrixFast(GameMatrix, CurrentObject, CurrentX, CurrentY);
+            FieldRenderer.UpdateMatrixFast();
         }
     }
 
@@ -267,7 +277,7 @@ public abstract class FieldController : MonoBehaviour
         int take = new System.Random().Next(RandomBag.Count);
         NextShape = RandomBag[take];
         RandomBag.RemoveAt(take);
-        FieldRenderer.ShowNextShape(NextShape);
+        FieldRenderer.ShowNextShape();
 
         for (int x = 0; x < CurrentObject.MaxX; x++)
             for (int y = 0; y < CurrentObject.MaxY; y++)
@@ -277,8 +287,8 @@ public abstract class FieldController : MonoBehaviour
                     return;
                 }
 
-        FieldRenderer.UpdateColors(GameMatrix, CurrentShape);
-        FieldRenderer.UpdateMatrix(GameMatrix, CurrentObject, CurrentX, CurrentY);
+        FieldRenderer.UpdateColors();
+        FieldRenderer.UpdateMatrix();
     }
     protected void SetBlockToField()
     {
@@ -294,7 +304,7 @@ public abstract class FieldController : MonoBehaviour
                     return;
 
         CurrentX++;
-        FieldRenderer.UpdateMatrixFast(GameMatrix, CurrentObject, CurrentX, CurrentY);
+        FieldRenderer.UpdateMatrixFast();
     }
     protected void MoveLeft()
     {
@@ -304,7 +314,7 @@ public abstract class FieldController : MonoBehaviour
                     return;
 
         CurrentX--;
-        FieldRenderer.UpdateMatrixFast(GameMatrix, CurrentObject, CurrentX, CurrentY);
+        FieldRenderer.UpdateMatrixFast();
     }
     protected void RotateBlock(bool clockwise)
     {
@@ -344,7 +354,7 @@ public abstract class FieldController : MonoBehaviour
         CurrentObject = newObject;
         if (++CurrentRotation == 4) CurrentRotation = 0;
 
-        FieldRenderer.UpdateMatrixFast(GameMatrix, CurrentObject, CurrentX, CurrentY);
+        FieldRenderer.UpdateMatrixFast();
     }
     protected bool TryWallKick(int cx, int cy, bool[, ] newObject)
     {
@@ -417,8 +427,8 @@ public abstract class FieldController : MonoBehaviour
             for (int x = 0; x < GameMatrix.MaxX; x++)
                 GameMatrix[x, GameMatrix.MaxY - 1 - y] = false;
 
-        FieldRenderer.UpdateColors(GameMatrix, CurrentShape);
-        FieldRenderer.UpdateMatrix(GameMatrix, CurrentObject, CurrentX, CurrentY);
+        FieldRenderer.UpdateColors();
+        FieldRenderer.UpdateMatrix();
     }
 
     public virtual void GameOver()
@@ -430,7 +440,7 @@ public abstract class FieldController : MonoBehaviour
         if (BlindRendering)
         {
             BlindRendering = false;
-            FieldRenderer.UpdateMatrix(GameMatrix, CurrentObject, CurrentX, CurrentY);
+            FieldRenderer.UpdateMatrix();
             BlindRendering = true;
         }
     }

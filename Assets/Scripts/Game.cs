@@ -13,5 +13,5 @@
     protected override int GetMaxX() => 10;
     protected override int GetMaxY() => 20;
 
-    public static void UpdateMatrix() => Instance.FieldRenderer.UpdateMatrix(Instance.GameMatrix, Instance.CurrentObject, Instance.CurrentX, Instance.CurrentY);
+    public static void UpdateMatrix() => Instance.FieldRenderer.UpdateMatrix();
 }

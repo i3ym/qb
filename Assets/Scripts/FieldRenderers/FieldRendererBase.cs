@@ -6,6 +6,18 @@ public abstract class FieldRendererBase : MonoBehaviour
     [SerializeField]
     protected IFieldRendererExtension[] Extensions = new IFieldRendererExtension[] { };
 
+    public IFieldController Controller;
+
+    int LastX, LastY, LastRotation;
+
+    protected GameMatrix GameMatrix => Controller.GameMatrix;
+    protected GameMatrix CurrentObject => Controller.CurrentObject;
+    protected int CurrentX => Controller.CurrentX;
+    protected int CurrentY => Controller.CurrentY;
+    protected int CurrentRotation => Controller.CurrentRotation;
+    protected Shapes CurrentShape => Controller.CurrentShape;
+    protected Shapes NextShape => Controller.NextShape;
+
     protected static Dictionary<Shapes, Color> ShapeColors = new Dictionary<Shapes, Color>();
     protected int MaxX, MaxY;
 
@@ -21,8 +33,10 @@ public abstract class FieldRendererBase : MonoBehaviour
         ShapeColors.Add(Shapes.O, Color.yellow);
     }
 
-    public virtual void Initialize()
+    public virtual void Initialize(IFieldController controller)
     {
+        Controller = controller;
+
         foreach (var extension in Extensions) extension.Start();
     }
     protected virtual void Update()
@@ -32,24 +46,30 @@ public abstract class FieldRendererBase : MonoBehaviour
     }
 
     public abstract void SetMaxs(int maxx, int maxy);
-    public void UpdateMatrix(GameMatrix gameMatrix, GameMatrix currentObject, int currentX, int currentY)
+    public void UpdateMatrix()
     {
-        if (!gameMatrix.Changed) return;
+        if (!GameMatrix.Changed && LastX == CurrentX && LastY == CurrentY && LastRotation == CurrentRotation) return;
 
-        gameMatrix.Changed = false;
-        _UpdateMatrix(gameMatrix, currentObject, currentX, currentY);
+        LastX = CurrentX;
+        LastY = CurrentY;
+        LastRotation = CurrentRotation;
+        GameMatrix.Changed = false;
+        _UpdateMatrix();
     }
-    public void UpdateMatrixFast(GameMatrix gameMatrix, GameMatrix currentObject, int currentX, int currentY)
+    public void UpdateMatrixFast()
     {
-        if (!gameMatrix.Changed) return;
+        if (!GameMatrix.Changed && LastX == CurrentX && LastY == CurrentY && LastRotation == CurrentRotation) return;
 
-        gameMatrix.Changed = false;
-        _UpdateMatrixFast(gameMatrix, currentObject, currentX, currentY);
+        LastX = CurrentX;
+        LastY = CurrentY;
+        LastRotation = CurrentRotation;
+        GameMatrix.Changed = false;
+        _UpdateMatrixFast();
     }
-    protected abstract void _UpdateMatrix(GameMatrix gameMatrix, GameMatrix currentObject, int currentX, int currentY);
-    protected abstract void _UpdateMatrixFast(GameMatrix gameMatrix, GameMatrix currentObject, int currentX, int currentY);
-    public abstract void UpdateColors(GameMatrix gameMatrix, Shapes currentShape);
-    public abstract void ShowNextShape(Shapes shape);
+    protected abstract void _UpdateMatrix();
+    protected abstract void _UpdateMatrixFast();
+    public abstract void UpdateColors();
+    public abstract void ShowNextShape();
 
     /// <returns> Duration of animation in seconds </returns> 
     public abstract float RemoveLinesAnimation(List<int> indexs, GameMatrix gameMatrix, GameMatrix currentObject, int currentX, int currentY);

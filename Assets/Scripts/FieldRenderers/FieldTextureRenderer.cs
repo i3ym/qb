@@ -16,9 +16,9 @@ public class FieldTextureRenderer : FieldRendererBase
 
     Color[] CurrentState;
 
-    public override void Initialize()
+    public override void Initialize(IFieldController controller)
     {
-        base.Initialize();
+        base.Initialize(controller);
 
         FieldRawImage = GetComponent<RawImage>();
         if (FieldRawImage == null) FieldRawImage = gameObject.AddComponent<RawImage>();
@@ -56,7 +56,7 @@ public class FieldTextureRenderer : FieldRendererBase
         FieldRawImage.color = Color.white;
     }
 
-    public override float RemoveLinesAnimation(List<int> y, GameMatrix gameMatrix, GameMatrix currentObject, int currentX, int currentY)
+    public override float RemoveLinesAnimation(List<int> y, GameMatrix gameMatrix, GameMatrix CurrentObject, int CurrentX, int CurrentY)
     {
         for (int i = y.Count - 1; i > -1; i--)
             for (int y2 = y[i]; y2 < MaxY - 1; y2++)
@@ -70,14 +70,14 @@ public class FieldTextureRenderer : FieldRendererBase
         return .2f;
     }
 
-    public override void ShowNextShape(Shapes shape)
+    public override void ShowNextShape()
     {
-        var obj = FieldController.ShapeObjects[shape];
+        var obj = FieldController.ShapeObjects[NextShape];
 
         int addx = (4 - obj.GetLength(0)) / 2;
         int addy = (4 - obj.GetLength(1)) / 2;
 
-        if (shape == Shapes.Z || shape == Shapes.ZR) addy++;
+        if (NextShape == Shapes.Z || NextShape == Shapes.ZR) addy++;
 
         NextObjectTexture.SetPixels(Enumerable.Repeat(black, 4 * 4).ToArray());
 
@@ -86,30 +86,30 @@ public class FieldTextureRenderer : FieldRendererBase
             {
                 if (x >= obj.GetLength(0) || y >= obj.GetLength(1)) continue;
 
-                if (obj[x, y]) NextObjectTexture.SetPixel(x + addx, y + addy, ShapeColors[shape]);
+                if (obj[x, y]) NextObjectTexture.SetPixel(x + addx, y + addy, ShapeColors[NextShape]);
             }
 
         NextObjectTexture.Apply();
         NextObjectRawImage.texture = NextObjectTexture;
     }
-    public override void UpdateColors(GameMatrix gameMatrix, Shapes currentShape) => CurrentColor = ShapeColors[currentShape];
-    protected override void _UpdateMatrix(GameMatrix gameMatrix, GameMatrix currentObject, int currentX, int currentY)
+    public override void UpdateColors() => CurrentColor = ShapeColors[CurrentShape];
+    protected override void _UpdateMatrix()
     {
         if (Game.BlindRendering)
         {
             for (int x = 0; x < MaxX; x++)
                 for (int y = MaxY - 1; y >= 0; y--)
                 {
-                    if (gameMatrix[x, y])
+                    if (GameMatrix[x, y])
                     {
                         SetState(x, y, CurrentColor);
 
                         for (int yy = y - 1; yy >= 0; yy--)
-                            SetState(x, yy, currentObject[x - currentX, yy - currentY] ? CurrentColor : black);
+                            SetState(x, yy, CurrentObject[x - CurrentX, yy - CurrentY] ? CurrentColor : black);
 
                         break;
                     }
-                    else SetState(x, y, currentObject[x - currentX, y - currentY] ? CurrentColor : black);
+                    else SetState(x, y, CurrentObject[x - CurrentX, y - CurrentY] ? CurrentColor : black);
                 }
         }
         else
@@ -117,9 +117,9 @@ public class FieldTextureRenderer : FieldRendererBase
             for (int y = 0; y < MaxY; y++)
                 for (int x = 0; x < MaxX; x++)
                 {
-                    if (currentObject[x - currentX, y - currentY])
+                    if (CurrentObject[x - CurrentX, y - CurrentY])
                         SetState(x, y, CurrentColor);
-                    else if (!gameMatrix[x, y])
+                    else if (!GameMatrix[x, y])
                         SetState(x, y, black);
                 }
         }
@@ -128,22 +128,22 @@ public class FieldTextureRenderer : FieldRendererBase
         FieldTexture.Apply();
         FieldRawImage.texture = FieldTexture;
     }
-    protected override void _UpdateMatrixFast(GameMatrix gameMatrix, GameMatrix currentObject, int currentX, int currentY)
+    protected override void _UpdateMatrixFast()
     {
-        _UpdateMatrix(gameMatrix, currentObject, currentX, currentY);
+        _UpdateMatrix();
 
         return;
 
-        if (Game.BlindRendering) _UpdateMatrix(gameMatrix, currentObject, currentX, currentY);
+        if (Game.BlindRendering) _UpdateMatrix();
         else
-            for (int y = currentY; y < currentY + currentObject.MaxY + 1; y++)
-                for (int x = currentX - 1; x < currentX + currentObject.MaxX + 1; x++)
+            for (int y = CurrentY; y < CurrentY + CurrentObject.MaxY + 1; y++)
+                for (int x = CurrentX - 1; x < CurrentX + CurrentObject.MaxX + 1; x++)
                 {
                     if (x < 0 || y < 0 || x >= MaxX || y >= MaxY) continue; // gameMatrix.IsInBounds(x, y); copied for performance resons
 
-                    if (currentObject[x - currentX, y - currentY])
+                    if (CurrentObject[x - CurrentX, y - CurrentY])
                         CurrentState[x + (y * MaxX)] = CurrentColor; // SetState(x, y, CurrentColor); copied for performance reasons
-                    else if (!gameMatrix.GetWithoutChecks(x, y))
+                    else if (!GameMatrix.GetWithoutChecks(x, y))
                         CurrentState[x + (y * MaxX)] = black; // SetState(x, y, black); copied for performance reasons
                 }
 
