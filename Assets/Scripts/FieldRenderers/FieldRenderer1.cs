@@ -2,19 +2,19 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FieldRenderer1 : FieldCanvasRendererBase
+public class FieldRenderer1 : FieldObjectRendererBase
 {
     Color StartCameraColor;
 
     void Start() => StartCameraColor = Game.Camera.backgroundColor;
 
-    public override float RemoveLinesAnimation(List<int> y, GameMatrix gameMatrix, GameMatrix currentObject, int X, int Y)
+    public override float RemoveLinesAnimation(List<int> listy, GameMatrix gameMatrix, GameMatrix currentObject, int x, int y)
     {
-        StartCoroutine(RemoveLinesAnimationCoroutine(y, gameMatrix, currentObject, X, Y));
+        StartCoroutine(RemoveLinesAnimationCoroutine(listy, gameMatrix, currentObject, x, y));
         return 1f;
     }
 
-    IEnumerator RemoveLinesAnimationCoroutine(List<int> y, GameMatrix gameMatrix, GameMatrix currentObject, int X, int Y)
+    IEnumerator RemoveLinesAnimationCoroutine(List<int> listy, GameMatrix gameMatrix, GameMatrix currentObject, int x, int y)
     {
         float speed = 0f;
 
@@ -30,17 +30,17 @@ public class FieldRenderer1 : FieldCanvasRendererBase
 
             for (int yy = 0; yy < MaxY; yy++)
             {
-                if (y.Contains(yy))
+                if (listy.Contains(yy))
                 {
                     for (int xx = 0; xx < MaxX; xx++)
                         (GameObjects[xx, yy].transform as RectTransform).anchoredPosition = Vector2.Lerp((GameObjects[xx, yy].transform as RectTransform).anchoredPosition,
                             new Vector2(xx + .5f - MaxX / 2f, -1 + .5f - MaxY / 2f), -speed);
                 }
-                else if (yy > y[0])
+                else if (yy > listy[0])
                 {
                     count = 0;
-                    for (int i = 0; i < y.Count; i++)
-                        if (y[i] < yy) count++;
+                    for (int i = 0; i < listy.Count; i++)
+                        if (listy[i] < yy) count++;
                         else break;
 
                     for (int xx = 0; xx < MaxX; xx++)
@@ -52,7 +52,7 @@ public class FieldRenderer1 : FieldCanvasRendererBase
             yield return wff;
         }
 
-        Game.Camera.backgroundColor += Color.white * (y.Count / 4f - .1f);
+        Game.Camera.backgroundColor += Color.white * (listy.Count / 4f - .1f);
         StartCoroutine(RevertCameraBackgroundColorCorotuine());
 
         /* var burst = TetrisEffectParticle.emission.GetBurst(0);
@@ -62,9 +62,9 @@ public class FieldRenderer1 : FieldCanvasRendererBase
 
         for (int yy = 0; yy < MaxY; yy++)
             for (int xx = 0; xx < MaxX; xx++)
-                (GameObjects[xx, yy].transform as RectTransform).anchoredPosition = new Vector2(xx + .5f - MaxX / 2f, yy + .5f - MaxY / 2f); // TODO check if this is working in canvas
+                (GameObjects[xx, yy].transform as RectTransform).anchoredPosition = new Vector2(xx + .5f - MaxX / 2f, yy + .5f - MaxY / 2f);
 
-        base.RemoveLinesAnimation(y, gameMatrix, currentObject, X, Y);
+        base.RemoveLinesAnimation(listy, gameMatrix, currentObject, x, y);
 
         // if (updateBgColor) SetHeightColor(gameMatrix);
     }

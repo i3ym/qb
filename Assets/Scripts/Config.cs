@@ -2,7 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public static class Config
+public class Config : MonoBehaviour
 {
-    public static RenderingTexture ActiveRenderingTexture = RenderingTexture.Classic;
+    public static Config Instance;
+
+    [SerializeField]
+    public Texture2D Atlas = null;
+
+    void Awake() => Instance = this;
 }

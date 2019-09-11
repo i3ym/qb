@@ -25,10 +25,17 @@ public abstract class Menu : MonoBehaviour
 
             ActiveController.ActiveButtonIndex--;
 
+            if (ActiveController.ActiveButtonIndex < 0)
+                ActiveController.ActiveButtonIndex = ActiveController.Buttons.Length - 1;
+
             while (!ActiveController.Buttons[ActiveController.ActiveButtonIndex].gameObject.activeSelf)
+            {
                 ActiveController.ActiveButtonIndex--;
 
-            if (ActiveController.ActiveButtonIndex < 0) ActiveController.ActiveButtonIndex = ActiveController.Buttons.Length - 1;
+                if (ActiveController.ActiveButtonIndex < 0)
+                    ActiveController.ActiveButtonIndex = ActiveController.Buttons.Length - 1;
+            }
+
             UpdateButtonDesign();
         };
         PlayerControls.OnDown += () =>

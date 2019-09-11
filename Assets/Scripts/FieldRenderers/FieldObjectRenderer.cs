@@ -1,27 +1,29 @@
-﻿using System;
+﻿using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 
-public abstract class FieldObjectRendererBase<T> : FieldRendererBase where T : Component
+public abstract class FieldObjectRendererBase : FieldRendererBase
 {
     [SerializeField]
     protected GameObject FieldGameObjectPrefab = null;
     [SerializeField]
     protected Transform NextObjectsParent = null;
-    [SerializeField]
-    protected Material BaseFieldGOMaterial = null;
 
-    protected T[, ] GameObjects;
+    protected RawImage[, ] GameObjects;
     protected GameObject[] NextObjects = new GameObject[7];
-    protected Dictionary<Shapes, Material> ShapeMaterials = new Dictionary<Shapes, Material>();
+
+    protected Dictionary<Shapes, Rect> Uvs = new Dictionary<Shapes, Rect>();
+
+    protected Texture2D Atlas => Config.Instance.Atlas;
 
     public override void Initialize()
     {
         base.Initialize();
 
-        foreach (var shape in Enum.GetValues(typeof(Shapes)).Cast<Shapes>())
-            ShapeMaterials.Add(shape, GetMaterial(shape));
+        var shapes = new Shapes[] { Shapes.G, Shapes.ZR, Shapes.GR, Shapes.O, Shapes.T, Shapes.Z, Shapes.I };
+        for (int i = 0; i < shapes.Length; i++)
+            Uvs.Add(shapes[i], new Rect(16f / Atlas.width * i, 1f - (16f / Atlas.height), 16f / Atlas.width, 16f / Atlas.height));
 
         for (int i = 0; i < 7; i++) NextObjects[i] = CreateNextObject((Shapes) i);
     }
@@ -31,29 +33,33 @@ public abstract class FieldObjectRendererBase<T> : FieldRendererBase where T : C
         MaxX = maxx;
         MaxY = maxy;
 
-        GameObjects = new T[maxx, maxy];
+        GameObjects = new RawImage[maxx, maxy];
 
         for (int y = 0; y < maxy; y++)
             for (int x = 0; x < maxx; x++)
-                GameObjects[x, y] = GetNewCube(new Vector2(x - MaxX / 2f, y - MaxY / 2f)).GetComponent<T>();
+                GameObjects[x, y] = GetNewCube(new Vector2(x - MaxX / 2f, y - MaxY / 2f)).GetComponent<RawImage>();
     }
 
-    protected abstract void SetMaterial(T t, Material material);
-    protected abstract void SetMaterial(T t, T t2);
+    protected void SetMaterial(RawImage img, Shapes shape) => img.uvRect = Uvs[shape];
+    protected void SetMaterial(RawImage img, RawImage img2) => img.uvRect = img2.uvRect;
 
-    protected virtual Material GetMaterial(Shapes shape) => new Material(BaseFieldGOMaterial) { color = ShapeColors[shape] };
     protected virtual GameObject GetNewCube(Vector3 pos)
     {
-        GameObject go = Instantiate(FieldGameObjectPrefab, pos + new Vector3(.5f, .5f), Quaternion.identity, transform);
+        GameObject go = Instantiate(FieldGameObjectPrefab, pos, Quaternion.identity, transform);
+        (go.transform as RectTransform).anchoredPosition = pos + new Vector3(.5f, .5f);
         go.SetActive(false);
+
+        go.GetComponent<RawImage>().texture = Atlas;
 
         return go;
     }
-    protected virtual GameObject GetNewNextCube(Vector3 pos, Transform parent, Material mat)
+    protected virtual GameObject GetNewNextCube(Vector3 pos, Transform parent, Shapes shape)
     {
         var cube = GetNewCube(pos);
         cube.transform.SetParent(parent, false);
-        SetMaterial(cube.GetComponent<T>(), mat);
+        (cube.transform as RectTransform).anchoredPosition = pos;
+
+        SetMaterial(cube.GetComponent<RawImage>(), shape);
         return cube;
     }
     protected virtual GameObject CreateNextObject(Shapes shape)
@@ -73,7 +79,7 @@ public abstract class FieldObjectRendererBase<T> : FieldRendererBase where T : C
             {
                 try
                 {
-                    if (Game.ShapeObjects[shape][x, y]) GetNewNextCube(new Vector3(x + addx, y + addy), go.transform, ShapeMaterials[shape]).SetActive(true);
+                    if (Game.ShapeObjects[shape][x, y]) GetNewNextCube(new Vector3(x + addx, y + addy), go.transform, shape).SetActive(true);
                 }
                 catch { }
             }
@@ -109,6 +115,9 @@ public abstract class FieldObjectRendererBase<T> : FieldRendererBase where T : C
     }
     protected override void _UpdateMatrixFast(GameMatrix gameMatrix, GameMatrix currentObject, int currentX, int currentY)
     {
+        _UpdateMatrix(gameMatrix, currentObject, currentX, currentY);
+        return;
+
         if (Game.BlindRendering)
         {
             for (int x = 0; x < MaxX; x++)
@@ -143,7 +152,7 @@ public abstract class FieldObjectRendererBase<T> : FieldRendererBase where T : C
     {
         for (int y = 0; y < MaxY; y++)
             for (int x = 0; x < MaxX; x++)
-                if (!gameMatrix[x, y]) SetMaterial(GameObjects[x, y], ShapeMaterials[currentShape]);
+                if (!gameMatrix[x, y]) SetMaterial(GameObjects[x, y], currentShape);
     }
     public override void ShowNextShape(Shapes shape)
     {
@@ -151,10 +160,10 @@ public abstract class FieldObjectRendererBase<T> : FieldRendererBase where T : C
         NextObjects[(int) shape].SetActive(true);
     }
 
-    public override float RemoveLinesAnimation(List<int> y, GameMatrix gameMatrix, GameMatrix currentObject, int X, int Y)
+    public override float RemoveLinesAnimation(List<int> listy, GameMatrix gameMatrix, GameMatrix currentObject, int x, int y)
     {
-        for (int i = y.Count - 1; i > -1; i--)
-            for (int y2 = y[i]; y2 < MaxY - 1; y2++)
+        for (int i = listy.Count - 1; i > -1; i--)
+            for (int y2 = listy[i]; y2 < MaxY - 1; y2++)
                 for (int x2 = 0; x2 < MaxX; x2++)
                     SetMaterial(GameObjects[x2, y2], GameObjects[x2, y2 + 1]);
 

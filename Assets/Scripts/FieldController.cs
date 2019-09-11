@@ -12,9 +12,12 @@ public abstract class FieldController : MonoBehaviour
     public static Dictionary<Shapes, bool[, ]> ShapeObjects = new Dictionary<Shapes, bool[, ]>();
     protected static int[][, ] TetrominoWallKickData, TetrominoWallKickDataI; //0R R0 R2 2R 2L L2 L0 0L
 
+    [HideInInspector]
     public int MaxX, MaxY;
 
+    [HideInInspector]
     public int Lvl = 0;
+    [HideInInspector]
     public bool IsAdContinued;
 
     protected ITetrisControlsProvider Controls;
@@ -108,16 +111,16 @@ public abstract class FieldController : MonoBehaviour
         SpawnBlock();
     }
 
-    protected IEnumerator RemoveLineAnimation(List<int> y)
+    protected IEnumerator RemoveLineAnimation(List<int> indexs)
     {
         CurrentX = 4;
         CurrentY = 25;
         IsPaused = true;
 
-        yield return new WaitForSeconds(FieldRenderer.RemoveLinesAnimation(y, GameMatrix, CurrentObject, CurrentX, CurrentY));
+        yield return new WaitForSeconds(FieldRenderer.RemoveLinesAnimation(indexs, GameMatrix, CurrentObject, CurrentX, CurrentY));
 
-        for (int i = y.Count - 1; i > -1; i--)
-            for (int y2 = y[i]; y2 < MaxY - 1; y2++)
+        for (int i = indexs.Count - 1; i > -1; i--)
+            for (int y2 = indexs[i]; y2 < MaxY - 1; y2++)
                 for (int x2 = 0; x2 < MaxX; x2++)
                     GameMatrix[x2, y2] = GameMatrix[x2, y2 + 1];
 

@@ -71,5 +71,5 @@ public abstract class FieldRendererBase : MonoBehaviour
     public abstract void ShowNextShape(Shapes shape);
 
     /// <returns> Duration of animation in seconds </returns> 
-    public abstract float RemoveLinesAnimation(List<int> y, GameMatrix gameMatrix, GameMatrix currentObject, int currentX, int currentY);
+    public abstract float RemoveLinesAnimation(List<int> indexs, GameMatrix gameMatrix, GameMatrix currentObject, int currentX, int currentY);
 }
