@@ -2,6 +2,7 @@ public class GameMatrix
 {
     readonly public int MaxX, MaxY;
     bool[, ] Matrix;
+    public bool Changed = false;
 
     public GameMatrix(int maxx, int maxy)
     {
@@ -16,7 +17,11 @@ public class GameMatrix
         get => IsInBounds(x, y) ? Matrix[x, y] : false;
         set
         {
-            if (IsInBounds(x, y)) Matrix[x, y] = value;
+            if (IsInBounds(x, y))
+            {
+                Matrix[x, y] = value;
+                Changed = true;
+            }
         }
     }
 

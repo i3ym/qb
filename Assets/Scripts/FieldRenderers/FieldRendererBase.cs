@@ -6,17 +6,12 @@ public abstract class FieldRendererBase : MonoBehaviour
     [SerializeField]
     protected IFieldRendererExtension[] Extensions = new IFieldRendererExtension[] { };
 
-    protected Dictionary<Shapes, Color> ShapeColors = new Dictionary<Shapes, Color>();
+    protected static Dictionary<Shapes, Color> ShapeColors = new Dictionary<Shapes, Color>();
     protected int MaxX, MaxY;
 
-    GameMatrix UpdateGameMatrix, UpdateCurrentObject;
-    int UpdateCurrentX, UpdateCurrentY;
-    bool DoUpdateMatrix = false, DoUpdateMatrixFast = false;
-
-    public virtual void Initialize()
+    static FieldRendererBase()
     {
-        foreach (var extension in Extensions) extension.Start();
-
+        ShapeColors.Clear();
         ShapeColors.Add(Shapes.G, Color.blue);
         ShapeColors.Add(Shapes.GR, new Color(1f, .5f, 0f));
         ShapeColors.Add(Shapes.Z, Color.red);
@@ -25,45 +20,31 @@ public abstract class FieldRendererBase : MonoBehaviour
         ShapeColors.Add(Shapes.T, new Color(.5f, 0f, 1f));
         ShapeColors.Add(Shapes.O, Color.yellow);
     }
+
+    public virtual void Initialize()
+    {
+        foreach (var extension in Extensions) extension.Start();
+    }
     protected virtual void Update()
     {
         foreach (var extension in Extensions)
             extension.Update();
     }
-    void LateUpdate()
-    {
-        if (DoUpdateMatrix)
-        {
-            _UpdateMatrix(UpdateGameMatrix, UpdateCurrentObject, UpdateCurrentX, UpdateCurrentY);
-            DoUpdateMatrix = false;
-            DoUpdateMatrixFast = false;
-        }
-        else if (DoUpdateMatrixFast)
-        {
-            _UpdateMatrixFast(UpdateGameMatrix, UpdateCurrentObject, UpdateCurrentX, UpdateCurrentY);
-            DoUpdateMatrixFast = false;
-        }
-    }
-
 
     public abstract void SetMaxs(int maxx, int maxy);
     public void UpdateMatrix(GameMatrix gameMatrix, GameMatrix currentObject, int currentX, int currentY)
     {
-        UpdateGameMatrix = gameMatrix;
-        UpdateCurrentObject = currentObject;
-        UpdateCurrentX = currentX;
-        UpdateCurrentY = currentY;
+        if (!gameMatrix.Changed) return;
 
-        DoUpdateMatrix = true;
+        gameMatrix.Changed = false;
+        _UpdateMatrix(gameMatrix, currentObject, currentX, currentY);
     }
     public void UpdateMatrixFast(GameMatrix gameMatrix, GameMatrix currentObject, int currentX, int currentY)
     {
-        UpdateGameMatrix = gameMatrix;
-        UpdateCurrentObject = currentObject;
-        UpdateCurrentX = currentX;
-        UpdateCurrentY = currentY;
+        if (!gameMatrix.Changed) return;
 
-        DoUpdateMatrixFast = true;
+        gameMatrix.Changed = false;
+        _UpdateMatrixFast(gameMatrix, currentObject, currentX, currentY);
     }
     protected abstract void _UpdateMatrix(GameMatrix gameMatrix, GameMatrix currentObject, int currentX, int currentY);
     protected abstract void _UpdateMatrixFast(GameMatrix gameMatrix, GameMatrix currentObject, int currentX, int currentY);
