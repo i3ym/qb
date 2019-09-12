@@ -19,7 +19,7 @@ public abstract class ChooseMenu : Menu
 
         var buttons = GetButtons();
         Buttons = new Button[buttons.Length];
-        
+
         MaxX = (int) transform.rect.width;
         MaxY = (int) transform.rect.height - (Buttons.Length - 1) * 2;
 
@@ -50,12 +50,7 @@ public abstract class ChooseMenu : Menu
             onSelect();
             ShowField(index);
         };
-        btn.OnClick += () =>
-        {
-            onClick();
-            Game.Instance.RestartGame();
-            SetMenu(null as Menu);
-        };
+        btn.OnClick += () => onClick();
 
         var autoGame = go.GetComponent<AutoGame>();
         autoGame.SetMax(MaxX, MaxY);

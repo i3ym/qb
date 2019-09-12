@@ -71,8 +71,8 @@ public class FieldTextureRenderer : FieldRendererBase
     {
         var obj = FieldController.ShapeObjects[NextShape];
 
-        int addx = (4 - obj.GetLength(0)) / 2;
-        int addy = (4 - obj.GetLength(1)) / 2;
+        int addx = (4 - obj.MaxX) / 2;
+        int addy = (4 - obj.MaxY) / 2;
 
         if (NextShape == Shapes.Z || NextShape == Shapes.ZR) addy++;
 
@@ -81,7 +81,7 @@ public class FieldTextureRenderer : FieldRendererBase
         for (int x = 0; x < 4; x++)
             for (int y = 0; y < 4; y++)
             {
-                if (x >= obj.GetLength(0) || y >= obj.GetLength(1)) continue;
+                if (x >= obj.MaxX || y >= obj.MaxY) continue;
 
                 if (obj[x, y]) NextObjectTexture.SetPixel(x + addx, y + addy, ShapeColors[NextShape]);
             }

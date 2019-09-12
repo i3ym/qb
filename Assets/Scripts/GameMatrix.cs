@@ -44,7 +44,6 @@ public class GameMatrix
         return matrix;
     }
 
-    //
 
     public static implicit operator GameMatrix(bool[, ] matrix) => new GameMatrix(matrix.GetLength(0), matrix.GetLength(1)) { Matrix = matrix };
 }

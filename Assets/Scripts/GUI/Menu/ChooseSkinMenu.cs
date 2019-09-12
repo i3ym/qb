@@ -3,6 +3,8 @@ using System.Linq;
 
 public class ChooseSkinMenu : ChooseMenu
 {
+    protected override Type PreviousMenuType => typeof(SettingsMenu);
+
     protected override(string name, Action onSelect, Action onClick) [] GetButtons()
     {
         return new []
@@ -10,9 +12,11 @@ public class ChooseSkinMenu : ChooseMenu
             "Classic",
             "Sadness",
             "Forest",
-            "TODO",
+            "Lines",
             "Faces",
             "Neon"
-        }.Select((string x, int i) => (x, (Action) (() => FieldObjectRenderer.Skin = i + 1), (Action) (() => FieldObjectRenderer.Skin = i + 1))).ToArray();
+        }.Select((string x, int i) => (x,
+            (Action) (() => FieldObjectRenderer.Skin = i + 1),
+            (Action) (() => SetMenu<SettingsMenu>()))).ToArray();
     }
 }

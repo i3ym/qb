@@ -9,7 +9,7 @@ public abstract class FieldController : MonoBehaviour, IFieldController
     public static Camera Camera;
     public static bool BlindRendering = false;
 
-    public static Dictionary<Shapes, bool[, ]> ShapeObjects = new Dictionary<Shapes, bool[, ]>();
+    public static Dictionary<Shapes, GameMatrix> ShapeObjects = new Dictionary<Shapes, GameMatrix>();
     protected static int[][, ] TetrominoWallKickData, TetrominoWallKickDataI; //0R R0 R2 2R 2L L2 L0 0L
 
     [HideInInspector]

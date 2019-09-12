@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -6,23 +7,20 @@ public abstract class FieldObjectRenderer : FieldRendererBase
 {
     public static int Skin
     {
-        get => _Skin;
+        get => Config.SelectedSkin;
         set
         {
-            _Skin = value;
+            Config.SelectedSkin = value;
             RecreateUvs();
         }
     }
-
-    static int _Skin = 1;
 
     [SerializeField]
     protected GameObject FieldGameObjectPrefab = null;
     [SerializeField]
     protected Transform NextObjectsParent = null;
 
-    protected RawImage[, ] GameObjects;
-    protected GameObject[] NextObjects = new GameObject[7];
+    protected RawImage[, ] GameObjects, NextObjects;
 
     protected static Dictionary<Shapes, Rect> Uvs = new Dictionary<Shapes, Rect>();
 
@@ -33,13 +31,12 @@ public abstract class FieldObjectRenderer : FieldRendererBase
         base.Initialize(controller);
 
         RecreateUvs();
-        for (int i = 0; i < 7; i++) NextObjects[i] = CreateNextObject((Shapes) i);
     }
 
     static void RecreateUvs()
     {
         Uvs.Clear();
-        
+
         var shapes = new Shapes[] { Shapes.G, Shapes.ZR, Shapes.GR, Shapes.O, Shapes.T, Shapes.Z, Shapes.I };
         for (int i = 0; i < shapes.Length; i++)
             Uvs.Add(shapes[i], new Rect(16f / Atlas.width * i, 1f - (16f / Atlas.height * Skin), 16f / Atlas.width, 16f / Atlas.height));
@@ -56,6 +53,23 @@ public abstract class FieldObjectRenderer : FieldRendererBase
         for (int y = 0; y < MaxY; y++)
             for (int x = 0; x < MaxX; x++)
                 GameObjects[x, y] = GetNewCube(new Vector2(x - MaxX / 2f, y - MaxY / 2f)).GetComponent<RawImage>();
+
+        if (NextObjects != null)
+            foreach (var img in NextObjects)
+                Destroy(img.gameObject);
+
+        NextObjects = new RawImage[4, 4];
+
+        GameObject cube;
+        for (int y = 0; y < 4; y++)
+            for (int x = 0; x < 4; x++)
+            {
+                cube = GetNewCube(new Vector2(x - MaxX / 2f, y - MaxY / 2f));
+                cube.transform.SetParent(NextObjectsParent, false);
+                (cube.transform as RectTransform).anchoredPosition = new Vector2(x, y);
+
+                NextObjects[x, y] = cube.GetComponent<RawImage>();
+            }
     }
 
     protected void SetMaterial(RawImage img, Shapes shape) => img.uvRect = Uvs[shape];
@@ -80,31 +94,31 @@ public abstract class FieldObjectRenderer : FieldRendererBase
         SetMaterial(cube.GetComponent<RawImage>(), shape);
         return cube;
     }
-    protected virtual GameObject CreateNextObject(Shapes shape)
-    {
-        var go = new GameObject("NEXT_" + shape.ToString());
-        go.transform.SetParent(NextObjectsParent);
-        go.transform.localPosition = new Vector3(.5f, .5f);
-        go.transform.localScale = Vector3.one;
+    /* protected virtual GameObject CreateNextObject(Shapes shape)
+     {
+         var go = new GameObject("NEXT_" + shape.ToString());
+         go.transform.SetParent(NextObjectsParent);
+         go.transform.localPosition = new Vector3(.5f, .5f);
+         go.transform.localScale = Vector3.one;
 
-        int addx = 0, addy = 0;
+         int addx = 0, addy = 0;
 
-        if (shape == Shapes.I || shape == Shapes.GR || shape == Shapes.G || shape == Shapes.T) addy = -1;
-        if (shape == Shapes.O) addx = 1;
+         if (shape == Shapes.I || shape == Shapes.GR || shape == Shapes.G || shape == Shapes.T) addy = -1;
+         if (shape == Shapes.O) addx = 1;
 
-        for (int x = 0; x < 4; x++)
-            for (int y = 0; y < 4; y++)
-            {
-                try
-                {
-                    if (Game.ShapeObjects[shape][x, y]) GetNewNextCube(new Vector3(x + addx, y + addy), go.transform, shape).SetActive(true);
-                }
-                catch { }
-            }
+         for (int x = 0; x < 4; x++)
+             for (int y = 0; y < 4; y++)
+             {
+                 try
+                 {
+                     if (Game.ShapeObjects[shape][x, y]) GetNewNextCube(new Vector3(x + addx, y + addy), go.transform, shape).SetActive(true);
+                 }
+                 catch { }
+             }
 
-        go.SetActive(false);
-        return go;
-    }
+         go.SetActive(false);
+         return go;
+     }*/
 
     protected override void _UpdateMatrix()
     {
@@ -179,8 +193,14 @@ public abstract class FieldObjectRenderer : FieldRendererBase
     }
     public override void ShowNextShape()
     {
-        for (int i = 0; i < 7; i++) NextObjects[i].SetActive(false);
-        NextObjects[(int) NextShape].SetActive(true);
+        var nextMatrix = FieldController.ShapeObjects[NextShape];
+
+        for (int y = 0; y < 4; y++)
+            for (int x = 0; x < 4; x++)
+            {
+                NextObjects[x, y].gameObject.SetActive(nextMatrix[x, y]);
+                SetMaterial(NextObjects[x, y], NextShape);
+            }
     }
 
     public override float RemoveLinesAnimation(List<int> listy, GameMatrix GameMatrix, GameMatrix CurrentObject, int x, int y)
