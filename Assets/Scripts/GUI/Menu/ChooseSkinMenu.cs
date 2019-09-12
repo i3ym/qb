@@ -19,4 +19,10 @@ public class ChooseSkinMenu : ChooseMenu
             (Action) (() => FieldObjectRenderer.Skin = i + 1),
             (Action) (() => SetMenu<SettingsMenu>()))).ToArray();
     }
+
+    protected override void OnShow()
+    {
+        ActiveButtonIndex = Config.SelectedSkin - 1;
+        UpdateButtonDesign();
+    }
 }
