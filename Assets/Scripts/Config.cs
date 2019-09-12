@@ -28,9 +28,6 @@ public class Config : MonoBehaviour
         {
             Cfg = new Configuration();
         }
-
-
-        Debug.Log(SelectedSkin);
     }
 
     static void Save() => File.WriteAllText(SavePath, JsonUtility.ToJson(Cfg));

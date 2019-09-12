@@ -224,8 +224,8 @@ public abstract class FieldController : MonoBehaviour, IFieldController
     {
         bool needStop()
         {
-            for (int x = 0; x < CurrentObject.MaxX; x++)
-                for (int y = 0; y < CurrentObject.MaxY; y++)
+            for (int y = 0; y < CurrentObject.MaxY; y++)
+                for (int x = 0; x < CurrentObject.MaxX; x++)
                 {
                     if (x + CurrentX >= GameMatrix.MaxX ||
                         y + CurrentY - 1 >= GameMatrix.MaxY ||
@@ -247,15 +247,21 @@ public abstract class FieldController : MonoBehaviour, IFieldController
             while (IsPaused) yield return new WaitWhile(() => IsPaused);
 
             time = Time.time;
-
             while (time + (Controls.Down ? FastMoveDownSpeed : MoveDownSpeed) > Time.time)
                 yield return null;
 
             if (IsPaused) continue;
             if (needStop())
             {
-                SetBlockToField();
-                RemoveLines();
+                time = Time.time;
+                while (!Controls.Down && time + .5f > Time.time && needStop())
+                    yield return null;
+
+                if (needStop())
+                {
+                    SetBlockToField();
+                    RemoveLines();
+                }
             }
             else
             {
