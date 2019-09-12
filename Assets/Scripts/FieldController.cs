@@ -36,11 +36,13 @@ public abstract class FieldController : MonoBehaviour, IFieldController
 
     GameMatrix IFieldController.GameMatrix => GameMatrix;
     GameMatrix IFieldController.CurrentObject => CurrentObject;
+    int IFieldController.MaxX => MaxX;
+    int IFieldController.MaxY => MaxY;
     int IFieldController.CurrentX => CurrentX;
     int IFieldController.CurrentY => CurrentY;
+    int IFieldController.CurrentRotation => CurrentRotation;
     Shapes IFieldController.CurrentShape => CurrentShape;
     Shapes IFieldController.NextShape => NextShape;
-    int IFieldController.CurrentRotation => CurrentRotation;
 
     protected int _score, _lines;
 
@@ -80,7 +82,10 @@ public abstract class FieldController : MonoBehaviour, IFieldController
         if (FieldRenderer == null) FieldRenderer = GetComponent<FieldRendererBase>();
 
         FieldRenderer.Initialize(this);
-        FieldRenderer.SetMaxs(GetMaxX(), GetMaxY());
+
+        MaxX = GetMaxX();
+        MaxY = GetMaxY();
+        FieldRenderer.CreateField();
 
         SetDefaults();
     }

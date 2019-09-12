@@ -28,7 +28,11 @@ public class GameMatrix
     public bool GetWithoutChecks(int x, int y) => Matrix[x, y];
     public bool IsInBounds(int x, int y) => !(x < 0 || y < 0 || x >= MaxX || y >= MaxY);
 
-    public void Clear() => Matrix = new bool[MaxX, MaxY];
+    public void Clear()
+    {
+        Matrix = new bool[MaxX, MaxY];
+        Changed = true;
+    }
     public GameMatrix Clone()
     {
         GameMatrix matrix = new GameMatrix(MaxX, MaxY);

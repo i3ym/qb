@@ -12,6 +12,8 @@ public abstract class FieldRendererBase : MonoBehaviour
 
     protected GameMatrix GameMatrix => Controller.GameMatrix;
     protected GameMatrix CurrentObject => Controller.CurrentObject;
+    protected int MaxX => Controller.MaxX;
+    protected int MaxY => Controller.MaxY;
     protected int CurrentX => Controller.CurrentX;
     protected int CurrentY => Controller.CurrentY;
     protected int CurrentRotation => Controller.CurrentRotation;
@@ -19,7 +21,6 @@ public abstract class FieldRendererBase : MonoBehaviour
     protected Shapes NextShape => Controller.NextShape;
 
     protected static Dictionary<Shapes, Color> ShapeColors = new Dictionary<Shapes, Color>();
-    protected int MaxX, MaxY;
 
     static FieldRendererBase()
     {
@@ -45,7 +46,7 @@ public abstract class FieldRendererBase : MonoBehaviour
             extension.Update();
     }
 
-    public abstract void SetMaxs(int maxx, int maxy);
+    public abstract void CreateField();
     public void UpdateMatrix()
     {
         if (!GameMatrix.Changed && LastX == CurrentX && LastY == CurrentY && LastRotation == CurrentRotation) return;

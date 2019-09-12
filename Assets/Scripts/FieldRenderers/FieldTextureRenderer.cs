@@ -40,14 +40,11 @@ public class FieldTextureRenderer : FieldRendererBase
     [MethodImpl(256)]
     Color GetState(int x, int y) => CurrentState[x + (y * MaxX)];
 
-    public override void SetMaxs(int maxx, int maxy)
+    public override void CreateField()
     {
-        MaxX = maxx;
-        MaxY = maxy;
-
         CurrentState = Enumerable.Repeat(black, MaxX * MaxY).ToArray();
 
-        FieldTexture = new Texture2D(maxx, maxy, TextureFormat.RGB24, 0, true);
+        FieldTexture = new Texture2D(MaxX, MaxY, TextureFormat.RGB24, 0, true);
         FieldTexture.filterMode = FilterMode.Point;
         FieldTexture.SetPixels(CurrentState);
         FieldTexture.Apply();

@@ -5,7 +5,7 @@ using UnityEngine;
 
 public abstract class ChooseMenu : Menu
 {
-    public static int MaxX, MaxY;
+    public int MaxX, MaxY;
 
     [SerializeField]
     protected GameObject ButtonPrefab = null;
@@ -17,11 +17,11 @@ public abstract class ChooseMenu : Menu
     {
         transform = gameObject.transform as RectTransform;
 
-        MaxX = (int) transform.rect.width;
-        MaxY = (int) transform.rect.height - (Buttons.Length - 1) * 2;
-
         var buttons = GetButtons();
         Buttons = new Button[buttons.Length];
+        
+        MaxX = (int) transform.rect.width;
+        MaxY = (int) transform.rect.height - (Buttons.Length - 1) * 2;
 
         for (int i = 0; i < buttons.Length; i++)
             CreateButton(i, buttons.Length, buttons[i].name, buttons[i].onSelect, buttons[i].onClick);

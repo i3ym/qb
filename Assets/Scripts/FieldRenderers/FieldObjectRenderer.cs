@@ -1,10 +1,21 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public abstract class FieldObjectRendererBase : FieldRendererBase
+public abstract class FieldObjectRenderer : FieldRendererBase
 {
+    public static int Skin
+    {
+        get => _Skin;
+        set
+        {
+            _Skin = value;
+            RecreateUvs();
+        }
+    }
+
+    static int _Skin = 1;
+
     [SerializeField]
     protected GameObject FieldGameObjectPrefab = null;
     [SerializeField]
@@ -13,30 +24,37 @@ public abstract class FieldObjectRendererBase : FieldRendererBase
     protected RawImage[, ] GameObjects;
     protected GameObject[] NextObjects = new GameObject[7];
 
-    protected Dictionary<Shapes, Rect> Uvs = new Dictionary<Shapes, Rect>();
+    protected static Dictionary<Shapes, Rect> Uvs = new Dictionary<Shapes, Rect>();
 
-    protected Texture2D Atlas => Config.Instance.Atlas;
+    protected static Texture2D Atlas => Config.Instance.Atlas;
 
     public override void Initialize(IFieldController controller)
     {
         base.Initialize(controller);
 
-        var shapes = new Shapes[] { Shapes.G, Shapes.ZR, Shapes.GR, Shapes.O, Shapes.T, Shapes.Z, Shapes.I };
-        for (int i = 0; i < shapes.Length; i++)
-            Uvs.Add(shapes[i], new Rect(16f / Atlas.width * i, 1f - (16f / Atlas.height), 16f / Atlas.width, 16f / Atlas.height));
-
+        RecreateUvs();
         for (int i = 0; i < 7; i++) NextObjects[i] = CreateNextObject((Shapes) i);
     }
 
-    public override void SetMaxs(int maxx, int maxy)
+    static void RecreateUvs()
     {
-        MaxX = maxx;
-        MaxY = maxy;
+        Uvs.Clear();
+        
+        var shapes = new Shapes[] { Shapes.G, Shapes.ZR, Shapes.GR, Shapes.O, Shapes.T, Shapes.Z, Shapes.I };
+        for (int i = 0; i < shapes.Length; i++)
+            Uvs.Add(shapes[i], new Rect(16f / Atlas.width * i, 1f - (16f / Atlas.height * Skin), 16f / Atlas.width, 16f / Atlas.height));
+    }
 
-        GameObjects = new RawImage[maxx, maxy];
+    public override void CreateField()
+    {
+        if (GameObjects != null)
+            foreach (var img in GameObjects)
+                Destroy(img.gameObject);
 
-        for (int y = 0; y < maxy; y++)
-            for (int x = 0; x < maxx; x++)
+        GameObjects = new RawImage[MaxX, MaxY];
+
+        for (int y = 0; y < MaxY; y++)
+            for (int x = 0; x < MaxX; x++)
                 GameObjects[x, y] = GetNewCube(new Vector2(x - MaxX / 2f, y - MaxY / 2f)).GetComponent<RawImage>();
     }
 
@@ -149,6 +167,8 @@ public abstract class FieldObjectRendererBase : FieldRendererBase
                     else if (!GameMatrix[x, y])
                         GameObjects[x, y].gameObject.SetActive(false);
                 }
+
+        UpdateColors();
     }
     public override void UpdateColors()
     {
@@ -156,13 +176,6 @@ public abstract class FieldObjectRendererBase : FieldRendererBase
             for (int x = 0; x < CurrentObject.MaxY; x++)
                 if (CurrentObject[x, y] && CurrentX + x >= 0 && CurrentY + y >= 0 && CurrentX + x < GameObjects.GetLength(0) && CurrentY + y < GameObjects.GetLength(1))
                     SetMaterial(GameObjects[CurrentX + x, CurrentY + y], CurrentShape);
-
-
-        return;
-
-        for (int y = 0; y < MaxY; y++)
-            for (int x = 0; x < MaxX; x++)
-                if (!GameMatrix[x, y]) SetMaterial(GameObjects[x, y], CurrentShape);
     }
     public override void ShowNextShape()
     {

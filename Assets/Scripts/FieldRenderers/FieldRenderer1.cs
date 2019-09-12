@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FieldRenderer1 : FieldObjectRendererBase
+public class FieldRenderer1 : FieldObjectRenderer
 {
     Color StartCameraColor;
 

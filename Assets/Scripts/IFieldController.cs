@@ -6,6 +6,8 @@ public interface IFieldController
 {
     GameMatrix GameMatrix { get; }
     GameMatrix CurrentObject { get; }
+    int MaxX { get; }
+    int MaxY { get; }
     int CurrentX { get; }
     int CurrentY { get; }
     int CurrentRotation { get; }
