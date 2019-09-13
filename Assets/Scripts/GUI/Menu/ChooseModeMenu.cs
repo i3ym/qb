@@ -6,17 +6,10 @@ public class ChooseModeMenu : ChooseMenu
         new(string, Action, Action) []
         {
             ("Normal",
-                () => Game.BlindRendering = false, () =>
-                {
-                    Game.Instance.RestartGame();
-                    SetMenu(null as Menu);
-                }),
+            () => Game.BlindRendering = false,
+            () => SetMenu<ChooseLvlMenu>()),
             ("Blind",
-                () => Game.BlindRendering = true,
-                () =>
-                {
-                    Game.Instance.RestartGame();
-                    SetMenu(null as Menu);
-                })
+            () => Game.BlindRendering = true,
+            () => SetMenu<ChooseLvlMenu>())
         };
 }

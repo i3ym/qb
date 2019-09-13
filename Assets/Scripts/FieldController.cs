@@ -19,9 +19,10 @@ public abstract class FieldController : MonoBehaviour, IFieldController
     public int Lvl = 0;
     [HideInInspector]
     public bool IsAdContinued;
+    [HideInInspector]
+    public int StartLvl = 0;
 
     protected ITetrisControlsProvider Controls;
-    protected int StartLvl;
     protected bool IsLvlReached, IsPaused;
     protected float MoveDownSpeed;
     protected List<Shapes> RandomBag = new List<Shapes>();
@@ -29,6 +30,7 @@ public abstract class FieldController : MonoBehaviour, IFieldController
     protected GameMatrix GameMatrix, CurrentObject;
     protected int CurrentX, CurrentY, CurrentRotation;
     protected Shapes CurrentShape, NextShape;
+    protected bool BlockJustSpawned = false;
 
     protected float FastMoveDownSpeed => MoveDownSpeed > 2f / 60f ? 2f / 60f : MoveDownSpeed / 2f;
     protected int Score { get => _score; set { _score = value; ScoreText.text = value.ToString(); } }
@@ -246,6 +248,15 @@ public abstract class FieldController : MonoBehaviour, IFieldController
         {
             while (IsPaused) yield return new WaitWhile(() => IsPaused);
 
+            if (BlockJustSpawned)
+            {
+                time = Time.time + .5f;
+                while (time > Time.time && !Controls.Left && !Controls.Right && !Controls.Down)
+                    yield return null;
+
+                BlockJustSpawned = false;
+            }
+
             time = Time.time;
             while (time + (Controls.Down ? FastMoveDownSpeed : MoveDownSpeed) > Time.time)
                 yield return null;
@@ -253,8 +264,8 @@ public abstract class FieldController : MonoBehaviour, IFieldController
             if (IsPaused) continue;
             if (needStop())
             {
-                time = Time.time;
-                while (!Controls.Down && time + .5f > Time.time && needStop())
+                time = Time.time + .5f;
+                while (!Controls.Down && time > Time.time && needStop())
                     yield return null;
 
                 if (needStop())
@@ -300,6 +311,8 @@ public abstract class FieldController : MonoBehaviour, IFieldController
 
         FieldRenderer.UpdateColors();
         FieldRenderer.UpdateMatrix();
+
+        BlockJustSpawned = true;
     }
     protected void SetBlockToField()
     {
