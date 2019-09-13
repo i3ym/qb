@@ -18,7 +18,6 @@ public class FieldRenderer1 : FieldObjectRenderer
     {
         float speed = 0f;
 
-        Vector3 temp;
         float time = Time.time + 1f;
         int count;
 
@@ -26,7 +25,9 @@ public class FieldRenderer1 : FieldObjectRenderer
 
         while (time > Time.time)
         {
-            temp = new Vector3(0, speed -= .01f);
+            yield return wff;
+
+            speed -= .01f;
 
             for (int yy = 0; yy < MaxY; yy++)
             {
@@ -34,7 +35,7 @@ public class FieldRenderer1 : FieldObjectRenderer
                 {
                     for (int xx = 0; xx < MaxX; xx++)
                         (GameObjects[xx, yy].transform as RectTransform).anchoredPosition = Vector2.Lerp((GameObjects[xx, yy].transform as RectTransform).anchoredPosition,
-                            new Vector2(xx + .5f - MaxX / 2f, -1 + .5f - MaxY / 2f), -speed);
+                            new Vector2(xx, -1), -speed);
                 }
                 else if (yy > listy[0])
                 {
@@ -45,28 +46,19 @@ public class FieldRenderer1 : FieldObjectRenderer
 
                     for (int xx = 0; xx < MaxX; xx++)
                         (GameObjects[xx, yy].transform as RectTransform).anchoredPosition = Vector2.Lerp((GameObjects[xx, yy].transform as RectTransform).anchoredPosition,
-                            new Vector2(xx + .5f - MaxX / 2f, yy - count + .5f - MaxY / 2f), -speed);
+                            new Vector2(xx, yy - count), -speed);
                 }
             }
-
-            yield return wff;
         }
-
-        Game.Camera.backgroundColor += Color.white * (listy.Count / 4f - .1f);
-        StartCoroutine(RevertCameraBackgroundColorCorotuine());
-
-        /* var burst = TetrisEffectParticle.emission.GetBurst(0);
-        burst.count = 10 * y.Count;
-        TetrisEffectParticle.emission.SetBurst(0, burst);
-        TetrisEffectParticle.Play();*/
 
         for (int yy = 0; yy < MaxY; yy++)
             for (int xx = 0; xx < MaxX; xx++)
-                (GameObjects[xx, yy].transform as RectTransform).anchoredPosition = new Vector2(xx + .5f - MaxX / 2f, yy + .5f - MaxY / 2f);
+                (GameObjects[xx, yy].transform as RectTransform).anchoredPosition = new Vector2(xx, yy);
 
         base.RemoveLinesAnimation(listy, gameMatrix, currentObject, x, y);
 
-        // if (updateBgColor) SetHeightColor(gameMatrix);
+        Game.Camera.backgroundColor += Color.white * (listy.Count / 4f - .1f);
+        StartCoroutine(RevertCameraBackgroundColorCorotuine());
     }
 
     IEnumerator RevertCameraBackgroundColorCorotuine()

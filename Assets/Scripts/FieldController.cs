@@ -144,8 +144,6 @@ public abstract class FieldController : MonoBehaviour, IFieldController
         for (int x2 = 0; x2 < MaxX; x2++)
             GameMatrix[x2, MaxY - 1] = false;
 
-        FieldRenderer.UpdateMatrix();
-
         IsPaused = false;
         SpawnBlock();
     }
@@ -321,10 +319,10 @@ public abstract class FieldController : MonoBehaviour, IFieldController
                     return;
                 }
 
+        BlockJustSpawned = true;
+
         FieldRenderer.UpdateColors();
         FieldRenderer.UpdateMatrix();
-
-        BlockJustSpawned = true;
     }
     protected void SetBlockToField()
     {
