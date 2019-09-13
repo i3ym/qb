@@ -291,18 +291,30 @@ public abstract class FieldController : MonoBehaviour, IFieldController
         if (RandomBag.Count == 0)
             RandomBag.AddRange(new Shapes[] { Shapes.G, Shapes.GR, Shapes.I, Shapes.O, Shapes.T, Shapes.Z, Shapes.ZR });
 
-        CurrentX = 4;
-        CurrentY = 19;
         CurrentRotation = 0;
-        CurrentObject = ShapeObjects[CurrentShape = NextShape];
+        CurrentShape = NextShape;
+        CurrentObject = ShapeObjects[CurrentShape];
+
+        CurrentX = 4;
+        CurrentY = 20 - CurrentObject.MaxY;
+
+        for (int y = CurrentObject.MaxY - 1; y >= 0; y--)
+        {
+            for (int x = 0; x < CurrentObject.MaxX; x++)
+                if (CurrentObject[x, y])
+                    goto end;
+
+            CurrentY++;
+        }
+        end: ;
 
         int take = new System.Random().Next(RandomBag.Count);
         NextShape = RandomBag[take];
         RandomBag.RemoveAt(take);
         FieldRenderer.ShowNextShape();
 
-        for (int x = 0; x < CurrentObject.MaxX; x++)
-            for (int y = 0; y < CurrentObject.MaxY; y++)
+        for (int y = 0; y < CurrentObject.MaxY; y++)
+            for (int x = 0; x < CurrentObject.MaxX; x++)
                 if (CurrentObject[x, y] && GameMatrix[x + CurrentX, y + CurrentY])
                 {
                     GameOver();
