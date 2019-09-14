@@ -14,15 +14,16 @@ public class ChooseSkinMenu : ChooseMenu
             "Forest",
             "Lines",
             "Faces",
-            "Neon"
+            "Neon",
+            "Leaf Fall"
         }.Select((string x, int i) => (x,
-            (Action) (() => FieldObjectRenderer.Skin = i + 1),
+            (Action) (() => Config.SelectedSkin = i),
             (Action) (() => SetMenu<MainMenu>()))).ToArray();
     }
 
     protected override void OnShow()
     {
-        ActiveButtonIndex = Config.SelectedSkin - 1;
+        ActiveButtonIndex = Config.SelectedSkin;
         UpdateButtonDesign();
     }
 }

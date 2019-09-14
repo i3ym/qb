@@ -1,20 +1,9 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
 public abstract class FieldObjectRenderer : FieldRendererBase
 {
-    public static int Skin
-    {
-        get => Config.SelectedSkin;
-        set
-        {
-            Config.SelectedSkin = value;
-            RecreateUvs();
-        }
-    }
-
     [SerializeField]
     protected GameObject FieldGameObjectPrefab = null;
     [SerializeField]
@@ -30,7 +19,8 @@ public abstract class FieldObjectRenderer : FieldRendererBase
     {
         base.Initialize(controller);
 
-        RecreateUvs();
+        Config.OnSkinChange += () => RecreateUvs();
+        Config.SelectedSkin = Config.SelectedSkin;
     }
 
     static void RecreateUvs()
@@ -39,7 +29,7 @@ public abstract class FieldObjectRenderer : FieldRendererBase
 
         var shapes = new Shapes[] { Shapes.G, Shapes.ZR, Shapes.GR, Shapes.O, Shapes.T, Shapes.Z, Shapes.I };
         for (int i = 0; i < shapes.Length; i++)
-            Uvs.Add(shapes[i], new Rect(16f / Atlas.width * i, 1f - (16f / Atlas.height * Skin), 16f / Atlas.width, 16f / Atlas.height));
+            Uvs.Add(shapes[i], new Rect(16f / Atlas.width * i, 1f - (16f / Atlas.height * (Config.SelectedSkin + 1)), 16f / Atlas.width, 16f / Atlas.height));
     }
 
     public override void CreateField()

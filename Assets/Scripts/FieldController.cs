@@ -53,7 +53,7 @@ public abstract class FieldController : MonoBehaviour, IFieldController
     [SerializeField]
     protected TextMeshProUGUI ScoreText = null, TimeText = null, LvlText = null, LinesText = null;
     [SerializeField]
-    protected FieldRendererBase FieldRenderer = null;
+    public FieldRendererBase FieldRenderer = null;
 
     static FieldController()
     {

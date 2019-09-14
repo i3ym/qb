@@ -78,6 +78,8 @@ public abstract class Menu : MonoBehaviour
     {
         foreach (var m in Menus) m.gameObject.SetActive(false);
 
+        BottomLine.Instance.enabled = !(TopImage.Instance.enabled = menu == null || menu.GetType() == typeof(PauseMenu) || menu.GetType() == typeof(GameOverMenu));
+
         if (menu != null) menu.Enable();
         ActiveController = menu;
         UpdateButtonDesign();
