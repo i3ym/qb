@@ -57,6 +57,7 @@ public abstract class Menu : MonoBehaviour
         PlayerControls.OnRotateC += () =>
         {
             if (ActiveController == null || !ActiveController.enabled || !ActiveController.gameObject.activeSelf) return;
+            ActiveController.OnGoBack();
             SetMenu(ActiveController.PreviousMenuType);
         };
     }
@@ -71,6 +72,7 @@ public abstract class Menu : MonoBehaviour
 
     protected abstract void Init();
     protected virtual void OnShow() { }
+    protected virtual void OnGoBack() { }
 
     public static void SetMenu(Menu menu)
     {
@@ -80,7 +82,7 @@ public abstract class Menu : MonoBehaviour
         ActiveController = menu;
         UpdateButtonDesign();
     }
-    public static void SetMenu(Type type) => SetMenu(Menus.First(x => x.GetType() == type));
+    public static void SetMenu(Type type) => SetMenu(type == null ? null as Menu : Menus.First(x => x.GetType() == type));
     public static void SetMenu<T>() where T : Menu => SetMenu(typeof(T));
 
     protected void Enable()

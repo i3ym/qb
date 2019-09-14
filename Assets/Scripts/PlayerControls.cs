@@ -10,12 +10,13 @@ public class PlayerControls : MonoBehaviour
     public static Action OnRight = delegate { };
     public static Action OnRotate = delegate { };
     public static Action OnRotateC = delegate { };
+    public static Action OnPause = delegate { };
 
     static InputAction UpInput, DownInput, LeftInput, RightInput;
-    static InputAction RotateInput, RotateCInput;
+    static InputAction RotateInput, RotateCInput, PauseInput;
 
     [SerializeField]
-    InputAction _UpInput = null, _DownInput = null, _LeftInput = null, _RightInput = null, _RotateInput = null, _RotateCInput = null;
+    InputAction _UpInput = null, _DownInput = null, _LeftInput = null, _RightInput = null, _RotateInput = null, _RotateCInput = null, _PauseInput = null;
 
 
     void Awake()
@@ -26,6 +27,7 @@ public class PlayerControls : MonoBehaviour
         (RightInput = _RightInput).Enable();
         (RotateInput = _RotateInput).Enable();
         (RotateCInput = _RotateCInput).Enable();
+        (PauseInput = _PauseInput).Enable();
 
 
         UpInput.started += (_) => OnUp();
@@ -34,6 +36,7 @@ public class PlayerControls : MonoBehaviour
         RightInput.performed += (_) => OnRight();
         RotateInput.performed += (_) => OnRotate();
         RotateCInput.performed += (_) => OnRotateC();
+        PauseInput.performed += (_) => OnPause();
 
 
         Controller.controller.Up.OnMouseDownAction += () => OnUp();
@@ -42,6 +45,7 @@ public class PlayerControls : MonoBehaviour
         Controller.controller.Right.OnMouseDownAction += () => OnRight();
         Controller.controller.Rotate.OnMouseDownAction += () => OnRotate();
         Controller.controller.RotateC.OnMouseDownAction += () => OnRotateC();
+        Controller.controller.Pause.OnMouseDownAction += () => OnPause();
     }
 
 
@@ -55,4 +59,5 @@ public class PlayerControls : MonoBehaviour
 
     public static bool Rotate => RotateInput.phase == InputActionPhase.Started || Controller.controller.Rotate.Pressed;
     public static bool RotateC => RotateCInput.phase == InputActionPhase.Started || Controller.controller.RotateC.Pressed;
+    public static bool Pause => PauseInput.phase == InputActionPhase.Started || Controller.controller.Pause.Pressed;
 }

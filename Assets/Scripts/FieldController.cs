@@ -21,9 +21,11 @@ public abstract class FieldController : MonoBehaviour, IFieldController
     public bool IsAdContinued;
     [HideInInspector]
     public int StartLvl = 0;
+    [HideInInspector]
+    public bool IsPaused = false;
 
     protected ITetrisControlsProvider Controls;
-    protected bool IsLvlReached, IsPaused;
+    protected bool IsLvlReached;
     protected float MoveDownSpeed;
     protected List<Shapes> RandomBag = new List<Shapes>();
 
@@ -118,12 +120,15 @@ public abstract class FieldController : MonoBehaviour, IFieldController
     {
         StopAllCoroutines();
         SetDefaults();
-        IsPaused = false;
+
+        IsPaused = true;
 
         StartCoroutine(MoveBlockVerticalCoroutine());
         StartCoroutine(MoveHorizontalCoroutine());
         StartCoroutine(BlockRotateCoroutine());
         StartCoroutine(TimeTextUpdateCoroutine());
+
+        IsPaused = false;
 
         SpawnBlock();
     }
@@ -169,7 +174,11 @@ public abstract class FieldController : MonoBehaviour, IFieldController
 
         while (true)
         {
-            while (IsPaused) yield return new WaitWhile(() => IsPaused);
+            while (IsPaused)
+            {
+                yield return new WaitWhile(() => IsPaused);
+                yield return new WaitForSeconds(.1f);
+            }
 
             if (Controls.Rotate && !rotate) RotateBlock(true);
             else if (Controls.RotateC && !rotate) RotateBlock(false);
