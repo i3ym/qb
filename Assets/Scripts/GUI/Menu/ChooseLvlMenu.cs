@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ChooseLvlMenu : Menu
 {
-    protected override Type PreviousMenuType => typeof(MainMenu);
+    protected override Type PreviousMenuType => typeof(ChooseModeMenu);
 
     [SerializeField]
     TextMeshProUGUI LevelText = null;
