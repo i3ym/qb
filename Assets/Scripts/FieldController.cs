@@ -258,7 +258,7 @@ public abstract class FieldController : MonoBehaviour, IFieldController
             if (BlockJustSpawned)
             {
                 time = Time.time + .5f;
-                while (time > Time.time && !Controls.Left && !Controls.Right && !Controls.Down)
+                while (time > Time.time && !Controls.Left && !Controls.Right && !Controls.Down && !Controls.Rotate && !Controls.RotateC)
                     yield return null;
 
                 BlockJustSpawned = false;
