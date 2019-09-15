@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using UnityEngine;
 
 public abstract class Menu : MonoBehaviour
@@ -13,6 +14,20 @@ public abstract class Menu : MonoBehaviour
     [SerializeField]
     protected Button[] Buttons;
 
+    protected bool IsLocked
+    {
+        get => _IsLocked;
+        set
+        {
+            _IsLocked = value;
+
+            foreach (var btn in Buttons)
+                btn.GetComponent<TextMeshProUGUI>().color = value ? Color.gray : Color.white;
+        }
+    }
+
+    bool _IsLocked = false;
+
     protected int ActiveButtonIndex = 0;
 
     protected abstract Type PreviousMenuType { get; }
@@ -21,7 +36,7 @@ public abstract class Menu : MonoBehaviour
     {
         PlayerControls.OnUp += () =>
         {
-            if (ActiveController == null || !ActiveController.enabled || !ActiveController.gameObject.activeSelf) return;
+            if (ActiveController == null || ActiveController.IsLocked || !ActiveController.enabled || !ActiveController.gameObject.activeSelf) return;
 
             ActiveController.ActiveButtonIndex--;
 
@@ -40,7 +55,7 @@ public abstract class Menu : MonoBehaviour
         };
         PlayerControls.OnDown += () =>
         {
-            if (ActiveController == null || !ActiveController.enabled || !ActiveController.gameObject.activeSelf) return;
+            if (ActiveController == null || ActiveController.IsLocked || !ActiveController.enabled || !ActiveController.gameObject.activeSelf) return;
 
             ActiveController.ActiveButtonIndex = (ActiveController.ActiveButtonIndex + 1) % ActiveController.Buttons.Length;
 
@@ -51,12 +66,12 @@ public abstract class Menu : MonoBehaviour
         };
         PlayerControls.OnRotate += () =>
         {
-            if (ActiveController == null || !ActiveController.enabled || !ActiveController.gameObject.activeSelf) return;
+            if (ActiveController == null || ActiveController.IsLocked || !ActiveController.enabled || !ActiveController.gameObject.activeSelf) return;
             ActiveButton.OnClick();
         };
         PlayerControls.OnRotateC += () =>
         {
-            if (ActiveController == null || !ActiveController.enabled || !ActiveController.gameObject.activeSelf) return;
+            if (ActiveController == null || ActiveController.IsLocked || !ActiveController.enabled || !ActiveController.gameObject.activeSelf) return;
             ActiveController.OnGoBack();
             SetMenu(ActiveController.PreviousMenuType);
         };

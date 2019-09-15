@@ -16,7 +16,16 @@ public class GameOverMenu : Menu
 
         Buttons[0].OnClick += async() =>
         {
-            while (!Advertisement.IsReady()) await Task.Delay(100);
+            if (!Advertisement.IsReady())
+            {
+                IsLocked = true;
+
+                while (!Advertisement.IsReady())
+                    await Task.Delay(100);
+
+                IsLocked = false;
+            }
+
             Advertisement.Show();
         };
         Buttons[1].OnClick += () =>
