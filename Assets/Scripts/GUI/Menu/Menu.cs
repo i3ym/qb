@@ -89,6 +89,7 @@ public abstract class Menu : MonoBehaviour
     protected virtual void OnShow() { }
     protected virtual void OnGoBack() { }
 
+    public static T GetMenu<T>() where T : Menu => Menus.OfType<T>().First();
     public static void SetMenu(Menu menu)
     {
         foreach (var m in Menus) m.gameObject.SetActive(false);

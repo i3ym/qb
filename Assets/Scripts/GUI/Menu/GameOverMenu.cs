@@ -30,14 +30,33 @@ public class GameOverMenu : Menu
         };
         Buttons[1].OnClick += () =>
         {
-            Game.Instance.RestartGame();
+            Buttons[0].gameObject.SetActive(true);
+            Buttons[1].gameObject.SetActive(false);
+
+            Game.Instance.ContinueGameWithAd();
             SetMenu(null as Menu);
         };
         Buttons[2].OnClick += () =>
         {
+            Game.Instance.RestartGame();
+            SetMenu(null as Menu);
+        };
+        Buttons[3].OnClick += () =>
+        {
             Game.Instance.SetDefaults();
             SetMenu<MainMenu>();
         };
+
+        Buttons[1].gameObject.SetActive(false);
+    }
+
+    public void AdWatched()
+    {
+        Buttons[0].gameObject.SetActive(false);
+        Buttons[1].gameObject.SetActive(true);
+        
+        ActiveButtonIndex = 1;
+        UpdateButtonDesign();
     }
 
     protected override void OnShow()
@@ -46,7 +65,7 @@ public class GameOverMenu : Menu
 
         if (Game.Instance.IsAdContinued)
         {
-            ActiveButtonIndex = 1;
+            ActiveButtonIndex = 2;
             UpdateButtonDesign();
         }
     }
@@ -60,8 +79,8 @@ public class GameOverMenu : Menu
 
         public void OnUnityAdsDidFinish(string placementId, ShowResult showResult)
         {
-            Game.Instance.ContinueGameWithAd();
-            SetMenu(null as Menu);
+            if (showResult == ShowResult.Finished)
+                GetMenu<GameOverMenu>().AdWatched();
         }
 
         public void OnUnityAdsDidStart(string placementId)
