@@ -257,7 +257,7 @@ public abstract class FieldController : MonoBehaviour, IFieldController
 
             if (BlockJustSpawned)
             {
-                time = Time.time + .5f;
+                time = Time.time + (20f / 60f);
                 while (time > Time.time && !Controls.Left && !Controls.Right && !Controls.Down && !Controls.Rotate && !Controls.RotateC)
                     yield return null;
 
@@ -271,7 +271,7 @@ public abstract class FieldController : MonoBehaviour, IFieldController
             if (IsPaused) continue;
             if (needStop())
             {
-                time = Time.time + .5f;
+                time = Time.time + (20f / 60f);
                 while (!Controls.Down && time > Time.time && needStop())
                     yield return null;
 
@@ -417,21 +417,30 @@ public abstract class FieldController : MonoBehaviour, IFieldController
         Lvl = lvl;
         LvlText.text = Lvl.ToString();
 
-        if (Lvl == 0) MoveDownSpeed = 48f / 60f;
-        else if (Lvl == 1) MoveDownSpeed = 43f / 60f;
-        else if (Lvl == 2) MoveDownSpeed = 38f / 60f;
-        else if (Lvl == 3) MoveDownSpeed = 33f / 60f;
-        else if (Lvl == 4) MoveDownSpeed = 28f / 60f;
-        else if (Lvl == 5) MoveDownSpeed = 23f / 60f;
-        else if (Lvl == 6) MoveDownSpeed = 18f / 60f;
-        else if (Lvl == 7) MoveDownSpeed = 13f / 60f;
-        else if (Lvl == 8) MoveDownSpeed = 8f / 60f;
-        else if (Lvl == 9) MoveDownSpeed = 6f / 60f;
-        else if (Lvl > 10 && Lvl < 13) MoveDownSpeed = 5f / 60f;
-        else if (Lvl > 12 && Lvl < 16) MoveDownSpeed = 4f / 60f;
-        else if (Lvl > 15 && Lvl < 19) MoveDownSpeed = 3f / 60f;
-        else if (Lvl > 18 && Lvl < 29) MoveDownSpeed = 2f / 60f;
-        else if (Lvl > 28) MoveDownSpeed = 1f / 60f;
+        if (Lvl == 0) MoveDownSpeed = 52f;
+        else if (Lvl == 1) MoveDownSpeed = 48f;
+        else if (Lvl == 2) MoveDownSpeed = 44f;
+        else if (Lvl == 3) MoveDownSpeed = 40f;
+        else if (Lvl == 4) MoveDownSpeed = 36f;
+        else if (Lvl == 5) MoveDownSpeed = 32f;
+        else if (Lvl == 6) MoveDownSpeed = 27f;
+        else if (Lvl == 7) MoveDownSpeed = 21f;
+        else if (Lvl == 8) MoveDownSpeed = 16f;
+        else if (Lvl == 9) MoveDownSpeed = 10f;
+        else if (Lvl == 10) MoveDownSpeed = 9f;
+        else if (Lvl == 11) MoveDownSpeed = 8f;
+        else if (Lvl == 12) MoveDownSpeed = 7f;
+        else if (Lvl == 13) MoveDownSpeed = 6f;
+        else if (Lvl == 14) MoveDownSpeed = 5f;
+        else if (Lvl == 15) MoveDownSpeed = 5f;
+        else if (Lvl == 16) MoveDownSpeed = 4f;
+        else if (Lvl == 17) MoveDownSpeed = 3f;
+        else if (Lvl == 18) MoveDownSpeed = 3f;
+        else if (Lvl == 19) MoveDownSpeed = 2f;
+        else if (Lvl == 20) MoveDownSpeed = 2f;
+        else MoveDownSpeed = 1f;
+
+        MoveDownSpeed = MoveDownSpeed / 60f;
     }
     protected void RemoveLines()
     {
