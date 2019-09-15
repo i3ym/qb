@@ -1,32 +1,52 @@
-public class GameMatrix
+using System.Collections;
+using System.Collections.Generic;
+
+public class GameMatrix : GameMatrix<bool>
 {
-    readonly public int MaxX, MaxY;
-    bool[, ] Matrix;
+    public GameMatrix(int maxx, int maxy) : base(maxx, maxy) { }
+
+    public static implicit operator GameMatrix(bool[, ] matrix) => new GameMatrix(matrix.GetLength(0), matrix.GetLength(1)) { Matrix = matrix };
+}
+
+public class GameMatrix<T> : IEnumerable<T>
+{
+    public readonly int MaxX;
+    public readonly int MaxY;
+    protected T[, ] Matrix;
+    public bool Changed = false;
 
     public GameMatrix(int maxx, int maxy)
     {
         MaxX = maxx;
         MaxY = maxy;
-        Matrix = new bool[MaxX, MaxY];
+        Matrix = new T[MaxX, MaxY];
     }
 
 
-    public bool this [int x, int y]
+    public T this [int x, int y]
     {
-        get => IsInBounds(x, y) ? Matrix[x, y] : false;
+        get => IsInBounds(x, y) ? Matrix[x, y] : default;
         set
         {
-            if (IsInBounds(x, y)) Matrix[x, y] = value;
+            if (IsInBounds(x, y))
+            {
+                Matrix[x, y] = value;
+                Changed = true;
+            }
         }
     }
 
-    public bool GetWithoutChecks(int x, int y) => Matrix[x, y];
+    public T GetWithoutChecks(int x, int y) => Matrix[x, y];
     public bool IsInBounds(int x, int y) => !(x < 0 || y < 0 || x >= MaxX || y >= MaxY);
 
-    public void Clear() => Matrix = new bool[MaxX, MaxY];
-    public GameMatrix Clone()
+    public void Clear()
     {
-        GameMatrix matrix = new GameMatrix(MaxX, MaxY);
+        Matrix = new T[MaxX, MaxY];
+        Changed = true;
+    }
+    public GameMatrix<T> Clone()
+    {
+        var matrix = new GameMatrix<T>(MaxX, MaxY);
 
         for (int y = 0; y < MaxY; y++)
             for (int x = 0; x < MaxX; x++)
@@ -35,7 +55,9 @@ public class GameMatrix
         return matrix;
     }
 
-    //
+    public IEnumerator<T> GetEnumerator() => (IEnumerator<T>) Matrix.GetEnumerator();
 
-    public static implicit operator GameMatrix(bool[, ] matrix) => new GameMatrix(matrix.GetLength(0), matrix.GetLength(1)) { Matrix = matrix };
+    IEnumerator IEnumerable.GetEnumerator() => Matrix.GetEnumerator();
+
+    public static implicit operator GameMatrix<T>(T[, ] matrix) => new GameMatrix<T>(matrix.GetLength(0), matrix.GetLength(1)) { Matrix = matrix };
 }

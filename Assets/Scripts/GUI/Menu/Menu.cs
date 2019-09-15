@@ -25,10 +25,17 @@ public abstract class Menu : MonoBehaviour
 
             ActiveController.ActiveButtonIndex--;
 
+            if (ActiveController.ActiveButtonIndex < 0)
+                ActiveController.ActiveButtonIndex = ActiveController.Buttons.Length - 1;
+
             while (!ActiveController.Buttons[ActiveController.ActiveButtonIndex].gameObject.activeSelf)
+            {
                 ActiveController.ActiveButtonIndex--;
 
-            if (ActiveController.ActiveButtonIndex < 0) ActiveController.ActiveButtonIndex = ActiveController.Buttons.Length - 1;
+                if (ActiveController.ActiveButtonIndex < 0)
+                    ActiveController.ActiveButtonIndex = ActiveController.Buttons.Length - 1;
+            }
+
             UpdateButtonDesign();
         };
         PlayerControls.OnDown += () =>
@@ -50,6 +57,7 @@ public abstract class Menu : MonoBehaviour
         PlayerControls.OnRotateC += () =>
         {
             if (ActiveController == null || !ActiveController.enabled || !ActiveController.gameObject.activeSelf) return;
+            ActiveController.OnGoBack();
             SetMenu(ActiveController.PreviousMenuType);
         };
     }
@@ -64,16 +72,19 @@ public abstract class Menu : MonoBehaviour
 
     protected abstract void Init();
     protected virtual void OnShow() { }
+    protected virtual void OnGoBack() { }
 
     public static void SetMenu(Menu menu)
     {
         foreach (var m in Menus) m.gameObject.SetActive(false);
 
+        BottomLine.Instance.enabled = !(TopImage.Instance.enabled = menu == null || menu.GetType() == typeof(PauseMenu) || menu.GetType() == typeof(GameOverMenu));
+
         if (menu != null) menu.Enable();
         ActiveController = menu;
         UpdateButtonDesign();
     }
-    public static void SetMenu(Type type) => SetMenu(Menus.First(x => x.GetType() == type));
+    public static void SetMenu(Type type) => SetMenu(type == null ? null as Menu : Menus.First(x => x.GetType() == type));
     public static void SetMenu<T>() where T : Menu => SetMenu(typeof(T));
 
     protected void Enable()

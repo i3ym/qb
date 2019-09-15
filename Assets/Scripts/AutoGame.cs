@@ -8,8 +8,14 @@ public class AutoGame : FieldController
         Controls = new AITetrisPlayerControlsProvider(this);
     }
 
-    protected override int GetMaxX() => ChooseModeMenu.MaxX;
-    protected override int GetMaxY() => ChooseModeMenu.MaxY;
+    protected override int GetMaxX() => MaxX;
+    protected override int GetMaxY() => MaxY;
+
+    public void SetMax(int x, int y)
+    {
+        MaxX = x;
+        MaxY = y;
+    }
 
     public void StopGame()
     {
@@ -17,8 +23,8 @@ public class AutoGame : FieldController
         IsPaused = true;
 
         GameMatrix.Clear();
-        CurrentObject.Clear();
-        FieldRenderer.UpdateMatrix(GameMatrix, CurrentObject, CurrentX, CurrentY);
+        CurrentObject = new GameMatrix(CurrentObject.MaxX, CurrentObject.MaxY);
+        FieldRenderer.UpdateMatrix();
     }
     public override void GameOver()
     {
