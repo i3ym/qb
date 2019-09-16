@@ -22,7 +22,17 @@ public abstract class FieldController : MonoBehaviour, IFieldController
     [HideInInspector]
     public int StartLvl = 0;
     [HideInInspector]
-    public bool IsPaused = false;
+    public bool IsPaused
+    {
+        get => _IsPaused;
+        set
+        {
+            _IsPaused = value;
+            Time.timeScale = 0f;
+        }
+    }
+
+    bool _IsPaused = false;
 
     protected ITetrisControlsProvider Controls;
     protected bool IsLvlReached;
@@ -249,7 +259,6 @@ public abstract class FieldController : MonoBehaviour, IFieldController
 
 
         float time;
-        float speed = MoveDownSpeed;
 
         while (true)
         {
