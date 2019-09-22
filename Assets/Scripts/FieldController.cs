@@ -196,7 +196,7 @@ public abstract class FieldController : MonoBehaviour, IFieldController
         if (RemoveLinesAnimationCoroutine.MoveNext() && RemoveLinesAnimationCoroutine.Current) return;
 
         RemoveLines(LinesToRemove);
-
+        
         SpawnBlock();
         WaitDownTime = 20;
         State = State.HoldingOnTop;

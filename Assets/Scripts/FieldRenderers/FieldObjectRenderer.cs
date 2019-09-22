@@ -177,13 +177,17 @@ public abstract class FieldObjectRenderer : FieldRendererBase
             }
     }
 
-    public override IEnumerator<bool> RemoveLinesAnimation(int[] indexs)
+    public override IEnumerator<bool> RemoveLinesAnimation(int[] lines)
     {
-        for (int i = indexs.Length - 1; i > -1; i--)
-            for (int y2 = indexs[i]; y2 < MaxY - 1; y2++)
+        var animation = _RemoveLinesAnimation(lines);
+
+        while (animation.MoveNext() && animation.Current)
+            yield return true;
+
+        for (int i = lines.Length - 1; i > -1; i--)
+            for (int y2 = lines[i]; y2 < MaxY - 1; y2++)
                 for (int x2 = 0; x2 < MaxX; x2++)
                     SetMaterial(GameObjects[x2, y2], GameObjects[x2, y2 + 1]);
-
-        for (byte i = 0; i < 20; i++) yield return true;
     }
+    protected abstract IEnumerator<bool> _RemoveLinesAnimation(int[] lines);
 }

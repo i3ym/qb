@@ -71,5 +71,5 @@ public abstract class FieldRendererBase : MonoBehaviour, IFieldRenderer
     public abstract void UpdateColors();
     public abstract void ShowNextShape();
 
-    public abstract IEnumerator<bool> RemoveLinesAnimation(int[] indexs);
+    public abstract IEnumerator<bool> RemoveLinesAnimation(int[] lines);
 }

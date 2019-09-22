@@ -9,7 +9,7 @@ public class FieldRenderer1 : FieldObjectRenderer
 
     void Start() => StartCameraColor = Game.Camera.backgroundColor;
 
-    public override IEnumerator<bool> RemoveLinesAnimation(int[] lines)
+    protected override IEnumerator<bool> _RemoveLinesAnimation(int[] lines)
     {
         float speed = .1f;
         float time = Time.time + 1f;
@@ -47,8 +47,6 @@ public class FieldRenderer1 : FieldObjectRenderer
         for (int yy = 0; yy < MaxY; yy++)
             for (int xx = 0; xx < MaxX; xx++)
                 (GameObjects[xx, yy].transform as RectTransform).anchoredPosition = new Vector2(xx, yy);
-
-        base.RemoveLinesAnimation(lines);
 
         Game.Camera.backgroundColor += Color.white * (lines.Length / 4f - .1f);
         StartCoroutine(RevertCameraBackgroundColorCorotuine());
