@@ -1480,8 +1480,8 @@ MonoBehaviour:
   Right: {fileID: 1321927148}
   Rotate: {fileID: 445636100}
   RotateC: {fileID: 4417637242719809567}
-  Back: {fileID: 1295361235}
   Select: {fileID: 1611204574}
+  Back: {fileID: 1295361235}
   Pause: {fileID: 142041465}
 --- !u!1 &338013404
 GameObject:
@@ -6501,21 +6501,61 @@ MonoBehaviour:
       m_Action: Rotate C Input
       m_Flags: 0
   _SelectInput:
-    m_Name: 
+    m_Name: Select Input
     m_Type: 0
     m_ExpectedControlType: 
-    m_Id: 
+    m_Id: c253c290-d4be-41b1-9dd6-88be58b6d00a
     m_Processors: 
     m_Interactions: 
-    m_SingletonActionBindings: []
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: 92430220-39cb-4911-886a-34c93301c10d
+      m_Path: <Keyboard>/e
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Select Input
+      m_Flags: 0
+    - m_Name: 
+      m_Id: 910bbcee-6e32-4c37-bcfe-613116e071d7
+      m_Path: <Gamepad>/buttonEast
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Select Input
+      m_Flags: 0
   _BackInput:
-    m_Name: 
+    m_Name: Back Input
     m_Type: 0
     m_ExpectedControlType: 
-    m_Id: 
+    m_Id: f5a23457-7ebd-4c92-98a6-f8d44f58b836
     m_Processors: 
     m_Interactions: 
-    m_SingletonActionBindings: []
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: 2920d492-de38-46f5-86bc-7d24e133bb5d
+      m_Path: <Keyboard>/q
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Back Input
+      m_Flags: 0
+    - m_Name: 
+      m_Id: 7515191c-36c9-43b2-92c9-10d799402b96
+      m_Path: <Keyboard>/enter
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Back Input
+      m_Flags: 0
+    - m_Name: 
+      m_Id: c6fe8c94-f8db-481c-aff8-cb65088d89be
+      m_Path: <Gamepad>/buttonSouth
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Back Input
+      m_Flags: 0
   _PauseInput:
     m_Name: Pause Input
     m_Type: 0
