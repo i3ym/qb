@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class FieldRenderer1 : FieldObjectRenderer
@@ -8,16 +9,9 @@ public class FieldRenderer1 : FieldObjectRenderer
 
     void Start() => StartCameraColor = Game.Camera.backgroundColor;
 
-    public override float RemoveLinesAnimation(List<int> listy, GameMatrix gameMatrix, GameMatrix currentObject, int x, int y)
+    public override IEnumerator<bool> RemoveLinesAnimation(int[] lines)
     {
-        StartCoroutine(RemoveLinesAnimationCoroutine(listy, gameMatrix, currentObject, x, y));
-        return 1f;
-    }
-
-    IEnumerator RemoveLinesAnimationCoroutine(List<int> listy, GameMatrix gameMatrix, GameMatrix currentObject, int x, int y)
-    {
-        float speed = 0f;
-
+        float speed = .1f;
         float time = Time.time + 1f;
         int count;
 
@@ -25,28 +19,27 @@ public class FieldRenderer1 : FieldObjectRenderer
 
         while (time > Time.time)
         {
-            yield return wff;
-
-            speed -= .01f;
+            speed += .001f;
+            yield return true;
 
             for (int yy = 0; yy < MaxY; yy++)
             {
-                if (listy.Contains(yy))
+                if (lines.Any(x => x == yy))
                 {
                     for (int xx = 0; xx < MaxX; xx++)
                         (GameObjects[xx, yy].transform as RectTransform).anchoredPosition = Vector2.Lerp((GameObjects[xx, yy].transform as RectTransform).anchoredPosition,
-                            new Vector2(xx, -1), -speed);
+                            new Vector2(xx, -1), speed);
                 }
-                else if (yy > listy[0])
+                else if (yy > lines[0])
                 {
                     count = 0;
-                    for (int i = 0; i < listy.Count; i++)
-                        if (listy[i] < yy) count++;
+                    for (int i = 0; i < lines.Length; i++)
+                        if (lines[i] < yy) count++;
                         else break;
 
                     for (int xx = 0; xx < MaxX; xx++)
                         (GameObjects[xx, yy].transform as RectTransform).anchoredPosition = Vector2.Lerp((GameObjects[xx, yy].transform as RectTransform).anchoredPosition,
-                            new Vector2(xx, yy - count), -speed);
+                            new Vector2(xx, yy - count), speed);
                 }
             }
         }
@@ -55,9 +48,9 @@ public class FieldRenderer1 : FieldObjectRenderer
             for (int xx = 0; xx < MaxX; xx++)
                 (GameObjects[xx, yy].transform as RectTransform).anchoredPosition = new Vector2(xx, yy);
 
-        base.RemoveLinesAnimation(listy, gameMatrix, currentObject, x, y);
+        base.RemoveLinesAnimation(lines);
 
-        Game.Camera.backgroundColor += Color.white * (listy.Count / 4f - .1f);
+        Game.Camera.backgroundColor += Color.white * (lines.Length / 4f - .1f);
         StartCoroutine(RevertCameraBackgroundColorCorotuine());
     }
 

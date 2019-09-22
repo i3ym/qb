@@ -64,12 +64,12 @@ public abstract class Menu : MonoBehaviour
 
             UpdateButtonDesign();
         };
-        PlayerControls.OnRotate += () =>
+        PlayerControls.OnSelect += () =>
         {
             if (ActiveController == null || ActiveController.IsLocked || !ActiveController.enabled || !ActiveController.gameObject.activeSelf) return;
             ActiveButton.OnClick();
         };
-        PlayerControls.OnRotateC += () =>
+        PlayerControls.OnBack += () =>
         {
             if (ActiveController == null || ActiveController.IsLocked || !ActiveController.enabled || !ActiveController.gameObject.activeSelf) return;
             ActiveController.OnGoBack();
@@ -99,6 +99,11 @@ public abstract class Menu : MonoBehaviour
         if (menu != null) menu.Enable();
         ActiveController = menu;
         UpdateButtonDesign();
+
+        Controller.controller.Select.gameObject.SetActive(menu != null);
+        Controller.controller.Back.gameObject.SetActive(menu != null);
+        Controller.controller.Rotate.gameObject.SetActive(menu == null);
+        Controller.controller.RotateC.gameObject.SetActive(menu == null);
     }
     public static void SetMenu(Type type) => SetMenu(type == null ? null as Menu : Menus.First(x => x.GetType() == type));
     public static void SetMenu<T>() where T : Menu => SetMenu(typeof(T));

@@ -15,7 +15,8 @@ public class ChooseSkinMenu : ChooseMenu
             "Lines",
             "Faces",
             "Neon",
-            "Leaf Fall"
+            "Autumn",
+            "Hot Dog"
         }.Select((string x, int i) => (x,
             (Action) (() => Config.SelectedSkin = i),
             (Action) (() => SetMenu<MainMenu>()))).ToArray();

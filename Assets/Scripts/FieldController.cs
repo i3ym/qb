@@ -22,29 +22,48 @@ public abstract class FieldController : MonoBehaviour, IFieldController
     [HideInInspector]
     public int StartLvl = 0;
     [HideInInspector]
-    public bool IsPaused
-    {
-        get => _IsPaused;
-        set
-        {
-            _IsPaused = value;
-            Time.timeScale = 0f;
-        }
-    }
-
-    bool _IsPaused = false;
+    public bool IsPaused = false;
 
     protected ITetrisControlsProvider Controls;
     protected bool IsLvlReached;
-    protected float MoveDownSpeed;
     protected List<Shapes> RandomBag = new List<Shapes>();
 
     protected GameMatrix GameMatrix, CurrentObject;
     protected int CurrentX, CurrentY, CurrentRotation;
     protected Shapes CurrentShape, NextShape;
-    protected bool BlockJustSpawned = false;
 
-    protected float FastMoveDownSpeed => MoveDownSpeed > 2f / 60f ? 2f / 60f : MoveDownSpeed / 2f;
+    protected int WaitDownTime = 0, WaitHorizontalTime = 6;
+    protected State State = State.Falling;
+    protected HorizontalState HorizontalState = HorizontalState.Waiting;
+    protected RotateState RotateState = RotateState.Waiting;
+    protected int[] LinesToRemove;
+    protected IEnumerator<bool> RemoveLinesAnimationCoroutine;
+    protected static int[] Levels = new int[]
+    {
+        52,
+        48,
+        44,
+        40,
+        36,
+        32,
+        27,
+        21,
+        16,
+        10,
+        9,
+        8,
+        7,
+        6,
+        5,
+        5,
+        4,
+        3,
+        3,
+        2,
+        2
+    };
+    protected int LevelSpeed => Lvl > Levels.Length ? 1 : Levels[Lvl];
+
     protected int Score { get => _score; set { _score = value; ScoreText.text = value.ToString(); } }
     protected int Lines { get => _lines; set { _lines = value; LinesText.text = value.ToString(); } }
 
@@ -102,6 +121,8 @@ public abstract class FieldController : MonoBehaviour, IFieldController
         FieldRenderer.CreateField();
 
         SetDefaults();
+
+        Time.fixedDeltaTime = 1f / 60f;
     }
 
     public void SetDefaults()
@@ -120,186 +141,185 @@ public abstract class FieldController : MonoBehaviour, IFieldController
         RandomBag.Clear();
         Score = 0;
         Lines = 0;
+        WaitDownTime = 0;
+        WaitHorizontalTime = 6;
         TimeText.text = new DateTime(0).ToLongTimeString();
         NextShape = (Shapes) new System.Random().Next(7);
-        SetLvl(Lvl);
 
-        FieldRenderer.UpdateMatrix();
+        FieldRenderer.UpdateField();
     }
     public void StartGame()
     {
         StopAllCoroutines();
         SetDefaults();
 
-        IsPaused = true;
-
-        StartCoroutine(MoveBlockVerticalCoroutine());
-        StartCoroutine(MoveHorizontalCoroutine());
-        StartCoroutine(BlockRotateCoroutine());
-        StartCoroutine(TimeTextUpdateCoroutine());
-
+        StartCoroutine(FrameCoroutine());
         IsPaused = false;
 
         SpawnBlock();
     }
 
-    protected IEnumerator RemoveLineAnimation(List<int> indexs)
+    protected IEnumerator FrameCoroutine()
     {
-        CurrentX = 4;
-        CurrentY = 25;
-        IsPaused = true;
-
-        yield return new WaitForSeconds(FieldRenderer.RemoveLinesAnimation(indexs, GameMatrix, CurrentObject, CurrentX, CurrentY));
-
-        for (int i = indexs.Count - 1; i > -1; i--)
-            for (int y2 = indexs[i]; y2 < MaxY - 1; y2++)
-                for (int x2 = 0; x2 < MaxX; x2++)
-                    GameMatrix[x2, y2] = GameMatrix[x2, y2 + 1];
-
-        for (int x2 = 0; x2 < MaxX; x2++)
-            GameMatrix[x2, MaxY - 1] = false;
-
-        IsPaused = false;
-        SpawnBlock();
-    }
-    protected IEnumerator TimeTextUpdateCoroutine()
-    {
-        WaitForSeconds wff = new WaitForSeconds(1f);
-
+        var wfs = new WaitForFixedUpdate();
+        byte frame = 0;
         var time = new DateTime(0);
 
         while (true)
         {
-            while (IsPaused) yield return new WaitWhile(() => IsPaused);
+            yield return wfs;
 
-            TimeText.text = time.ToLongTimeString();
+            if (IsPaused) continue;
 
-            yield return wff;
-            time = time.AddSeconds(1);
-        }
-    }
-    protected IEnumerator BlockRotateCoroutine()
-    {
-        bool rotate = false;
-
-        while (true)
-        {
-            while (IsPaused)
+            frame++;
+            if (frame == 60)
             {
-                yield return new WaitWhile(() => IsPaused);
-                yield return new WaitForSeconds(.1f);
+                time = time.AddSeconds(1);
+                TimeText.text = time.ToLongTimeString();
+                frame = 0;
             }
 
-            if (Controls.Rotate && !rotate) RotateBlock(true);
-            else if (Controls.RotateC && !rotate) RotateBlock(false);
-
-            rotate = Controls.Rotate || Controls.RotateC;
-
-            yield return null;
-        }
-    }
-    protected IEnumerator MoveHorizontalCoroutine()
-    {
-        const float firstPause = 6f / 60f;
-        const float nextPause = 3f / 60f;
-        WaitForSeconds firstw = new WaitForSeconds(firstPause);
-        WaitForSeconds nextw = new WaitForSeconds(nextPause);
-
-        bool isStarted = false;
-        float time;
-        bool right, left;
-
-        while (true)
-        {
-            while (IsPaused) yield return new WaitWhile(() => IsPaused);
-
-            right = Controls.Right;
-            left = Controls.Left;
-
-            if (!right && !left)
+            if (State == State.Animation)
             {
-                isStarted = false;
-
-                yield return null;
+                PlayAnimation();
                 continue;
             }
 
-            if (right) MoveRight();
-            else if (left) MoveLeft();
-
-            time = Time.time;
-            while (time > Time.time - (isStarted ? nextPause : firstPause))
-            {
-                yield return null;
-                if (!right && !left) break;
-            }
-
-            if (!isStarted) isStarted = true;
-
-            yield return null;
+            Rotate();
+            MoveHorizontal();
+            MoveDown();
         }
     }
-    protected IEnumerator MoveBlockVerticalCoroutine()
+
+    protected void PlayAnimation()
     {
-        bool needStop()
+        if (RemoveLinesAnimationCoroutine.MoveNext() && RemoveLinesAnimationCoroutine.Current) return;
+
+        RemoveLines(LinesToRemove);
+
+        SpawnBlock();
+        WaitDownTime = 20;
+        State = State.HoldingOnTop;
+    }
+    protected void Rotate()
+    {
+        var wasWaiting = State == State.WaitingOnGround;
+
+        var rotate = PlayerControls.Rotate;
+        var rotatec = PlayerControls.RotateC;
+
+        if (RotateState == RotateState.Waiting)
         {
-            for (int y = 0; y < CurrentObject.MaxY; y++)
-                for (int x = 0; x < CurrentObject.MaxX; x++)
-                {
-                    if (x + CurrentX >= GameMatrix.MaxX ||
-                        y + CurrentY - 1 >= GameMatrix.MaxY ||
-                        x + CurrentX < 0) continue;
+            if (rotate || rotatec)
+            {
+                if (rotate) RotateBlock(true);
+                if (rotatec) RotateBlock(false);
 
-                    if (CurrentObject[x, y] && (y + CurrentY - 1 < 0 || GameMatrix[x + CurrentX, y + CurrentY - 1]))
-                        return true;
-                }
+                RotateState = RotateState.Rotated;
+            }
+        }
+        else if (RotateState == RotateState.Rotated && !rotate && !rotatec)
+            RotateState = RotateState.Waiting;
 
-            return false;
+        if (wasWaiting && !NeedStop())
+        {
+            WaitDownTime = LevelSpeed;
+            State = State.Falling;
+        }
+    }
+    protected void MoveHorizontal()
+    {
+        if (WaitHorizontalTime > 0)
+            WaitHorizontalTime--;
+
+        if (WaitHorizontalTime > 0) return;
+
+        var wasWaiting = State == State.WaitingOnGround;
+
+        var right = PlayerControls.Right;
+        var left = PlayerControls.Left;
+
+        if (HorizontalState == HorizontalState.Waiting && (right || left))
+        {
+            WaitHorizontalTime = 6;
+            HorizontalState = HorizontalState.Moving;
+        }
+        else if (HorizontalState == HorizontalState.Moving)
+        {
+            if (right || left) WaitHorizontalTime = 3;
+            else HorizontalState = HorizontalState.Waiting;
         }
 
+        if (right) MoveRight();
+        else if (left) MoveLeft();
 
-        float time;
-
-        while (true)
+        if (wasWaiting && !NeedStop())
         {
-            while (IsPaused) yield return new WaitWhile(() => IsPaused);
+            WaitDownTime = LevelSpeed;
+            State = State.Falling;
+        }
+    }
+    protected void MoveDown()
+    {
+        WaitDownTime--;
 
-            if (BlockJustSpawned)
+        if (State == State.Falling && PlayerControls.Down)
+            WaitDownTime -= LevelSpeed / 3 + 1;
+        else if (State == State.WaitingOnGround && PlayerControls.Down)
+            WaitDownTime = 0;
+        else if (State == State.HoldingOnTop && (PlayerControls.Left || PlayerControls.Right || PlayerControls.Rotate || PlayerControls.RotateC))
+            WaitDownTime = 0;
+
+        if (WaitDownTime > 0) return;
+
+        if (State == State.HoldingOnTop)
+            State = State.Falling;
+
+        if (NeedStop())
+        {
+            SetBlockToField();
+
+            LinesToRemove = GetLinesToRemove();
+            if (LinesToRemove.Length == 0)
             {
-                time = Time.time + (20f / 60f);
-                while (time > Time.time && !Controls.Left && !Controls.Right && !Controls.Down && !Controls.Rotate && !Controls.RotateC)
-                    yield return null;
-
-                BlockJustSpawned = false;
-            }
-
-            time = Time.time;
-            while (time + (Controls.Down ? FastMoveDownSpeed : MoveDownSpeed) > Time.time)
-                yield return null;
-
-            if (IsPaused) continue;
-            if (needStop())
-            {
-                time = Time.time + (20f / 60f);
-                while (!Controls.Down && time > Time.time && needStop())
-                    yield return null;
-
-                if (needStop())
-                {
-                    SetBlockToField();
-                    RemoveLines();
-                }
+                SpawnBlock();
+                WaitDownTime = 20;
+                State = State.HoldingOnTop;
             }
             else
             {
-                CurrentY--;
-                Score++;
+                RemoveLinesAnimationCoroutine = FieldRenderer.RemoveLinesAnimation(LinesToRemove);
+                State = State.Animation;
             }
 
-            if (IsPaused) continue;
-
-            FieldRenderer.UpdateMatrixFast();
+            return;
         }
+
+        CurrentY--;
+        FieldRenderer.UpdateFieldFast();
+
+        WaitDownTime = LevelSpeed;
+
+        if (NeedStop())
+        {
+            WaitDownTime = LevelSpeed + 20;
+            State = State.WaitingOnGround;
+        }
+    }
+    protected bool NeedStop()
+    {
+        for (int y = 0; y < CurrentObject.MaxY; y++)
+            for (int x = 0; x < CurrentObject.MaxX; x++)
+            {
+                if (x + CurrentX >= GameMatrix.MaxX ||
+                    y + CurrentY - 1 >= GameMatrix.MaxY ||
+                    x + CurrentX < 0) continue;
+
+                if (CurrentObject[x, y] && (y + CurrentY - 1 < 0 || GameMatrix[x + CurrentX, y + CurrentY - 1]))
+                    return true;
+            }
+
+        return false;
     }
 
     protected void SpawnBlock()
@@ -337,10 +357,8 @@ public abstract class FieldController : MonoBehaviour, IFieldController
                     return;
                 }
 
-        BlockJustSpawned = true;
-
         FieldRenderer.UpdateColors();
-        FieldRenderer.UpdateMatrix();
+        FieldRenderer.UpdateField();
     }
     protected void SetBlockToField()
     {
@@ -356,7 +374,7 @@ public abstract class FieldController : MonoBehaviour, IFieldController
                     return;
 
         CurrentX++;
-        FieldRenderer.UpdateMatrixFast();
+        FieldRenderer.UpdateFieldFast();
     }
     protected void MoveLeft()
     {
@@ -366,7 +384,7 @@ public abstract class FieldController : MonoBehaviour, IFieldController
                     return;
 
         CurrentX--;
-        FieldRenderer.UpdateMatrixFast();
+        FieldRenderer.UpdateFieldFast();
     }
     protected void RotateBlock(bool clockwise)
     {
@@ -406,7 +424,7 @@ public abstract class FieldController : MonoBehaviour, IFieldController
         CurrentObject = newObject;
         if (++CurrentRotation == 4) CurrentRotation = 0;
 
-        FieldRenderer.UpdateMatrixFast();
+        FieldRenderer.UpdateFieldFast();
     }
     protected bool TryWallKick(int cx, int cy, bool[, ] newObject)
     {
@@ -421,67 +439,60 @@ public abstract class FieldController : MonoBehaviour, IFieldController
 
         return true;
     }
-    protected void SetLvl(int lvl)
-    {
-        Lvl = lvl;
-        LvlText.text = Lvl.ToString();
 
-        if (Lvl == 0) MoveDownSpeed = 52f;
-        else if (Lvl == 1) MoveDownSpeed = 48f;
-        else if (Lvl == 2) MoveDownSpeed = 44f;
-        else if (Lvl == 3) MoveDownSpeed = 40f;
-        else if (Lvl == 4) MoveDownSpeed = 36f;
-        else if (Lvl == 5) MoveDownSpeed = 32f;
-        else if (Lvl == 6) MoveDownSpeed = 27f;
-        else if (Lvl == 7) MoveDownSpeed = 21f;
-        else if (Lvl == 8) MoveDownSpeed = 16f;
-        else if (Lvl == 9) MoveDownSpeed = 10f;
-        else if (Lvl == 10) MoveDownSpeed = 9f;
-        else if (Lvl == 11) MoveDownSpeed = 8f;
-        else if (Lvl == 12) MoveDownSpeed = 7f;
-        else if (Lvl == 13) MoveDownSpeed = 6f;
-        else if (Lvl == 14) MoveDownSpeed = 5f;
-        else if (Lvl == 15) MoveDownSpeed = 5f;
-        else if (Lvl == 16) MoveDownSpeed = 4f;
-        else if (Lvl == 17) MoveDownSpeed = 3f;
-        else if (Lvl == 18) MoveDownSpeed = 3f;
-        else if (Lvl == 19) MoveDownSpeed = 2f;
-        else if (Lvl == 20) MoveDownSpeed = 2f;
-        else MoveDownSpeed = 1f;
-
-        MoveDownSpeed = MoveDownSpeed / 60f;
-    }
-    protected void RemoveLines()
+    protected int[] GetLinesToRemove()
     {
-        List<int> indexs = new List<int>();
+        var lines = new List<int>(GameMatrix.MaxY);
 
         for (int y = 0; y < MaxY; y++)
+            if (IsLineFull(y))
+                lines.Add(y);
+
+        // TODO move somewhere
+        if (lines.Count != 0)
         {
-            for (int x = 0; x < MaxX; x++)
-                if (!GameMatrix[x, y])
-                    goto End;
-
-            indexs.Add(y);
-
-            End: ;
-        }
-
-        if (indexs.Count != 0)
-        {
-            Lines += indexs.Count;
+            Lines += lines.Count;
 
             if (!IsLvlReached && (Lines >= StartLvl * 10 + 10 || StartLvl * 10 >= 150)) IsLvlReached = true;
-            if (IsLvlReached && (Lines - indexs.Count) % 10 + indexs.Count > 9) SetLvl(++Lvl);
+            if (IsLvlReached && (Lines - lines.Count) % 10 + lines.Count > 9) Lvl++;
 
-            if (indexs.Count == 1) Score += (indexs[0] + 1) * 40 * Lvl;
-            else if (indexs.Count == 2) Score += (indexs[0] + 1) * 100 * Lvl;
-            else if (indexs.Count == 3) Score += (indexs[0] + 1) * 300 * Lvl;
-            else if (indexs.Count == 4) Score += (indexs[0] + 1) * 1200 * Lvl;
-
-            StartCoroutine(RemoveLineAnimation(indexs));
+            if (lines.Count == 1) Score += (lines[0] + 1) * 40 * Lvl;
+            else if (lines.Count == 2) Score += (lines[0] + 1) * 100 * Lvl;
+            else if (lines.Count == 3) Score += (lines[0] + 1) * 300 * Lvl;
+            else if (lines.Count == 4) Score += (lines[0] + 1) * 1200 * Lvl;
         }
-        else SpawnBlock();
+        // /TODO
+
+        return lines.ToArray();
     }
+    protected void RemoveLines(int[] lines)
+    {
+        for (int i = lines.Length - 1; i > -1; i--)
+            for (int y2 = lines[i]; y2 < MaxY - 1; y2++)
+                for (int x2 = 0; x2 < MaxX; x2++)
+                    GameMatrix[x2, y2] = GameMatrix[x2, y2 + 1];
+
+        for (int x2 = 0; x2 < MaxX; x2++)
+            GameMatrix[x2, MaxY - 1] = false;
+    }
+
+    protected bool IsLineFull(int y)
+    {
+        for (int x = 0; x < MaxX; x++)
+            if (!GameMatrix[x, y])
+                return false;
+
+        return true;
+    }
+    protected bool IsLineEmpty(int y)
+    {
+        for (int x = 0; x < MaxX; x++)
+            if (GameMatrix[x, y])
+                return false;
+
+        return true;
+    }
+
     protected void RemoveTopLines(int count)
     {
         for (int y = 0; y < count; y++)
@@ -489,19 +500,18 @@ public abstract class FieldController : MonoBehaviour, IFieldController
                 GameMatrix[x, GameMatrix.MaxY - 1 - y] = false;
 
         FieldRenderer.UpdateColors();
-        FieldRenderer.UpdateMatrix();
+        FieldRenderer.UpdateField();
     }
 
     public virtual void GameOver()
     {
-        // StopAllCoroutines();
         IsPaused = true;
         Menu.SetMenu<GameOverMenu>();
 
         if (BlindRendering)
         {
             BlindRendering = false;
-            FieldRenderer.UpdateMatrix();
+            FieldRenderer.UpdateField();
             BlindRendering = true;
         }
     }
@@ -525,4 +535,24 @@ public abstract class FieldController : MonoBehaviour, IFieldController
 
     protected abstract int GetMaxX();
     protected abstract int GetMaxY();
+}
+
+public enum State : byte
+{
+    Falling,
+    WaitingOnGround,
+    HoldingOnTop,
+    Animation
+}
+
+public enum HorizontalState : byte
+{
+    Waiting,
+    Moving
+}
+
+public enum RotateState : byte
+{
+    Waiting,
+    Rotated
 }

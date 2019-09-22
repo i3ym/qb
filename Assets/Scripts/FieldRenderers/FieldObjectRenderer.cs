@@ -114,9 +114,6 @@ public abstract class FieldObjectRenderer : FieldRendererBase
     }
     protected override void _UpdateMatrixFast()
     {
-        _UpdateMatrix();
-        return;
-
         if (Game.BlindRendering)
         {
             for (int x = 0; x < MaxX; x++)
@@ -180,13 +177,13 @@ public abstract class FieldObjectRenderer : FieldRendererBase
             }
     }
 
-    public override float RemoveLinesAnimation(List<int> listy, GameMatrix GameMatrix, GameMatrix CurrentObject, int x, int y)
+    public override IEnumerator<bool> RemoveLinesAnimation(int[] indexs)
     {
-        for (int i = listy.Count - 1; i > -1; i--)
-            for (int y2 = listy[i]; y2 < MaxY - 1; y2++)
+        for (int i = indexs.Length - 1; i > -1; i--)
+            for (int y2 = indexs[i]; y2 < MaxY - 1; y2++)
                 for (int x2 = 0; x2 < MaxX; x2++)
                     SetMaterial(GameObjects[x2, y2], GameObjects[x2, y2 + 1]);
 
-        return .1f;
+        for (byte i = 0; i < 20; i++) yield return true;
     }
 }

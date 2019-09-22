@@ -1,12 +1,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class FieldRendererBase : MonoBehaviour
+public abstract class FieldRendererBase : MonoBehaviour, IFieldRenderer
 {
     [SerializeField]
     protected IFieldRendererExtension[] Extensions = new IFieldRendererExtension[] { };
 
-    public IFieldController Controller;
+    public IFieldController Controller { get; protected set; }
 
     int LastX, LastY, LastRotation;
 
@@ -37,7 +37,6 @@ public abstract class FieldRendererBase : MonoBehaviour
     public virtual void Initialize(IFieldController controller)
     {
         Controller = controller;
-
         foreach (var extension in Extensions) extension.Start();
     }
     protected virtual void Update()
@@ -47,7 +46,7 @@ public abstract class FieldRendererBase : MonoBehaviour
     }
 
     public abstract void CreateField();
-    public void UpdateMatrix()
+    public void UpdateField()
     {
         if (!GameMatrix.Changed && LastX == CurrentX && LastY == CurrentY && LastRotation == CurrentRotation) return;
 
@@ -57,7 +56,7 @@ public abstract class FieldRendererBase : MonoBehaviour
         GameMatrix.Changed = false;
         _UpdateMatrix();
     }
-    public void UpdateMatrixFast()
+    public void UpdateFieldFast()
     {
         if (!GameMatrix.Changed && LastX == CurrentX && LastY == CurrentY && LastRotation == CurrentRotation) return;
 
@@ -72,6 +71,5 @@ public abstract class FieldRendererBase : MonoBehaviour
     public abstract void UpdateColors();
     public abstract void ShowNextShape();
 
-    /// <returns> Duration of animation in seconds </returns> 
-    public abstract float RemoveLinesAnimation(List<int> indexs, GameMatrix gameMatrix, GameMatrix currentObject, int currentX, int currentY);
+    public abstract IEnumerator<bool> RemoveLinesAnimation(int[] indexs);
 }

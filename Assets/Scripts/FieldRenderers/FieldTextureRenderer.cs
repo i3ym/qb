@@ -53,18 +53,18 @@ public class FieldTextureRenderer : FieldRendererBase
         FieldRawImage.color = Color.white;
     }
 
-    public override float RemoveLinesAnimation(List<int> y, GameMatrix gameMatrix, GameMatrix CurrentObject, int CurrentX, int CurrentY)
+    public override IEnumerator<bool> RemoveLinesAnimation(int[] lines)
     {
-        for (int i = y.Count - 1; i > -1; i--)
-            for (int y2 = y[i]; y2 < MaxY - 1; y2++)
-                for (int x2 = 0; x2 < MaxX; x2++)
-                    SetState(x2, y2, GetState(x2, y2 + 1));
+        for (int i = lines.Length - 1; i > -1; i--)
+            for (int y = lines[i]; y < MaxY - 1; y++)
+                for (int x = 0; x < MaxX; x++)
+                    SetState(x, y, GetState(x, y + 1));
 
         FieldTexture.SetPixels(CurrentState);
         FieldTexture.Apply();
         FieldRawImage.texture = FieldTexture;
 
-        return .2f;
+        for (byte i = 0; i < 30; i++) yield return true;
     }
 
     public override void ShowNextShape()
