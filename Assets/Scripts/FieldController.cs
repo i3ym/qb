@@ -288,8 +288,8 @@ public abstract class FieldController : MonoBehaviour, IFieldController
     {
         var wasWaiting = State == State.WaitingOnGround;
 
-        var rotate = PlayerControls.Rotate;
-        var rotatec = PlayerControls.RotateC;
+        var rotate = Controls.Rotate;
+        var rotatec = Controls.RotateC;
 
         if (RotateState == RotateState.Waiting)
         {
@@ -319,8 +319,8 @@ public abstract class FieldController : MonoBehaviour, IFieldController
 
         var wasWaiting = State == State.WaitingOnGround;
 
-        var right = PlayerControls.Right;
-        var left = PlayerControls.Left;
+        var right = Controls.Right;
+        var left = Controls.Left;
 
         if (HorizontalState == HorizontalState.Waiting && (right || left))
         {
@@ -346,11 +346,11 @@ public abstract class FieldController : MonoBehaviour, IFieldController
     {
         WaitDownTime--;
 
-        if (State == State.Falling && PlayerControls.Down)
+        if (State == State.Falling && Controls.Down)
             WaitDownTime -= LevelSpeed / 3 + 1;
-        else if (State == State.WaitingOnGround && PlayerControls.Down)
+        else if (State == State.WaitingOnGround && Controls.Down)
             WaitDownTime = 0;
-        else if (State == State.HoldingOnTop && (PlayerControls.Left || PlayerControls.Right || PlayerControls.Rotate || PlayerControls.RotateC))
+        else if (State == State.HoldingOnTop && (Controls.Left || Controls.Right || Controls.Rotate || Controls.RotateC))
             WaitDownTime = 0;
 
         if (WaitDownTime > 0) return;

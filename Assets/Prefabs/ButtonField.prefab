@@ -249,8 +249,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MaxX: 0
   MaxY: 0
-  Lvl: 0
   IsAdContinued: 0
+  StartLvl: 0
+  IsPaused: 0
   ScoreText: {fileID: 287838075874029371}
   TimeText: {fileID: 4032160113394440213}
   LvlText: {fileID: 5792722455573510183}
