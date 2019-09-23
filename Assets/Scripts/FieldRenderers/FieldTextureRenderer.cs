@@ -127,10 +127,6 @@ public class FieldTextureRenderer : FieldRendererBase
     }
     protected override void _UpdateMatrixFast()
     {
-        _UpdateMatrix();
-
-        return;
-
         if (Game.BlindRendering) _UpdateMatrix();
         else
             for (int y = CurrentY; y < CurrentY + CurrentObject.MaxY + 1; y++)
@@ -143,8 +139,6 @@ public class FieldTextureRenderer : FieldRendererBase
                     else if (!GameMatrix.GetWithoutChecks(x, y))
                         CurrentState[x + (y * MaxX)] = black; // SetState(x, y, black); copied for performance reasons
                 }
-
-        // TODO fix pixels when moving more that 1 pixel in one frame
 
         FieldTexture.SetPixels(CurrentState);
         FieldTexture.Apply();

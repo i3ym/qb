@@ -10,8 +10,8 @@ public abstract class FieldRendererBase : MonoBehaviour, IFieldRenderer
 
     int LastX, LastY, LastRotation;
 
-    protected GameMatrix GameMatrix => Controller.GameMatrix;
-    protected GameMatrix CurrentObject => Controller.CurrentObject;
+    protected GameMatrix<bool> GameMatrix => Controller.GameMatrix;
+    protected GameMatrix<bool> CurrentObject => Controller.CurrentObject;
     protected int MaxX => Controller.MaxX;
     protected int MaxY => Controller.MaxY;
     protected int CurrentX => Controller.CurrentX;

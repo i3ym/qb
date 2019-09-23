@@ -9,8 +9,8 @@ public abstract class FieldController : MonoBehaviour, IFieldController
     public static Camera Camera;
     public static bool BlindRendering = false;
 
-    public static Dictionary<Shapes, GameMatrix> ShapeObjects = new Dictionary<Shapes, GameMatrix>();
-    protected static int[][, ] TetrominoWallKickData, TetrominoWallKickDataI; //0R R0 R2 2R 2L L2 L0 0L
+    public static Dictionary<Shapes, GameMatrix<bool>> ShapeObjects = new Dictionary<Shapes, GameMatrix<bool>>();
+    protected static(int, int) [][] TetrominoWallKickData, TetrominoWallKickDataI; //0R R0 R2 2R 2L L2 L0 0L
 
     [HideInInspector]
     public int MaxX, MaxY;
@@ -26,7 +26,7 @@ public abstract class FieldController : MonoBehaviour, IFieldController
     protected bool IsLvlReached;
     protected List<Shapes> RandomBag = new List<Shapes>();
 
-    protected GameMatrix GameMatrix, CurrentObject;
+    protected GameMatrix<bool> GameMatrix, CurrentObject;
     protected int CurrentX, CurrentY, CurrentRotation;
     protected Shapes CurrentShape, NextShape;
 
@@ -66,8 +66,8 @@ public abstract class FieldController : MonoBehaviour, IFieldController
     protected int Lines { get => _Lines; set { _Lines = value; LinesText.text = value.ToString(); } }
     protected int Lvl { get => _Lvl; set { _Lvl = value; LvlText.text = value.ToString(); } }
 
-    GameMatrix IFieldController.GameMatrix => GameMatrix;
-    GameMatrix IFieldController.CurrentObject => CurrentObject;
+    GameMatrix<bool> IFieldController.GameMatrix => GameMatrix;
+    GameMatrix<bool> IFieldController.CurrentObject => CurrentObject;
     int IFieldController.MaxX => MaxX;
     int IFieldController.MaxY => MaxY;
     int IFieldController.CurrentX => CurrentX;
@@ -85,26 +85,87 @@ public abstract class FieldController : MonoBehaviour, IFieldController
 
     static FieldController()
     {
+        bool[, ] convert(string text)
+        {
+            var spt = text.Replace(" ", "").Replace(" ", "").Replace("\r", "").Split('\n');
+            bool[, ] output = new bool[spt[0].Length, spt.Length];
+
+            for (int y = 0; y < spt.Length; y++)
+                for (int x = 0; x < spt[y].Length; x++)
+                    output[x, y] = spt[spt[y].Length - 1 - y][x] == '1';
+
+            return output;
+        }
+
         ShapeObjects.Clear();
-        ShapeObjects.Add(Shapes.G, new bool[, ] { { false, true, false }, { false, true, false }, { false, true, true } });
-        ShapeObjects.Add(Shapes.GR, new bool[, ] { { false, true, true }, { false, true, false }, { false, true, false } });
-        ShapeObjects.Add(Shapes.I, new bool[, ] { { false, true, false, false }, { false, true, false, false }, { false, true, false, false }, { false, true, false, false } });
-        ShapeObjects.Add(Shapes.O, new bool[, ] { { true, true }, { true, true } });
-        ShapeObjects.Add(Shapes.T, new bool[, ] { { false, true, false }, { false, true, true }, { false, true, false } });
-        ShapeObjects.Add(Shapes.Z, new bool[, ] { { true, false, false }, { true, true, false }, { false, true, false } });
-        ShapeObjects.Add(Shapes.ZR, new bool[, ] { { false, true, false }, { true, true, false }, { true, false, false } });
+        ShapeObjects.Add(Shapes.G, convert(
+            @"001
+            111
+            000"));
+        ShapeObjects.Add(Shapes.GR, convert(
+            @"100
+            111
+            000"));
+        ShapeObjects.Add(Shapes.I, convert(
+            @"0000
+            1111
+            0000
+            0000"));
+        ShapeObjects.Add(Shapes.O, convert(
+            @"11
+            11"));
+        ShapeObjects.Add(Shapes.T, convert(
+            @"010
+            111
+            000"));
+        ShapeObjects.Add(Shapes.Z, convert(
+            @"110
+            011
+            000"));
+        ShapeObjects.Add(Shapes.ZR, convert(
+            @"011
+            110
+            000"));
 
-        TetrominoWallKickData = new int[4][, ];
-        TetrominoWallKickData[0] = new int[, ] { { 0, 0 }, {-1, 0 }, {-1, 1 }, { 0, -2 }, {-1, -2 } };
-        TetrominoWallKickData[1] = new int[, ] { { 0, 0 }, { 1, 0 }, { 1, -1 }, { 0, 2 }, { 1, 2 } };
-        TetrominoWallKickData[2] = new int[, ] { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, -2 }, { 1, 2 } };
-        TetrominoWallKickData[3] = new int[, ] { { 0, 0 }, {-1, 0 }, {-1, -1 }, { 0, 2 }, {-1, 2 } };
+        #region WallKickData
 
-        TetrominoWallKickDataI = new int[4][, ];
-        TetrominoWallKickDataI[0] = new int[, ] { { 0, 0 }, {-2, 0 }, { 1, 0 }, {-2, -1 }, { 1, 2 } };
-        TetrominoWallKickDataI[1] = new int[, ] { { 0, 0 }, {-1, 0 }, { 2, 0 }, {-1, 2 }, { 2, -1 } };
-        TetrominoWallKickDataI[2] = new int[, ] { { 0, 0 }, { 2, 0 }, {-1, 0 }, { 2, 1 }, {-1, -2 } };
-        TetrominoWallKickDataI[3] = new int[, ] { { 0, 0 }, { 1, 0 }, {-2, 0 }, { 1, -2 }, {-2, 1 } };
+        TetrominoWallKickData = new(int, int) [4][];
+        TetrominoWallKickData[0] = new []
+        {
+            (0, 0), (-1, 0), (-1, 1), (0, -2), (-1, -2)
+        };
+        TetrominoWallKickData[1] = new []
+        {
+            (0, 0), (1, 0), (1, -1), (0, 2), (1, 2)
+        };
+        TetrominoWallKickData[2] = new []
+        {
+            (0, 0), (1, 0), (1, 1), (0, -2), (1, -2)
+        };
+        TetrominoWallKickData[3] = new []
+        {
+            (0, 0), (-1, 0), (-1, -1), (0, 2), (-1, 2)
+        };
+
+        TetrominoWallKickDataI = new(int, int) [4][];
+        TetrominoWallKickDataI[0] = new []
+        {
+            (0, 0), (-2, 0), (1, 0), (-2, -1), (1, 2)
+        };
+        TetrominoWallKickDataI[1] = new []
+        {
+            (0, 0), (-1, 0), (2, 0), (-1, 2), (2, -1)
+        };
+        TetrominoWallKickDataI[2] = new []
+        {
+            (0, 0), (2, 0), (-1, 0), (2, 1), (-1, -2)
+        };
+        TetrominoWallKickDataI[3] = new []
+        {
+            (0, 0), (1, 0), (-2, 0), (1, -2), (-2, 1)
+        };
+
+        #endregion
     }
 
     protected virtual void Awake()
@@ -132,8 +193,8 @@ public abstract class FieldController : MonoBehaviour, IFieldController
         IsPaused = true;
         IsLvlReached = false;
         IsAdContinued = false;
-        GameMatrix = new GameMatrix(MaxX, MaxY);
-        CurrentObject = new GameMatrix(0, 0);
+        GameMatrix = new GameMatrix<bool>(MaxX, MaxY);
+        CurrentObject = new GameMatrix<bool>(0, 0);
         CurrentRotation = 0;
         CurrentX = MaxX / 2 - 1;
         CurrentY = MaxY - 1;
@@ -391,29 +452,24 @@ public abstract class FieldController : MonoBehaviour, IFieldController
     }
     protected void RotateBlock(bool clockwise)
     {
-        bool[, ] newObject = new bool[CurrentObject.MaxY, CurrentObject.MaxX];
+        if (CurrentShape == Shapes.O) return;
 
-        if (clockwise)
-            for (int x = 0; x < CurrentObject.MaxX; x++)
-                for (int y = 0; y < CurrentObject.MaxY; y++)
-                    newObject[y, CurrentObject.MaxX - 1 - x] = CurrentObject[x, y];
-        else
-            for (int x = 0; x < CurrentObject.MaxX; x++)
-                for (int y = 0; y < CurrentObject.MaxY; y++)
-                    newObject[CurrentObject.MaxY - 1 - y, x] = CurrentObject[x, y];
+        var newObject = clockwise ?
+            CurrentObject.RotateClockwise() :
+            CurrentObject.RotateAntiClockwise();
 
         int cx = 0, cy = 0;
         bool rotate = false;
-        int[, ] wkd;
+        (int x, int y) [] wkd;
 
         for (int i = 0; i < 5; i++)
         {
-            wkd = (CurrentShape == Shapes.I ? TetrominoWallKickDataI : TetrominoWallKickData) [CurrentRotation];
+            wkd = (CurrentShape == Shapes.I ? TetrominoWallKickDataI : TetrominoWallKickData) [clockwise ? CurrentRotation : (CurrentRotation - 1 + 4) % 4];
 
-            cx = CurrentX + (clockwise? wkd[i, 0]: -wkd[i, 0]);
-            cy = CurrentY + (clockwise? wkd[i, 1]: -wkd[i, 1]);
+            cx = CurrentX + (clockwise ? wkd[i].x : -wkd[i].x);
+            cy = CurrentY + (clockwise ? wkd[i].y : -wkd[i].y);
 
-            if (TryWallKick(cx, cy, newObject))
+            if (CanBePlaced(cx, cy, GameMatrix, newObject))
             {
                 rotate = true;
                 break;
@@ -425,20 +481,21 @@ public abstract class FieldController : MonoBehaviour, IFieldController
         CurrentX = cx;
         CurrentY = cy;
         CurrentObject = newObject;
-        if (++CurrentRotation == 4) CurrentRotation = 0;
+        CurrentRotation += clockwise ? 1 : -1;
+
+        while (CurrentRotation < 0) CurrentRotation += 4;
+        if (CurrentRotation > 3) CurrentRotation %= 4;
 
         FieldRenderer.UpdateFieldFast();
     }
-    protected bool TryWallKick(int cx, int cy, bool[, ] newObject)
+    public static bool CanBePlaced(int cx, int cy, GameMatrix<bool> gameMatrix, GameMatrix<bool> newObject)
     {
-        for (int x = 0; x < newObject.GetLength(0); x++)
-            for (int y = 0; y < newObject.GetLength(1); y++)
-            {
-                if (x + cx < 0 || x + cx >= GameMatrix.MaxX ||
-                    y + cy < 0 || y + cy >= GameMatrix.MaxY ||
-                    GameMatrix[x + cx, y + cy] && newObject[x, y])
+        for (int x = 0; x < newObject.MaxX; x++)
+            for (int y = 0; y < newObject.MaxY; y++)
+                if (x + cx < 0 || x + cx >= gameMatrix.MaxX ||
+                    y + cy < 0 || y + cy >= gameMatrix.MaxY ||
+                    gameMatrix[x + cx, y + cy] && newObject[x, y])
                     return false;
-            }
 
         return true;
     }
@@ -459,9 +516,6 @@ public abstract class FieldController : MonoBehaviour, IFieldController
             else return linesCount / 10;
         }
         else return startLvl;
-
-        // if (!IsLvlReached && (linesCount >= (StartLvl * 10 + 10) || StartLvl >= 15)) IsLvlReached = true;
-        // if (IsLvlReached && (linesCount - LinesToRemove.Length) % 10 + LinesToRemove.Length > 9) Lvl++;
     }
 
     protected int[] GetLinesToRemove()

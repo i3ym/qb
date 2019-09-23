@@ -4,8 +4,8 @@ using UnityEngine;
 
 public interface IFieldController
 {
-    GameMatrix GameMatrix { get; }
-    GameMatrix CurrentObject { get; }
+    GameMatrix<bool> GameMatrix { get; }
+    GameMatrix<bool> CurrentObject { get; }
     int MaxX { get; }
     int MaxY { get; }
     int CurrentX { get; }

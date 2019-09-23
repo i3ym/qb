@@ -23,7 +23,7 @@ public class AutoGame : FieldController
         IsPaused = true;
 
         GameMatrix.Clear();
-        CurrentObject = new GameMatrix(CurrentObject.MaxX, CurrentObject.MaxY);
+        CurrentObject = new GameMatrix<bool>(CurrentObject.MaxX, CurrentObject.MaxY);
         FieldRenderer.UpdateField();
     }
     public override void GameOver()
