@@ -63,4 +63,22 @@ public class FieldRenderer1 : FieldObjectRenderer
             yield return wff;
         }
     }
+
+    public override IEnumerator<bool> GameOverAnimation()
+    {
+        var uv = new Rect(16f / Atlas.width * (byte) BackgroundMaker.Tile.Background,
+            1f - (16f / Atlas.height * (Config.SelectedSkin + 1)), 16f / Atlas.width, 16f / Atlas.height);
+
+        for (int y = GameMatrix.MaxY - 1; y >= GameMatrix.MaxY / 2; y--)
+            for (int x = 0; x < GameMatrix.MaxX; x++)
+            {
+                GameObjects[x, y].gameObject.SetActive(true);
+                GameObjects[x, y].uvRect = uv;
+
+                GameObjects[GameMatrix.MaxX - 1 - x, GameMatrix.MaxY - 1 - y].gameObject.SetActive(true);
+                GameObjects[GameMatrix.MaxX - 1 - x, GameMatrix.MaxY - 1 - y].uvRect = uv;
+
+                yield return true;
+            }
+    }
 }

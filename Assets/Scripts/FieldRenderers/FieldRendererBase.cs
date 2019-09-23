@@ -20,20 +20,6 @@ public abstract class FieldRendererBase : MonoBehaviour, IFieldRenderer
     protected Shapes CurrentShape => Controller.CurrentShape;
     protected Shapes NextShape => Controller.NextShape;
 
-    protected static Dictionary<Shapes, Color> ShapeColors = new Dictionary<Shapes, Color>();
-
-    static FieldRendererBase()
-    {
-        ShapeColors.Clear();
-        ShapeColors.Add(Shapes.G, Color.blue);
-        ShapeColors.Add(Shapes.GR, new Color(1f, .5f, 0f));
-        ShapeColors.Add(Shapes.Z, Color.red);
-        ShapeColors.Add(Shapes.ZR, Color.green);
-        ShapeColors.Add(Shapes.I, new Color(0f, 1f, 1f));
-        ShapeColors.Add(Shapes.T, new Color(.5f, 0f, 1f));
-        ShapeColors.Add(Shapes.O, Color.yellow);
-    }
-
     public virtual void Initialize(IFieldController controller)
     {
         Controller = controller;
@@ -72,4 +58,5 @@ public abstract class FieldRendererBase : MonoBehaviour, IFieldRenderer
     public abstract void ShowNextShape();
 
     public abstract IEnumerator<bool> RemoveLinesAnimation(int[] lines);
+    public abstract IEnumerator<bool> GameOverAnimation();
 }

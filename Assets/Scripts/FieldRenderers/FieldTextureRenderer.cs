@@ -16,6 +16,20 @@ public class FieldTextureRenderer : FieldRendererBase
 
     Color[] CurrentState;
 
+    protected static Dictionary<Shapes, Color> ShapeColors = new Dictionary<Shapes, Color>();
+
+    static FieldTextureRenderer()
+    {
+        ShapeColors.Clear();
+        ShapeColors.Add(Shapes.G, Color.blue);
+        ShapeColors.Add(Shapes.GR, new Color(1f, .5f, 0f));
+        ShapeColors.Add(Shapes.Z, Color.red);
+        ShapeColors.Add(Shapes.ZR, Color.green);
+        ShapeColors.Add(Shapes.I, new Color(0f, 1f, 1f));
+        ShapeColors.Add(Shapes.T, new Color(.5f, 0f, 1f));
+        ShapeColors.Add(Shapes.O, Color.yellow);
+    }
+
     public override void Initialize(IFieldController controller)
     {
         base.Initialize(controller);
@@ -31,8 +45,6 @@ public class FieldTextureRenderer : FieldRendererBase
         NextObjectRawImage.texture = NextObjectTexture;
         NextObjectRawImage.color = Color.white;
     }
-
-    //
 
     [MethodImpl(256)]
     void SetState(int x, int y, Color color) => CurrentState[x + (y * MaxX)] = color;
@@ -143,5 +155,10 @@ public class FieldTextureRenderer : FieldRendererBase
         FieldTexture.SetPixels(CurrentState);
         FieldTexture.Apply();
         FieldRawImage.texture = FieldTexture;
+    }
+
+    public override IEnumerator<bool> GameOverAnimation()
+    {
+        yield return true;
     }
 }

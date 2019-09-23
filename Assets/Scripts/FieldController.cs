@@ -35,7 +35,7 @@ public abstract class FieldController : MonoBehaviour, IFieldController
     protected HorizontalState HorizontalState = HorizontalState.Waiting;
     protected RotateState RotateState = RotateState.Waiting;
     protected int[] LinesToRemove;
-    protected IEnumerator<bool> RemoveLinesAnimationCoroutine;
+    protected IEnumerator<bool> RemoveLinesAnimationCoroutine, GameOverAnimationCoroutine;
     protected static int[] Levels = new int[]
     {
         52,
@@ -190,6 +190,9 @@ public abstract class FieldController : MonoBehaviour, IFieldController
         MaxX = GetMaxX();
         MaxY = GetMaxY();
 
+        State = State.Falling;
+        GameOverAnimationCoroutine = null;
+        RemoveLinesAnimationCoroutine = null;
         IsPaused = true;
         IsLvlReached = false;
         IsAdContinued = false;
@@ -231,6 +234,12 @@ public abstract class FieldController : MonoBehaviour, IFieldController
 
             if (IsPaused) continue;
 
+            if (State == State.GameOver)
+            {
+                PlayDeathAnimation();
+                continue;
+            }
+
             frame++;
             if (frame == 60)
             {
@@ -260,6 +269,20 @@ public abstract class FieldController : MonoBehaviour, IFieldController
         SpawnBlock();
         WaitDownTime = 20;
         State = State.HoldingOnTop;
+    }
+    protected void PlayDeathAnimation()
+    {
+        if (GameOverAnimationCoroutine.MoveNext() && GameOverAnimationCoroutine.Current) return;
+
+        IsPaused = true;
+        Menu.SetMenu<GameOverMenu>();
+
+        if (BlindRendering)
+        {
+            BlindRendering = false;
+            FieldRenderer.UpdateField();
+            BlindRendering = true;
+        }
     }
     protected void Rotate()
     {
@@ -343,6 +366,9 @@ public abstract class FieldController : MonoBehaviour, IFieldController
             if (LinesToRemove.Length == 0)
             {
                 SpawnBlock();
+
+                if (State == State.GameOver) return;
+
                 WaitDownTime = 20;
                 State = State.HoldingOnTop;
             }
@@ -568,15 +594,8 @@ public abstract class FieldController : MonoBehaviour, IFieldController
 
     public virtual void GameOver()
     {
-        IsPaused = true;
-        Menu.SetMenu<GameOverMenu>();
-
-        if (BlindRendering)
-        {
-            BlindRendering = false;
-            FieldRenderer.UpdateField();
-            BlindRendering = true;
-        }
+        State = State.GameOver;
+        GameOverAnimationCoroutine = FieldRenderer.GameOverAnimation();
     }
     public void RestartGame()
     {
@@ -593,6 +612,7 @@ public abstract class FieldController : MonoBehaviour, IFieldController
 
         IsAdContinued = true;
         IsPaused = false;
+        State = State.Falling;
         RemoveTopLines(7);
     }
 
@@ -605,15 +625,14 @@ public enum State : byte
     Falling,
     WaitingOnGround,
     HoldingOnTop,
-    Animation
+    Animation,
+    GameOver
 }
-
 public enum HorizontalState : byte
 {
     Waiting,
     Moving
 }
-
 public enum RotateState : byte
 {
     Waiting,
