@@ -16,8 +16,6 @@ public abstract class FieldController : MonoBehaviour, IFieldController
     public int MaxX, MaxY;
 
     [HideInInspector]
-    public int Lvl = 0;
-    [HideInInspector]
     public bool IsAdContinued;
     [HideInInspector]
     public int StartLvl = 0;
@@ -64,8 +62,9 @@ public abstract class FieldController : MonoBehaviour, IFieldController
     };
     protected int LevelSpeed => Lvl > Levels.Length ? 1 : Levels[Lvl];
 
-    protected int Score { get => _score; set { _score = value; ScoreText.text = value.ToString(); } }
-    protected int Lines { get => _lines; set { _lines = value; LinesText.text = value.ToString(); } }
+    protected int Score { get => _Score; set { _Score = value; ScoreText.text = value.ToString(); } }
+    protected int Lines { get => _Lines; set { _Lines = value; LinesText.text = value.ToString(); } }
+    protected int Lvl { get => _Lvl; set { _Lvl = value; LvlText.text = value.ToString(); } }
 
     GameMatrix IFieldController.GameMatrix => GameMatrix;
     GameMatrix IFieldController.CurrentObject => CurrentObject;
@@ -77,7 +76,7 @@ public abstract class FieldController : MonoBehaviour, IFieldController
     Shapes IFieldController.CurrentShape => CurrentShape;
     Shapes IFieldController.NextShape => NextShape;
 
-    protected int _score, _lines;
+    protected int _Score, _Lines, _Lvl;
 
     [SerializeField]
     protected TextMeshProUGUI ScoreText = null, TimeText = null, LvlText = null, LinesText = null;
@@ -196,7 +195,7 @@ public abstract class FieldController : MonoBehaviour, IFieldController
         if (RemoveLinesAnimationCoroutine.MoveNext() && RemoveLinesAnimationCoroutine.Current) return;
 
         RemoveLines(LinesToRemove);
-        
+
         SpawnBlock();
         WaitDownTime = 20;
         State = State.HoldingOnTop;
@@ -288,6 +287,10 @@ public abstract class FieldController : MonoBehaviour, IFieldController
             }
             else
             {
+                Lines += LinesToRemove.Length;
+                Score += GetScoreForLine(LinesToRemove.Length, LinesToRemove[0]);
+                Lvl = GetLvlFor(Lines, StartLvl);
+
                 RemoveLinesAnimationCoroutine = FieldRenderer.RemoveLinesAnimation(LinesToRemove);
                 State = State.Animation;
             }
@@ -439,6 +442,27 @@ public abstract class FieldController : MonoBehaviour, IFieldController
 
         return true;
     }
+    protected int GetScoreForLine(int linesCount, int minHeight)
+    {
+        if (linesCount == 1) return (minHeight + 1) * 40 * Lvl;
+        else if (linesCount == 2) return (minHeight + 1) * 100 * Lvl;
+        else if (linesCount == 3) return (minHeight + 1) * 300 * Lvl;
+        else if (linesCount == 4) return (minHeight + 1) * 1200 * Lvl;
+
+        return 0;
+    }
+    protected int GetLvlFor(int linesCount, int startLvl)
+    {
+        if (linesCount >= StartLvl * 10 + 10 || StartLvl >= 15)
+        {
+            if (StartLvl >= 15) return linesCount / 10 - 5;
+            else return linesCount / 10;
+        }
+        else return startLvl;
+
+        // if (!IsLvlReached && (linesCount >= (StartLvl * 10 + 10) || StartLvl >= 15)) IsLvlReached = true;
+        // if (IsLvlReached && (linesCount - LinesToRemove.Length) % 10 + LinesToRemove.Length > 9) Lvl++;
+    }
 
     protected int[] GetLinesToRemove()
     {
@@ -447,21 +471,6 @@ public abstract class FieldController : MonoBehaviour, IFieldController
         for (int y = 0; y < MaxY; y++)
             if (IsLineFull(y))
                 lines.Add(y);
-
-        // TODO move somewhere
-        if (lines.Count != 0)
-        {
-            Lines += lines.Count;
-
-            if (!IsLvlReached && (Lines >= StartLvl * 10 + 10 || StartLvl * 10 >= 150)) IsLvlReached = true;
-            if (IsLvlReached && (Lines - lines.Count) % 10 + lines.Count > 9) Lvl++;
-
-            if (lines.Count == 1) Score += (lines[0] + 1) * 40 * Lvl;
-            else if (lines.Count == 2) Score += (lines[0] + 1) * 100 * Lvl;
-            else if (lines.Count == 3) Score += (lines[0] + 1) * 300 * Lvl;
-            else if (lines.Count == 4) Score += (lines[0] + 1) * 1200 * Lvl;
-        }
-        // /TODO
 
         return lines.ToArray();
     }
