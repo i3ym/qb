@@ -347,7 +347,10 @@ public abstract class FieldController : MonoBehaviour, IFieldController
         WaitDownTime--;
 
         if (State == State.Falling && Controls.Down)
+        {
             WaitDownTime -= LevelSpeed / 3 + 1;
+            Score++;
+        }
         else if (State == State.WaitingOnGround && Controls.Down)
             WaitDownTime = 0;
         else if (State == State.HoldingOnTop && (Controls.Left || Controls.Right || Controls.Rotate || Controls.RotateC))
@@ -527,10 +530,10 @@ public abstract class FieldController : MonoBehaviour, IFieldController
     }
     protected int GetScoreForLine(int linesCount, int minHeight)
     {
-        if (linesCount == 1) return (minHeight + 1) * 40 * Lvl;
-        else if (linesCount == 2) return (minHeight + 1) * 100 * Lvl;
-        else if (linesCount == 3) return (minHeight + 1) * 300 * Lvl;
-        else if (linesCount == 4) return (minHeight + 1) * 1200 * Lvl;
+        if (linesCount == 1) return (minHeight + 1) * 40 * (Lvl + 1);
+        else if (linesCount == 2) return (minHeight + 1) * 100 * (Lvl + 1);
+        else if (linesCount == 3) return (minHeight + 1) * 300 * (Lvl + 1);
+        else if (linesCount == 4) return (minHeight + 1) * 1200 * (Lvl + 1);
 
         return 0;
     }
