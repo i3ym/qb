@@ -6,7 +6,6 @@ public class SettingsMenu : Menu
 
     protected override void Init()
     {
-        Buttons[0].OnClick += () => SetMenu<SettingsGraphicsMenu>();
-        Buttons[1].OnClick += () => SetMenu<ChooseSkinMenu>();
+        Buttons[0].OnClick += () => SetMenu<SettingsLanguageMenu>();
     }
 }

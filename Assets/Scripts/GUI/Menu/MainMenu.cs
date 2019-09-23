@@ -8,8 +8,9 @@ public class MainMenu : Menu
     protected override void Init()
     {
         Buttons[0].OnClick += () => SetMenu<ChooseModeMenu>();
-        Buttons[1].OnClick += () => SetMenu<ChooseSkinMenu>();
-        Buttons[2].OnClick += () => Application.Quit();
+        Buttons[1].OnClick += () => SetMenu<SettingsMenu>();
+        Buttons[2].OnClick += () => SetMenu<ChooseSkinMenu>();
+        Buttons[3].OnClick += () => Application.Quit();
 
         SetMenu(this);
     }
