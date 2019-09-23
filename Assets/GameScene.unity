@@ -8616,11 +8616,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6827371403536409856, guid: 4dff82e2a508e6c5aa820d673febd64f,
         type: 3}
-      propertyPath: m_SizeDelta.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6827371403536409856, guid: 4dff82e2a508e6c5aa820d673febd64f,
-        type: 3}
       propertyPath: m_AnchorMin.x
       value: 0.5
       objectReference: {fileID: 0}
@@ -8649,6 +8644,11 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
+    - target: {fileID: 6827371403536409856, guid: 4dff82e2a508e6c5aa820d673febd64f,
+        type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6827371403536409857, guid: 4dff82e2a508e6c5aa820d673febd64f,
         type: 3}
       propertyPath: m_Name
@@ -8667,7 +8667,7 @@ PrefabInstance:
     - target: {fileID: 6827371403536409859, guid: 4dff82e2a508e6c5aa820d673febd64f,
         type: 3}
       propertyPath: m_textInfo.characterCount
-      value: 7
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 6827371403536409859, guid: 4dff82e2a508e6c5aa820d673febd64f,
         type: 3}
@@ -8677,7 +8677,7 @@ PrefabInstance:
     - target: {fileID: 6827371403536409859, guid: 4dff82e2a508e6c5aa820d673febd64f,
         type: 3}
       propertyPath: m_textInfo.lineCount
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6827371403536409859, guid: 4dff82e2a508e6c5aa820d673febd64f,
         type: 3}
@@ -8688,6 +8688,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_text
       value: settings
+      objectReference: {fileID: 0}
+    - target: {fileID: 6827371403536409859, guid: 4dff82e2a508e6c5aa820d673febd64f,
+        type: 3}
+      propertyPath: m_textAlignment
+      value: 8224
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4dff82e2a508e6c5aa820d673febd64f, type: 3}
