@@ -69,7 +69,12 @@ public class GameMatrix<T> : IEnumerable<T>
         return matrix;
     }
 
-    public IEnumerator<T> GetEnumerator() => (IEnumerator<T>) Matrix.GetEnumerator();
+    public IEnumerator<T> GetEnumerator()
+    {
+        for (int x = 0; x < MaxX; x++)
+            for (int y = 0; y < MaxY; y++)
+                yield return Matrix[x, y];
+    }
     IEnumerator IEnumerable.GetEnumerator() => Matrix.GetEnumerator();
 
     public static implicit operator GameMatrix<T>(T[, ] matrix) => new GameMatrix<T>(matrix.GetLength(0), matrix.GetLength(1)) { Matrix = matrix };

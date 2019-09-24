@@ -5,8 +5,6 @@ using UnityEngine;
 
 public abstract class ChooseMenu : Menu
 {
-    public int MaxX, MaxY;
-
     [SerializeField]
     protected GameObject ButtonPrefab = null;
 
@@ -20,16 +18,13 @@ public abstract class ChooseMenu : Menu
         var buttons = GetButtons();
         Buttons = new Button[buttons.Length];
 
-        MaxX = (int) transform.rect.width;
-        MaxY = (int) transform.rect.height - (Buttons.Length - 1) * 2;
-
         for (int i = 0; i < buttons.Length; i++)
-            CreateButton(i, buttons.Length, buttons[i].name, buttons[i].onSelect, buttons[i].onClick);
+            CreateButton(i, buttons[i].name, buttons[i].onSelect, buttons[i].onClick);
     }
 
     protected abstract(string name, Action onSelect, Action onClick) [] GetButtons();
 
-    protected void CreateButton(int index, int max, string name, Action onSelect, Action onClick)
+    protected void CreateButton(int index, string name, Action onSelect, Action onClick)
     {
         var go = Instantiate(ButtonPrefab, Vector3.zero, Quaternion.identity, transform);
         var btn = go.GetComponentInChildren<Button>();
@@ -39,10 +34,7 @@ public abstract class ChooseMenu : Menu
         text.text = name;
         (btn.transform as RectTransform).sizeDelta = new Vector2(text.text.Length, (btn.transform as RectTransform).sizeDelta.y);
 
-        tr.anchorMin = new Vector2(0f, 1f);
-        tr.anchorMax = new Vector2(1f, 1f);
-        tr.sizeDelta = new Vector2(tr.sizeDelta.x, transform.rect.height / max);
-        tr.anchoredPosition = new Vector2(0f, -transform.rect.height / max * index);
+        tr.anchoredPosition = new Vector2(0f, -transform.rect.height / Buttons.Length * index);
         tr.localPosition -= new Vector3(0f, 0f, tr.localPosition.z);
 
         btn.OnSelect += () =>
@@ -52,37 +44,21 @@ public abstract class ChooseMenu : Menu
         };
         btn.OnClick += () => onClick();
 
-        var autoGame = go.GetComponent<AutoGame>();
-        autoGame.SetMax(MaxX, MaxY);
-
         Buttons[index] = btn;
     }
 
-    protected void ShowField(int selectedIndex)
+    protected override void OnShow() => AutoGame.Instance.StartGame();
+    protected override void OnClose() => AutoGame.Instance.StopGame();
+
+    protected virtual void ShowField(int selectedIndex)
     {
+        AutoGame.UpdateField();
+
         RectTransform tr;
         for (int i = 0; i < Buttons.Length; i++)
         {
-            tr = (Buttons[i].transform.parent as RectTransform);
-
-            tr.sizeDelta =
-                i == selectedIndex ?
-                new Vector2(tr.sizeDelta.x, transform.rect.height - (Buttons.Length - 1) * 2) :
-                new Vector2(tr.sizeDelta.x, 2f);
-
-            if (i <= selectedIndex) tr.anchoredPosition = new Vector2(tr.anchoredPosition.x, -i * 2);
-            else tr.anchoredPosition = new Vector2(tr.anchoredPosition.x, -(i * 2 - 2 + (transform.rect.height - (Buttons.Length - 1) * 2)));
-
-            if (i == selectedIndex)
-            {
-                tr.GetComponentInChildren<TextMeshProUGUI>().color = Color.white;
-                tr.GetComponent<AutoGame>().StartGame();
-            }
-            else
-            {
-                tr.GetComponentInChildren<TextMeshProUGUI>().color = Color.gray;
-                tr.GetComponent<AutoGame>().StopGame();
-            }
+            tr = (Buttons[i].transform as RectTransform);
+            tr.anchoredPosition = new Vector2(0f, -transform.rect.height / Buttons.Length * (i - selectedIndex));
         }
     }
 }

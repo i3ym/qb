@@ -87,6 +87,7 @@ public abstract class Menu : MonoBehaviour
 
     protected abstract void Init();
     protected virtual void OnShow() { }
+    protected virtual void OnClose() { }
     protected virtual void OnGoBack() { }
 
     public static T GetMenu<T>() where T : Menu => Menus.OfType<T>().First();
@@ -94,9 +95,12 @@ public abstract class Menu : MonoBehaviour
     {
         foreach (var m in Menus) m.gameObject.SetActive(false);
 
-        BottomLine.Instance.enabled = !(TopImage.Instance.enabled = menu == null || menu.GetType() == typeof(PauseMenu) || menu.GetType() == typeof(GameOverMenu));
+        BottomLine.Instance.enabled = !(TopImage.Instance.enabled =
+            menu == null || menu is PauseMenu || menu is GameOverMenu || menu is ChooseMenu);
 
         if (menu != null) menu.Enable();
+
+        if (ActiveController != null) ActiveController.OnClose();
         ActiveController = menu;
         UpdateButtonDesign();
 

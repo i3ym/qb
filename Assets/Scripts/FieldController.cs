@@ -210,7 +210,7 @@ public abstract class FieldController : MonoBehaviour, IFieldController
 
         FieldRenderer.UpdateField();
     }
-    public void StartGame()
+    public virtual void StartGame()
     {
         StopAllCoroutines();
         SetDefaults();
