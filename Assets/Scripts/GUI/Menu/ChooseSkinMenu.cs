@@ -16,7 +16,8 @@ public class ChooseSkinMenu : ChooseMenu
             "Faces",
             "Neon",
             "Leaf Fall",
-            "Hot Dog"
+            "Hot Dog",
+            "Vending Machine"
         }.Select((string x, int i) => (x,
             (Action) (() => Config.SelectedSkin = i),
             (Action) (() => SetMenu<MainMenu>()))).ToArray();
@@ -24,6 +25,8 @@ public class ChooseSkinMenu : ChooseMenu
 
     protected override void OnShow()
     {
+        base.OnShow();
+        
         ActiveButtonIndex = Config.SelectedSkin;
         UpdateButtonDesign();
     }
