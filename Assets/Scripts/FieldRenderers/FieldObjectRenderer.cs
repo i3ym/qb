@@ -12,12 +12,15 @@ public abstract class FieldObjectRenderer : FieldRendererBase
     protected GameMatrix<RawImage> GameObjects, NextObjects;
 
     protected static Dictionary<Shapes, Rect> Uvs = new Dictionary<Shapes, Rect>();
+    protected GameMatrix<BackgroundMaker.Tile> Tiles;
 
     protected static Texture2D Atlas => Config.Instance.Atlas;
 
     public override void Initialize(IFieldController controller)
     {
         base.Initialize(controller);
+
+        Tiles = new GameMatrix<BackgroundMaker.Tile>(MaxX, MaxY);
 
         Config.OnSkinChange += () => RecreateUvs();
         Config.SelectedSkin = Config.SelectedSkin;
@@ -87,6 +90,11 @@ public abstract class FieldObjectRenderer : FieldRendererBase
 
     protected override void _UpdateMatrix()
     {
+        for (int y = 0; y < CurrentObject.MaxY; y++)
+            for (int x = 0; x < CurrentObject.MaxX; x++)
+                if (CurrentObject[x, y])
+                    Tiles[CurrentX + x, CurrentY + y] = ShapeConverter.ToTile(CurrentShape);
+
         if (Game.BlindRendering)
         {
             for (int x = 0; x < MaxX; x++)
@@ -114,6 +122,11 @@ public abstract class FieldObjectRenderer : FieldRendererBase
     }
     protected override void _UpdateMatrixFast()
     {
+        for (int y = 0; y < CurrentObject.MaxY; y++)
+            for (int x = 0; x < CurrentObject.MaxX; x++)
+                if (CurrentObject[x, y])
+                    Tiles[CurrentX + x, CurrentY + y] = ShapeConverter.ToTile(CurrentShape);
+
         if (Game.BlindRendering)
         {
             for (int x = 0; x < MaxX; x++)
@@ -148,10 +161,9 @@ public abstract class FieldObjectRenderer : FieldRendererBase
     }
     public override void UpdateColors()
     {
-        for (int y = 0; y < CurrentObject.MaxX; y++)
-            for (int x = 0; x < CurrentObject.MaxY; x++)
-                if (!GameMatrix[CurrentX + x, CurrentY + y])
-                    SetMaterial(GameObjects[CurrentX + x, CurrentY + y], CurrentShape);
+        for (int y = 0; y < GameMatrix.MaxY; y++)
+            for (int x = 0; x < GameMatrix.MaxX; x++)
+                SetMaterial(GameObjects[x, y], ShapeConverter.ToShape(Tiles[x, y]));
     }
     public override void ShowNextShape()
     {

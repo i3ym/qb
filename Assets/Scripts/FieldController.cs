@@ -174,10 +174,9 @@ public abstract class FieldController : MonoBehaviour, IFieldController
 
         if (FieldRenderer == null) FieldRenderer = GetComponent<FieldRendererBase>();
 
-        FieldRenderer.Initialize(this);
-
         MaxX = GetMaxX();
         MaxY = GetMaxY();
+        FieldRenderer.Initialize(this);
         FieldRenderer.CreateField();
 
         SetDefaults();
