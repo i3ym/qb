@@ -34,7 +34,6 @@ public abstract class ChooseMenu : Menu
         text.text = name;
         (btn.transform as RectTransform).sizeDelta = new Vector2(text.text.Length, (btn.transform as RectTransform).sizeDelta.y);
 
-        tr.anchoredPosition = new Vector2(0f, -transform.rect.height / Buttons.Length * index);
         tr.localPosition -= new Vector3(0f, 0f, tr.localPosition.z);
 
         btn.OnSelect += () =>
@@ -58,7 +57,7 @@ public abstract class ChooseMenu : Menu
         for (int i = 0; i < Buttons.Length; i++)
         {
             tr = (Buttons[i].transform as RectTransform);
-            tr.anchoredPosition = new Vector2(0f, -transform.rect.height / Buttons.Length * (i - selectedIndex));
+            tr.anchoredPosition = new Vector2(0f, -(i - selectedIndex) * 3f);
         }
     }
 }
