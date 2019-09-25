@@ -2,13 +2,14 @@ using System;
 
 public class ChooseModeMenu : ChooseMenu
 {
-    protected override(string name, Action onSelect, Action onClick) [] GetButtons() =>
-        new(string, Action, Action) []
+    protected override((string rus, string eng) name, Action onSelect, Action onClick) [] GetButtons() =>
+        new((string, string), Action, Action) []
         {
-            ("Normal",
+            (("Обычный", "Normal"),
             () => Game.BlindRendering = false,
             () => SetMenu<ChooseLvlMenu>()),
-            ("Blind",
+
+            (("Слепой", "Blind"),
             () => Game.BlindRendering = true,
             () => SetMenu<ChooseLvlMenu>())
         };

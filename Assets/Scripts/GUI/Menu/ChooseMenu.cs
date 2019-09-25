@@ -22,17 +22,18 @@ public abstract class ChooseMenu : Menu
             CreateButton(i, buttons[i].name, buttons[i].onSelect, buttons[i].onClick);
     }
 
-    protected abstract(string name, Action onSelect, Action onClick) [] GetButtons();
+    protected abstract((string rus, string eng) name, Action onSelect, Action onClick) [] GetButtons();
 
-    protected void CreateButton(int index, string name, Action onSelect, Action onClick)
+    protected void CreateButton(int index, (string rus, string eng) name, Action onSelect, Action onClick)
     {
         var go = Instantiate(ButtonPrefab, Vector3.zero, Quaternion.identity, transform);
         var btn = go.GetComponentInChildren<Button>();
         var tr = go.transform as RectTransform;
 
         var text = btn.GetComponent<TextMeshProUGUI>();
-        text.text = name;
         (btn.transform as RectTransform).sizeDelta = new Vector2(text.text.Length, (btn.transform as RectTransform).sizeDelta.y);
+
+        btn.GetComponent<TranslatedText>().SetStrings(name.rus, name.eng);
 
         tr.localPosition -= new Vector3(0f, 0f, tr.localPosition.z);
 

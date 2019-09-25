@@ -20,9 +20,20 @@ public class Config : MonoBehaviour
             Save();
 
             OnSkinChange();
-            
+
             TopImage.Instance.texture = BackgroundMaker.GetTexture(value);
             BottomLine.Instance.texture = BackgroundMaker.GetBottomTexture(value);
+        }
+    }
+    public static Language Language
+    {
+        get => Cfg.Language;
+        set
+        {
+            Cfg.Language = value;
+            Save();
+
+            TranslatedText.SetLanguage(value);
         }
     }
 
@@ -38,13 +49,20 @@ public class Config : MonoBehaviour
         {
             Cfg = File.Exists(SavePath) ?
                 JsonUtility.FromJson<Configuration>(File.ReadAllText(SavePath)) :
-                new Configuration();
+                CreateNew();
         }
         catch
         {
-            Cfg = new Configuration();
+            Cfg = CreateNew();
         }
     }
+
+    static Configuration CreateNew() => new Configuration()
+    {
+        Language = Application.systemLanguage == SystemLanguage.English ?
+            Language.English :
+            Language.Russian
+    };
 
     static void Save() => File.WriteAllText(SavePath, JsonUtility.ToJson(Cfg));
 
@@ -54,5 +72,6 @@ public class Config : MonoBehaviour
     class Configuration
     {
         public int SelectedSkin = 1;
+        public Language Language = Language.English;
     }
 }
