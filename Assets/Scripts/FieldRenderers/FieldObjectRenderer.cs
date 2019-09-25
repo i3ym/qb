@@ -26,6 +26,9 @@ public abstract class FieldObjectRenderer : FieldRendererBase
         Config.SelectedSkin = Config.SelectedSkin;
     }
 
+    protected virtual void OnEnable() => NextObjectsParent.gameObject.SetActive(true);
+    protected virtual void OnDisable() => NextObjectsParent.gameObject.SetActive(false);
+
     static void RecreateUvs()
     {
         Uvs.Clear();
@@ -173,10 +176,10 @@ public abstract class FieldObjectRenderer : FieldRendererBase
         int addy = 0;
 
         if (NextShape == Shapes.O) addx = 1;
-        else if (NextShape != Shapes.I) addy = -1;
+        else addy = -1;
 
-        for (int y = 0; y < 4; y++)
-            for (int x = 0; x < 4; x++)
+        for (int y = 0; y < NextObjects.MaxY; y++)
+            for (int x = 0; x < NextObjects.MaxX; x++)
                 NextObjects[x, y].gameObject.SetActive(false);
 
         for (int y = 0; y < 4; y++)
