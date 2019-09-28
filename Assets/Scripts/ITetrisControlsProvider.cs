@@ -1,13 +1,4 @@
-public interface ITetrisControlsProvider
-{
-    bool Down { get; }
-    int Horizontal { get; }
-    bool Right { get; }
-    bool Left { get; }
-
-    bool Rotate { get; }
-    bool RotateC { get; }
-}
+using qb.Shared;
 
 public class TetrisPlayerControlsProvider : ITetrisControlsProvider
 {
@@ -23,9 +14,9 @@ public class TetrisPlayerControlsProvider : ITetrisControlsProvider
 
 public class AITetrisPlayerControlsProvider : ITetrisControlsProvider
 {
-    FieldController FieldController;
+    IFieldControllerInfo FieldController;
 
-    public AITetrisPlayerControlsProvider(FieldController fc) => FieldController = fc;
+    public AITetrisPlayerControlsProvider(IFieldControllerInfo fc) => FieldController = fc;
 
     public bool Down => UnityEngine.Random.value >.8f;
     public int Horizontal => UnityEngine.Random.value >.5f ? 1 : -1;

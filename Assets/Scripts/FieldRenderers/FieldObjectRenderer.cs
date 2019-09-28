@@ -1,29 +1,33 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using qb.Shared;
 using UnityEngine;
 using UnityEngine.UI;
 
-public abstract class FieldObjectRenderer : FieldRendererBase
+public class FieldObjectRenderer : FieldRendererBase
 {
-    [SerializeField]
-    protected GameObject FieldGameObjectPrefab = null;
-    [SerializeField]
-    protected Transform NextObjectsParent = null;
+    protected static Dictionary<Shape, Rect> Uvs = new Dictionary<Shape, Rect>();
 
-    protected GameMatrix<RawImage> GameObjects, NextObjects;
+    public readonly FieldRendererUnityInfo FieldRendererInfo;
+    protected GameMatrix<CubeTile> Tiles;
 
-    protected static Dictionary<Shapes, Rect> Uvs = new Dictionary<Shapes, Rect>();
-    protected GameMatrix<BackgroundMaker.Tile> Tiles;
+    protected GameObject FieldGameObjectPrefab { get => FieldRendererInfo.FieldGameObjectPrefab; set => FieldRendererInfo.FieldGameObjectPrefab = value; }
+    protected Transform NextObjectsParent { get => FieldRendererInfo.NextObjectsParent; set => FieldRendererInfo.NextObjectsParent = value; }
+    protected GameMatrix<RawImage> GameObjects { get => FieldRendererInfo.GameObjects; set => FieldRendererInfo.GameObjects = value; }
+    protected GameMatrix<RawImage> NextObjects { get => FieldRendererInfo.NextObjects; set => FieldRendererInfo.NextObjects = value; }
 
     protected static Texture2D Atlas => Config.Instance.Atlas;
 
-    public override void Initialize(IFieldController controller)
+    public FieldObjectRenderer(FieldRendererUnityInfo info)
     {
-        base.Initialize(controller);
+        FieldRendererInfo = info;
 
-        Tiles = new GameMatrix<BackgroundMaker.Tile>(MaxX, MaxY);
+        Tiles = new GameMatrix<CubeTile>(MaxX, MaxY);
 
         Config.OnSkinChange += () => RecreateUvs();
         Config.SelectedSkin = Config.SelectedSkin;
+
+        CreateField();
     }
 
     protected virtual void OnEnable() => NextObjectsParent.gameObject.SetActive(true);
@@ -33,16 +37,16 @@ public abstract class FieldObjectRenderer : FieldRendererBase
     {
         Uvs.Clear();
 
-        var shapes = new Shapes[] { Shapes.G, Shapes.ZR, Shapes.GR, Shapes.O, Shapes.T, Shapes.Z, Shapes.I };
+        var shapes = new [] { Shapes.G, Shapes.ZR, Shapes.GR, Shapes.O, Shapes.T, Shapes.Z, Shapes.I };
         for (int i = 0; i < shapes.Length; i++)
             Uvs.Add(shapes[i], new Rect(16f / Atlas.width * i, 1f - (16f / Atlas.height * (Config.SelectedSkin + 1)), 16f / Atlas.width, 16f / Atlas.height));
     }
 
-    public override void CreateField()
+    void CreateField()
     {
         if (GameObjects != null)
             foreach (var img in GameObjects)
-                Destroy(img.gameObject);
+                GameObject.Destroy(img.gameObject);
 
         GameObjects = new RawImage[MaxX, MaxY];
 
@@ -52,7 +56,7 @@ public abstract class FieldObjectRenderer : FieldRendererBase
 
         if (NextObjects != null)
             foreach (var img in NextObjects)
-                Destroy(img.gameObject);
+                GameObject.Destroy(img.gameObject);
 
         NextObjects = new RawImage[4, 4];
 
@@ -68,10 +72,15 @@ public abstract class FieldObjectRenderer : FieldRendererBase
             }
     }
 
-    protected void SetMaterial(RawImage img, Shapes shape)
+    protected void SetMaterial(RawImage img, Shape shape)
     {
         if (img != null)
             img.uvRect = Uvs[shape];
+    }
+    protected void SetMaterial(RawImage img, CubeTile tile)
+    {
+        if (img != null)
+            img.uvRect = Uvs[Shapes.FromTile(tile)];
     }
     protected void SetMaterial(RawImage img, RawImage img2)
     {
@@ -81,7 +90,7 @@ public abstract class FieldObjectRenderer : FieldRendererBase
 
     protected virtual GameObject GetNewCube(Vector3 pos)
     {
-        GameObject go = Instantiate(FieldGameObjectPrefab, pos, Quaternion.identity, transform);
+        GameObject go = GameObject.Instantiate(FieldGameObjectPrefab, pos, Quaternion.identity, FieldRendererInfo.transform);
         (go.transform as RectTransform).pivot = (go.transform as RectTransform).anchorMax = (go.transform as RectTransform).anchorMin = Vector2.zero;
         (go.transform as RectTransform).anchoredPosition = pos;
         go.SetActive(false);
@@ -91,12 +100,43 @@ public abstract class FieldObjectRenderer : FieldRendererBase
         return go;
     }
 
+    public override IEnumerator<bool> GameOverAnimation()
+    {
+        var uv = new Rect(16f / Atlas.width * (byte) CubeTile.Background,
+            1f - (16f / Atlas.height * (Config.SelectedSkin + 1)), 16f / Atlas.width, 16f / Atlas.height);
+
+        for (int y = GameMatrix.MaxY - 1; y >= GameMatrix.MaxY / 2; y--)
+            for (int x = 0; x < GameMatrix.MaxX; x++)
+            {
+                GameObjects[x, y].gameObject.SetActive(true);
+                GameObjects[x, y].uvRect = uv;
+
+                GameObjects[GameMatrix.MaxX - 1 - x, GameMatrix.MaxY - 1 - y].gameObject.SetActive(true);
+                GameObjects[GameMatrix.MaxX - 1 - x, GameMatrix.MaxY - 1 - y].uvRect = uv;
+
+                yield return true;
+            }
+    }
+
+    public override void UpdateLevelText()
+    { // TODO
+    }
+    public override void UpdateScoreText()
+    { // TODO
+    }
+    public override void UpdateLinesText()
+    { // TODO
+    }
+    public override void UpdateTimeText()
+    { // TODO
+    }
+
     protected override void _UpdateMatrix()
     {
         for (int y = 0; y < CurrentObject.MaxY; y++)
             for (int x = 0; x < CurrentObject.MaxX; x++)
                 if (CurrentObject[x, y])
-                    Tiles[CurrentX + x, CurrentY + y] = ShapeConverter.ToTile(CurrentShape);
+                    Tiles[CurrentX + x, CurrentY + y] = CurrentShape.Tile;
 
         if (Game.BlindRendering)
         {
@@ -128,7 +168,7 @@ public abstract class FieldObjectRenderer : FieldRendererBase
         for (int y = 0; y < CurrentObject.MaxY; y++)
             for (int x = 0; x < CurrentObject.MaxX; x++)
                 if (CurrentObject[x, y])
-                    Tiles[CurrentX + x, CurrentY + y] = ShapeConverter.ToTile(CurrentShape);
+                    Tiles[CurrentX + x, CurrentY + y] = CurrentShape.Tile;
 
         if (Game.BlindRendering)
         {
@@ -166,11 +206,11 @@ public abstract class FieldObjectRenderer : FieldRendererBase
     {
         for (int y = 0; y < GameMatrix.MaxY; y++)
             for (int x = 0; x < GameMatrix.MaxX; x++)
-                SetMaterial(GameObjects[x, y], ShapeConverter.ToShape(Tiles[x, y]));
+                SetMaterial(GameObjects[x, y], Tiles[x, y]);
     }
     public override void ShowNextShape()
     {
-        var nextMatrix = FieldController.ShapeObjects[NextShape];
+        var nextMatrix = NextShape.Matrix;
 
         int addx = 0;
         int addy = 0;
@@ -204,5 +244,43 @@ public abstract class FieldObjectRenderer : FieldRendererBase
                 for (int x2 = 0; x2 < MaxX; x2++)
                     SetMaterial(GameObjects[x2, y2], GameObjects[x2, y2 + 1]);
     }
-    protected abstract IEnumerator<bool> _RemoveLinesAnimation(int[] lines);
+    protected IEnumerator<bool> _RemoveLinesAnimation(int[] lines)
+    {
+        float speed = .1f;
+        float time = Time.time + 1f;
+        int count;
+
+        var wff = new WaitForFixedUpdate();
+
+        while (time > Time.time)
+        {
+            speed += .001f;
+            yield return true;
+
+            for (int yy = 0; yy < MaxY; yy++)
+            {
+                if (lines.Any(x => x == yy))
+                {
+                    for (int xx = 0; xx < MaxX; xx++)
+                        (GameObjects[xx, yy].transform as RectTransform).anchoredPosition = Vector2.Lerp((GameObjects[xx, yy].transform as RectTransform).anchoredPosition,
+                            new Vector2(xx, -1), speed);
+                }
+                else if (yy > lines[0])
+                {
+                    count = 0;
+                    for (int i = 0; i < lines.Length; i++)
+                        if (lines[i] < yy) count++;
+                        else break;
+
+                    for (int xx = 0; xx < MaxX; xx++)
+                        (GameObjects[xx, yy].transform as RectTransform).anchoredPosition = Vector2.Lerp((GameObjects[xx, yy].transform as RectTransform).anchoredPosition,
+                            new Vector2(xx, yy - count), speed);
+                }
+            }
+        }
+
+        for (int yy = 0; yy < MaxY; yy++)
+            for (int xx = 0; xx < MaxX; xx++)
+                (GameObjects[xx, yy].transform as RectTransform).anchoredPosition = new Vector2(xx, yy);
+    }
 }

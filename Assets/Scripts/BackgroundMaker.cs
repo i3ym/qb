@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using qb.Shared;
 using UnityEngine;
 
 public static class BackgroundMaker
@@ -15,19 +16,19 @@ public static class BackgroundMaker
         WallsMatrix = new byte[17, 21];
 
         for (int y = 0; y < 21; y++)
-            WallsMatrix[10, y] = (byte) Tile.VerticalWall;
+            WallsMatrix[10, y] = (byte) CubeTile.VerticalWall;
 
         for (int x = 11; x < 17; x++)
-            WallsMatrix[x, 16] = (byte) Tile.HorizontalWall;
+            WallsMatrix[x, 16] = (byte) CubeTile.HorizontalWall;
 
         for (int x = 0; x < 17; x++)
-            WallsMatrix[x, 0] = (byte) Tile.HorizontalWall;
+            WallsMatrix[x, 0] = (byte) CubeTile.HorizontalWall;
 
-        WallsMatrix[10, 16] = (byte) Tile.VerticalToRightWall;
-        WallsMatrix[10, 0] = (byte) Tile.HorizontalToUpWall;
-        WallsMatrix[11, 15] = (byte) Tile.TopLeftCorner;
-        WallsMatrix[11, 17] = (byte) Tile.BottomLeftCorner;
-        WallsMatrix[11, 1] = (byte) Tile.BottomLeftCorner;
+        WallsMatrix[10, 16] = (byte) CubeTile.VerticalToRightWall;
+        WallsMatrix[10, 0] = (byte) CubeTile.HorizontalToUpWall;
+        WallsMatrix[11, 15] = (byte) CubeTile.TopLeftCorner;
+        WallsMatrix[11, 17] = (byte) CubeTile.BottomLeftCorner;
+        WallsMatrix[11, 1] = (byte) CubeTile.BottomLeftCorner;
     }
 
     public static Texture2D GetBottomTexture(int skinIndex)
@@ -43,7 +44,7 @@ public static class BackgroundMaker
 
         // Background
 
-        pos = (byte) Tile.Background * 16;
+        pos = (byte) CubeTile.Background * 16;
 
         for (int x = 0; x < 17; x++)
             for (int yy = 0; yy < 16; yy++)
@@ -53,7 +54,7 @@ public static class BackgroundMaker
         // /Background
         // Walls
 
-        pos = (byte) Tile.HorizontalWall * 16;
+        pos = (byte) CubeTile.HorizontalWall * 16;
 
         for (int x = 0; x < tex.width / 16; x++)
             for (int yy = 0; yy < 16; yy++)
@@ -85,7 +86,7 @@ public static class BackgroundMaker
         // Background
 
         {
-            pos = (byte) Tile.Background * 16;
+            pos = (byte) CubeTile.Background * 16;
 
             void setbg(int x, int y)
             {
@@ -121,10 +122,10 @@ public static class BackgroundMaker
         // /Walls
         // Bottom
 
-        pos = (byte) Tile.LongBottomStart * 16;
+        pos = (byte) CubeTile.LongBottomStart * 16;
 
         for (int yy = 0; yy < 16; yy++)
-            for (int xx = 0; xx < 16 * ((byte) Tile.LongBottomEnd - (byte) Tile.LongBottomStart); xx++)
+            for (int xx = 0; xx < 16 * ((byte) CubeTile.LongBottomEnd - (byte) CubeTile.LongBottomStart); xx++)
                 SetCombineColor(tex, xx, yy,
                     atlas.GetPixel(pos + xx, atlas.height - 1 - (16 * skinIndex + (15 - yy))));
 
@@ -140,25 +141,5 @@ public static class BackgroundMaker
     static void SetCombineColor(Texture2D tex, int x, int y, Color clr)
     {
         if (clr.a >.1f) tex.SetPixel(x, y, clr);
-    }
-
-    public enum Tile : byte
-    {
-        CubeG = 0,
-        CubeZR = 1,
-        CubeGR = 2,
-        CubeO = 3,
-        CubeT = 4,
-        CubeZ = 5,
-        CubeI = 6,
-        TopLeftCorner = 7,
-        BottomLeftCorner = 8,
-        VerticalWall = 9,
-        HorizontalWall = 10,
-        HorizontalToUpWall = 11,
-        VerticalToRightWall = 12,
-        Background = 13,
-        LongBottomStart = 14,
-        LongBottomEnd = 29,
     }
 }

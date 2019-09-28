@@ -19,7 +19,7 @@ public class PauseMenu : Menu
         Buttons[1].OnClick += () =>
         {
             Game.Instance.IsPaused = false;
-            Game.Instance.RestartGame();
+            Game.Instance.StartGame();
             SetMenu(null as Menu);
         };
         Buttons[2].OnClick += () => SetMenu<MainMenu>();

@@ -38,7 +38,7 @@ public class GameOverMenu : Menu
         };
         Buttons[2].OnClick += () =>
         {
-            Game.Instance.RestartGame();
+            Game.Instance.StartGame();
             SetMenu(null as Menu);
         };
         Buttons[3].OnClick += () =>

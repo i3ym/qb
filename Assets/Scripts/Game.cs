@@ -1,17 +1,14 @@
-﻿public class Game : FieldController
+﻿using qb.Shared;
+
+public class Game : FieldController
 {
     public static Game Instance;
 
-    protected override void Awake()
+    public Game(IFieldRenderer renderer) : base(renderer, null)
     {
-        base.Awake();
-        
-        Instance = this;
         Controls = new TetrisPlayerControlsProvider();
+        Instance = this;
     }
-
-    protected override int GetMaxX() => 10;
-    protected override int GetMaxY() => 20;
 
     public static void UpdateField() => Instance.FieldRenderer.UpdateField();
 }

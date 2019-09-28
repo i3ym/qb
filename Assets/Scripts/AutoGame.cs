@@ -1,30 +1,20 @@
-﻿using UnityEngine;
+﻿using qb.Shared;
+using UnityEngine;
 
-public class AutoGame : FieldController
+public class AutoGame : FieldController<FieldObjectRenderer>
 {
     public static AutoGame Instance;
 
-    protected override void Awake()
+    public AutoGame(FieldObjectRenderer renderer) : base(renderer, null)
     {
-        base.Awake();
-
-        Instance = this;
         Controls = new AITetrisPlayerControlsProvider(this);
-    }
-
-    protected override int GetMaxX() => 10;
-    protected override int GetMaxY() => 20;
-
-    public void SetMax(int x, int y)
-    {
-        MaxX = x;
-        MaxY = y;
+        Instance = this;
     }
 
     public override void StartGame()
     {
         base.StartGame();
-        FieldRenderer.gameObject.SetActive(true);
+        FieldRenderer.FieldRendererInfo.gameObject.SetActive(true);
     }
 
     public void StopGame()
@@ -35,12 +25,12 @@ public class AutoGame : FieldController
         CurrentObject = new GameMatrix<bool>(CurrentObject.MaxX, CurrentObject.MaxY);
         FieldRenderer.UpdateField();
 
-        FieldRenderer.gameObject.SetActive(false);
+        FieldRenderer.FieldRendererInfo.gameObject.SetActive(false);
     }
     public override void GameOver()
     {
         StopGame();
-        RestartGame();
+        StartGame();
     }
 
     public static void UpdateField() => Instance.FieldRenderer.UpdateField();
