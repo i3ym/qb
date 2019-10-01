@@ -13,18 +13,18 @@ public class PauseMenu : Menu
 
         Buttons[0].OnClick += () =>
         {
-            Game.Instance.IsPaused = false;
+            GameStarter.Game.IsPaused = false;
             SetMenu(null as Menu);
         };
         Buttons[1].OnClick += () =>
         {
-            Game.Instance.IsPaused = false;
-            Game.Instance.StartGame();
+            GameStarter.Game.IsPaused = false;
+            GameStarter.Game.StartGame();
             SetMenu(null as Menu);
         };
         Buttons[2].OnClick += () => SetMenu<MainMenu>();
     }
 
-    protected override void OnShow() => Game.Instance.IsPaused = true;
-    protected override void OnGoBack() => Game.Instance.IsPaused = false;
+    protected override void OnShow() => GameStarter.Game.IsPaused = true;
+    protected override void OnGoBack() => GameStarter.Game.IsPaused = false;
 }

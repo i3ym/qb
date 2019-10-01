@@ -47,12 +47,12 @@ public abstract class ChooseMenu : Menu
         Buttons[index] = btn;
     }
 
-    protected override void OnShow() => AutoGame.Instance.StartGame();
-    protected override void OnClose() => AutoGame.Instance.StopGame();
+    protected override void OnShow() => GameStarter.AutoGame.StartGame();
+    protected override void OnClose() => GameStarter.AutoGame.IsPaused = true;
 
     protected virtual void ShowField(int selectedIndex)
     {
-        AutoGame.UpdateField();
+        GameStarter.AutoGame.FieldRenderer.UpdateField();
 
         RectTransform tr;
         for (int i = 0; i < Buttons.Length; i++)
