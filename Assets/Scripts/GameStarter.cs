@@ -12,11 +12,14 @@ public class GameStarter : MonoBehaviour
 
     void Start()
     {
-        GameRenderer = new FieldRenderer(MainField, new RemoveLinesAnimationSlideDown(), new GameOverFillingAnimation());
-        AutoGameRenderer = new FieldRenderer(MainField, new RemoveLinesAnimationSlideDown(), new GameOverFillingAnimation());
+        var removelinesanim = new RemoveLinesAnimationSlideDown();
+        var gameoveranim = new GameOverFillingAnimation();
+
+        GameRenderer = new FieldRenderer(MainField, removelinesanim, gameoveranim);
+        AutoGameRenderer = new FieldRenderer(MainField, removelinesanim, gameoveranim);
 
         Game = new UnityFieldController(GameRenderer, new PlayerTetrisControlsProvider());
-        AutoGame = new UnityFieldController(AutoGameRenderer, new AutoTetrisControlsProvider(AutoGame));
+        AutoGame = new UnityFieldController(AutoGameRenderer, new AutoTetrisControlsProvider());
 
         Game.AfterGameOverAnimation += (obj, e) => Menu.SetMenu<GameOverMenu>();
         AutoGame.AfterGameOverAnimation += (obj, e) => AutoGame.StartGame();
