@@ -33,17 +33,17 @@ public class GameOverMenu : Menu
             Buttons[0].gameObject.SetActive(true);
             Buttons[1].gameObject.SetActive(false);
 
-            Game.Instance.ContinueGameWithAd();
+            GameStarter.Game.ContinueGameWithAd();
             SetMenu(null as Menu);
         };
         Buttons[2].OnClick += () =>
         {
-            Game.Instance.RestartGame();
+            GameStarter.Game.StartGame();
             SetMenu(null as Menu);
         };
         Buttons[3].OnClick += () =>
         {
-            Game.Instance.SetDefaults();
+            GameStarter.Game.SetDefaults();
             SetMenu<MainMenu>();
         };
 
@@ -61,9 +61,9 @@ public class GameOverMenu : Menu
 
     protected override void OnShow()
     {
-        Buttons[0].gameObject.SetActive(!Game.Instance.IsAdContinued);
+        Buttons[0].gameObject.SetActive(!GameStarter.Game.IsAdContinued);
 
-        if (Game.Instance.IsAdContinued)
+        if (GameStarter.Game.IsAdContinued)
         {
             ActiveButtonIndex = 2;
             UpdateButtonDesign();

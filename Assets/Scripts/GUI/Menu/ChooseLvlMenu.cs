@@ -15,23 +15,17 @@ public class ChooseLvlMenu : Menu
 
         Buttons[0].OnClick += () =>
         {
-            Game.Instance.StartLvl++;
-
-            if (Game.Instance.StartLvl > 30) Game.Instance.StartLvl = 30;
-
-            LevelText.text = Game.Instance.StartLvl.ToString();
+            GameStarter.Game.StartLevel++;
+            LevelText.text = GameStarter.Game.StartLevel.ToString();
         };
         Buttons[1].OnClick += () =>
         {
-            Game.Instance.StartLvl--;
-
-            if (Game.Instance.StartLvl < 0) Game.Instance.StartLvl = 0;
-
-            LevelText.text = Game.Instance.StartLvl.ToString();
+            GameStarter.Game.StartLevel--;
+            LevelText.text = GameStarter.Game.StartLevel.ToString();
         };
         Buttons[2].OnClick += () =>
         {
-            Game.Instance.RestartGame();
+            GameStarter.Game.StartGame();
             SetMenu(null as Menu);
         };
     }

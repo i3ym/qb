@@ -1,4 +1,5 @@
 using System;
+using qb.Shared;
 
 public class ChooseModeMenu : ChooseMenu
 {
@@ -6,11 +7,11 @@ public class ChooseModeMenu : ChooseMenu
         new((string, string), Action, Action) []
         {
             (("Обычный", "Normal"),
-            () => Game.BlindRendering = false,
+            () => FieldController.BlindRendering = false,
             () => SetMenu<ChooseLvlMenu>()),
 
             (("Слепой", "Blind"),
-            () => Game.BlindRendering = true,
+            () => FieldController.BlindRendering = true,
             () => SetMenu<ChooseLvlMenu>())
         };
 }
