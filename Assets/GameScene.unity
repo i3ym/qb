@@ -3478,6 +3478,10 @@ MonoBehaviour:
   FieldGameObjectPrefab: {fileID: 4527048897482831143, guid: 380bc688e2449f76b83e65866e0418a2,
     type: 3}
   NextObjectsParent: {fileID: 695767126}
+  LevelText: {fileID: 1265724403}
+  ScoreText: {fileID: 388556563}
+  LinesText: {fileID: 467334216}
+  TimeText: {fileID: 776198581}
 --- !u!1 &713305191
 GameObject:
   m_ObjectHideFlags: 0

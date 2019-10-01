@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using qb.Shared;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -15,6 +16,8 @@ public class UnityField : MonoBehaviour, IField
     public GameObject FieldGameObjectPrefab = null;
     [SerializeField]
     public Transform NextObjectsParent = null;
+    [SerializeField]
+    TextMeshProUGUI LevelText = null, ScoreText = null, LinesText = null, TimeText = null;
 
     public GameMatrix<RawImage> GameObjects { get; private set; }
     public GameMatrix<RawImage> NextObjects { get; private set; }
@@ -86,22 +89,24 @@ public class UnityField : MonoBehaviour, IField
 
     public CubeTile this [int x, int y]
     {
-        set
-        {
-            if (value == CubeTile.None)
-            {
-                if (GameObjects[x, y].gameObject.activeSelf) GameObjects[x, y].gameObject.SetActive(false);
-            }
-            else if (!GameObjects[x, y].gameObject.activeSelf) GameObjects[x, y].gameObject.SetActive(true);
-
-            GameObjects[x, y].uvRect = Uvs[value];
-        }
+        set => SetTile(GameObjects[x, y], value);
     }
 
-    public void SetNextTile(int x, int y, CubeTile tile) => NextObjects[x, y].uvRect = Uvs[tile];
+    void SetTile(RawImage obj, CubeTile tile)
+    {
+        if (tile == CubeTile.None)
+        {
+            if (obj.gameObject.activeSelf) obj.gameObject.SetActive(false);
+        }
+        else if (!obj.gameObject.activeSelf) obj.gameObject.SetActive(true);
 
-    public void UpdateLevelText(int level) { }
-    public void UpdateScoreText(int score) { }
-    public void UpdateLinesText(int lines) { }
-    public void UpdateTimeText(DateTime time) { }
+        obj.uvRect = Uvs[tile];
+    }
+
+    public void SetNextTile(int x, int y, CubeTile tile) => SetTile(NextObjects[x, y], tile);
+
+    public void UpdateLevelText(int level) => LevelText.text = level.ToString();
+    public void UpdateScoreText(int score) => ScoreText.text = score.ToString();
+    public void UpdateLinesText(int lines) => LinesText.text = lines.ToString();
+    public void UpdateTimeText(DateTime time) => TimeText.text = time.ToLongTimeString();
 }

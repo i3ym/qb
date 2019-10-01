@@ -4,9 +4,9 @@ using qb.Shared;
 using qb.Shared.Animations;
 using UnityEngine;
 
-public class RemoveLinesAnimationSlideDown : RemoveLinesAnimation
+public class RemoveLinesAnimationSlideDown : RemoveLinesAnimation<UnityField>
 {
-    IEnumerator<bool> _Animation(int[] lines, IFieldControllerInfo controller, UnityField field)
+    protected override IEnumerator<bool> Animation(int[] lines, IFieldControllerInfo controller, UnityField field)
     {
         float speed = .1f;
         float time = Time.time + 1f;
@@ -42,13 +42,5 @@ public class RemoveLinesAnimationSlideDown : RemoveLinesAnimation
         for (int yy = 0; yy < controller.MaxY; yy++)
             for (int xx = 0; xx < controller.MaxX; xx++)
                 (field.GameObjects[xx, yy].transform as RectTransform).anchoredPosition = new Vector2(xx, yy);
-    }
-
-    public override IEnumerator<bool> Animation(int[] lines, IFieldControllerInfo controller, IField field)
-    {
-        var anim = Animation(lines, controller, field as UnityField);
-
-        while (anim.MoveNext())
-            yield return anim.Current;
     }
 }

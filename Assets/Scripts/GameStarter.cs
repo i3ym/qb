@@ -1,4 +1,5 @@
 using qb.Shared;
+using qb.Shared.Animations;
 using UnityEngine;
 
 public class GameStarter : MonoBehaviour
@@ -11,12 +12,13 @@ public class GameStarter : MonoBehaviour
 
     void Start()
     {
-        GameRenderer = new FieldRenderer(MainField);
-        AutoGameRenderer = new FieldRenderer(MainField);
+        GameRenderer = new FieldRenderer(MainField, new RemoveLinesAnimationSlideDown(), new GameOverFillingAnimation());
+        AutoGameRenderer = new FieldRenderer(MainField, new RemoveLinesAnimationSlideDown(), new GameOverFillingAnimation());
 
         Game = new UnityFieldController(GameRenderer, new PlayerTetrisControlsProvider());
         AutoGame = new UnityFieldController(AutoGameRenderer, new AutoTetrisControlsProvider(AutoGame));
 
-        AutoGame.OnDeath += (obj, e) => AutoGame.StartGame();
+        Game.AfterGameOverAnimation += (obj, e) => Menu.SetMenu<GameOverMenu>();
+        AutoGame.AfterGameOverAnimation += (obj, e) => AutoGame.StartGame();
     }
 }
