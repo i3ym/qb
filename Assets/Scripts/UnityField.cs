@@ -80,7 +80,7 @@ public class UnityField : MonoBehaviour, IField
 
         for (int i = 0; i < tiles.Length; i++)
             Uvs.Add((CubeTile) tiles.GetValue(i), new Rect(16f / Atlas.width * i,
-                1f - (16f / Atlas.height * (+1)),
+                1f - (16f / Atlas.height * (Config.SelectedSkin + 1)),
                 16f / Atlas.width,
                 16f / Atlas.height));
 
