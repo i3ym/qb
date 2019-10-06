@@ -23,5 +23,8 @@ public class GameStarter : MonoBehaviour
 
         Game.AfterGameOverAnimation += (obj, e) => Menu.SetMenu<GameOverMenu>();
         AutoGame.AfterGameOverAnimation += (obj, e) => AutoGame.StartGame();
+
+        Game.OnStartGame += (obj, e) => (Game.FieldRenderer.Field as UnityField).ResetPositions();
+        AutoGame.OnStartGame += (obj, e) => (AutoGame.FieldRenderer.Field as UnityField).ResetPositions();
     }
 }

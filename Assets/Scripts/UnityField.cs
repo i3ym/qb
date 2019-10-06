@@ -22,7 +22,15 @@ public class UnityField : MonoBehaviour, IField
     public GameMatrix<RawImage> GameObjects { get; private set; }
     public GameMatrix<RawImage> NextObjects { get; private set; }
 
-    static UnityField() => Config.OnSkinChange += () => RecreateUvs();
+    static Color Transparent, White;
+
+    static UnityField()
+    {
+        Config.OnSkinChange += () => RecreateUvs();
+
+        Transparent = new Color(0, 0, 0, 0);
+        White = new Color(1, 1, 1, 1);
+    }
     void Awake()
     {
         Config.SelectedSkin = Config.SelectedSkin;
@@ -59,13 +67,18 @@ public class UnityField : MonoBehaviour, IField
                 NextObjects[x, y] = cube.GetComponent<RawImage>();
             }
     }
-    protected virtual GameObject GetNewCube(Vector2 pos)
+    public void ResetPositions()
+    {
+        for (int y = 0; y < MaxY; y++)
+            for (int x = 0; x < MaxX; x++)
+                GameObjects[x, y].rectTransform.anchoredPosition = new Vector2(x, y);
+    }
+    GameObject GetNewCube(Vector2 pos)
     {
         GameObject go = GameObject.Instantiate(FieldGameObjectPrefab, pos, Quaternion.identity, transform);
         (go.transform as RectTransform).pivot = (go.transform as RectTransform).anchorMax = (go.transform as RectTransform).anchorMin = Vector2.zero;
         (go.transform as RectTransform).anchoredPosition = pos;
         go.transform.localPosition -= new Vector3(0f, 0f, go.transform.localPosition.z);
-        go.SetActive(false);
 
         go.GetComponent<RawImage>().texture = Atlas;
 
@@ -94,13 +107,12 @@ public class UnityField : MonoBehaviour, IField
 
     void SetTile(RawImage obj, CubeTile tile)
     {
-        if (tile == CubeTile.None)
+        if (tile == CubeTile.None) obj.color = Transparent;
+        else
         {
-            if (obj.gameObject.activeSelf) obj.gameObject.SetActive(false);
+            obj.color = White;
+            obj.uvRect = Uvs[tile];
         }
-        else if (!obj.gameObject.activeSelf) obj.gameObject.SetActive(true);
-
-        obj.uvRect = Uvs[tile];
     }
 
     public void SetNextTile(int x, int y, CubeTile tile) => SetTile(NextObjects[x, y], tile);
