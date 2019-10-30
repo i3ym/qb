@@ -1,6 +1,9 @@
 using UnityEngine;
 
-public class SetFixedTimeTo60 : MonoBehaviour
+namespace qb.Unity
 {
-    void Awake() => Time.fixedDeltaTime = 1f / 60f;
+    public class SetFixedTimeTo60 : MonoBehaviour
+    {
+        void Awake() => Time.fixedDeltaTime = 1f / 60f;
+    }
 }
