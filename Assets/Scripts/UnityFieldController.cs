@@ -1,21 +1,36 @@
 using System.Collections;
+using System.Linq;
 using qb.Shared;
+using qb.Shared.Animations;
+using qb.Shared.Input;
 using UnityEngine;
 
-public class UnityFieldController : FieldController
+namespace qb.Unity
 {
-    public UnityFieldController(IFieldRenderer renderer, ITetrisControlsProvider controls) : base(renderer, controls) { }
-
-    protected override void StartUpdating() => Config.Instance.StartCoroutine(UpdateCoroutine());
-
-    IEnumerator UpdateCoroutine()
+    public class UnityFieldController : FieldController
     {
-        var wfs = new WaitForFixedUpdate();
-
-        while (true)
+        public UnityFieldController(IField field, IControlsProvider controls,
+            RemoveLinesAnimation removelines, GameOverAnimation gameover) : base(field, controls, removelines, gameover)
         {
-            yield return wfs;
-            Update();
+            OnStartGame += (_, __) => (Field as UnityGameScreen).transform.localScale = Vector3.one;
+            OnPauseStateChange += (pause) =>
+            {
+                (Field as UnityGameScreen).transform.localScale = pause ? Vector3.zero : Vector3.one;
+                return true;
+            };
+        }
+
+        protected override void StartUpdating() => (Field as MonoBehaviour).StartCoroutine(UpdateCoroutine());
+
+        IEnumerator UpdateCoroutine()
+        {
+            var wfs = new WaitForFixedUpdate();
+
+            while (true)
+            {
+                yield return wfs;
+                Update();
+            }
         }
     }
 }

@@ -1,65 +1,74 @@
-using System.Collections.Generic;
+using System;
 using System.Linq;
-using TMPro;
+using qb.Shared;
 using UnityEngine;
+using UnityEngine.UI;
 
-public class TranslatedText : MonoBehaviour
+namespace qb.Unity
 {
-    static List<TranslatedText> Texts = new List<TranslatedText>();
-
-    TextMeshProUGUI Text
+    [RequireComponent(typeof(RawImage))]
+    public class TranslatedText : QBehaviour, IText
     {
-        get
+        [SerializeField] string Russian = null, English = null;
+        [SerializeField] public bool AutoSize = true;
+
+        public TranslatedString Text
         {
-            if (_Text == null) _Text = GetComponent<TextMeshProUGUI>();
-            return _Text;
+            get => _Text;
+            set
+            {
+                _Text = value;
+                UpdateTexture();
+            }
         }
-    }
-    TextMeshProUGUI _Text = null;
+        TranslatedString _Text;
 
-    Dictionary<Language, string> Languages = new Dictionary<Language, string>();
+        public RawImage RawImage => _RawImage == null ?
+            ((_RawImage = GetComponent<RawImage>()) == null ?
+                (_RawImage = gameObject.AddComponent<RawImage>()) :
+                _RawImage) : _RawImage;
+        RawImage _RawImage;
 
-    [SerializeField]
-    string Russian, English;
-
-    void Awake()
-    {
-        SetStrings(Russian, English);
-    }
-
-    public void SetStrings(string russian, string english)
-    {
-        if (!Texts.Contains(this)) Texts.Add(this);
-
-        if (string.IsNullOrWhiteSpace(russian) || string.IsNullOrWhiteSpace(english))
+        protected override void AwakeOverride() => Config.OnLanguageChange += (lang) => UpdateTexture();
+        protected void Start()
         {
-            Debug.LogWarning("Не настроен перевод для " + name);
-            return;
+            if (Russian != null && English != null) Text = (English, Russian);
         }
 
-        Languages.Clear();
+        void UpdateTexture()
+        {
+            int width = Math.Max(Text[Config.Language].Sum(x => FontCharacters.Get(x).Width) + Text[Config.Language].Length - 1, 1);
+            int height = FontCharacters.Get(' ').Height;
+            var texture = new Texture2D(width, height);
+            texture.filterMode = FilterMode.Point;
 
-        Languages.Add(Language.Russian, russian);
-        Languages.Add(Language.English, english);
+            int allx = 0;
 
-        UpdateText(Config.Language);
+            Character character;
+            foreach (var letter in Text[Config.Language])
+            {
+                character = FontCharacters.Get(letter);
+
+                for (int y = 0; y < character.Height; y++)
+                    for (int x = 0; x < character.Width; x++)
+                        texture.SetPixel(x + allx, texture.height - 1 - y, new Color(1, 1, 1, character[x, y] ? 1 : 0));
+
+                allx += character.Width + 1;
+
+                if (allx <= texture.width)
+                    for (int y = 0; y < character.Height; y++)
+                        texture.SetPixel(allx - 1, texture.height - 1 - y, new Color(1, 1, 1, 0));
+            }
+
+            texture.Apply();
+            RawImage.texture = texture;
+
+            if (AutoSize)
+                transform.sizeDelta = new Vector2(texture.width / 5f, 1f);
+
+            /* transform.sizeDelta = new Vector2(
+                 Math.Max(Text[Config.Language].Split('\n').Max(str => str.Sum(x => FontCharacters.Get(x).Width) + str.Length), 1) / 5f + 2,
+                 Text[Config.Language].Count(x => x == '\n') + 1);*/
+        }
     }
-
-    public void UpdateText(Language language)
-    {
-        Text.text = Languages[language];
-        Text.rectTransform.sizeDelta = new Vector2(Languages[language].Split('\n').Max(x => x.Length), Languages[language].Count(x => x == '\n') + 1);
-    }
-
-    public static void SetLanguage(Language language)
-    {
-        foreach (var text in Texts)
-            text.UpdateText(language);
-    }
-}
-
-public enum Language
-{
-    Russian,
-    English
 }

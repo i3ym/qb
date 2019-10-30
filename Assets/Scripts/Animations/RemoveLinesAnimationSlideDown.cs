@@ -4,43 +4,49 @@ using qb.Shared;
 using qb.Shared.Animations;
 using UnityEngine;
 
-public class RemoveLinesAnimationSlideDown : RemoveLinesAnimation<UnityField>
+namespace qb.Unity
 {
-    protected override IEnumerator<bool> Animation(int[] lines, IFieldControllerInfo controller, UnityField field)
+    public class RemoveLinesAnimationSlideDown : RemoveLinesAnimation<UnityGameScreen>
     {
-        float speed = .1f;
-        float time = Time.time + 1f;
-        int count;
-
-        while (time > Time.time)
+        protected override IEnumerator<bool> Animation(int[] lines, FieldController controller, UnityGameScreen field)
         {
-            speed += .001f;
-            yield return true;
+            float speed = .1f;
+            float time = Time.time + 1f;
+            int count;
+            var gameObjects = field.FieldGrid.GameObjects;
 
-            for (int yy = 0; yy < controller.MaxY; yy++)
+            while (time > Time.time)
             {
-                if (lines.Any(x => x == yy))
-                {
-                    for (int xx = 0; xx < controller.MaxX; xx++)
-                        (field.GameObjects[xx, yy].transform as RectTransform).anchoredPosition = Vector2.Lerp((field.GameObjects[xx, yy].transform as RectTransform).anchoredPosition,
-                            new Vector2(xx, -1), speed);
-                }
-                else if (yy > lines[0])
-                {
-                    count = 0;
-                    for (int i = 0; i < lines.Length; i++)
-                        if (lines[i] < yy) count++;
-                        else break;
+                speed += .001f;
+                yield return true;
 
-                    for (int xx = 0; xx < controller.MaxX; xx++)
-                        (field.GameObjects[xx, yy].transform as RectTransform).anchoredPosition = Vector2.Lerp((field.GameObjects[xx, yy].transform as RectTransform).anchoredPosition,
-                            new Vector2(xx, yy - count), speed);
+                for (int yy = 0; yy < controller.MaxY; yy++)
+                {
+                    if (lines.Any(x => x == yy))
+                    {
+                        for (int xx = 0; xx < controller.MaxX; xx++)
+                            (gameObjects[xx, yy].transform as RectTransform).anchoredPosition =
+                            Vector2.Lerp((gameObjects[xx, yy].transform as RectTransform).anchoredPosition,
+                                new Vector2(xx, -1), speed);
+                    }
+                    else if (yy > lines[0])
+                    {
+                        count = 0;
+                        for (int i = 0; i < lines.Length; i++)
+                            if (lines[i] < yy) count++;
+                            else break;
+
+                        for (int xx = 0; xx < controller.MaxX; xx++)
+                            (gameObjects[xx, yy].transform as RectTransform).anchoredPosition =
+                            Vector2.Lerp((gameObjects[xx, yy].transform as RectTransform).anchoredPosition,
+                                new Vector2(xx, yy - count), speed);
+                    }
                 }
             }
-        }
 
-        for (int yy = 0; yy < controller.MaxY; yy++)
-            for (int xx = 0; xx < controller.MaxX; xx++)
-                (field.GameObjects[xx, yy].transform as RectTransform).anchoredPosition = new Vector2(xx, yy);
+            for (int yy = 0; yy < controller.MaxY; yy++)
+                for (int xx = 0; xx < controller.MaxX; xx++)
+                    (gameObjects[xx, yy].transform as RectTransform).anchoredPosition = new Vector2(xx, yy);
+        }
     }
 }
