@@ -55,7 +55,7 @@ namespace qb.Unity
                 {
                     buttons[i].transform.SetParent(transform, false);
                     buttons[i].Text = buttons[i].Text;
-                    buttons[i].transform.anchoredPosition = new Vector2(0, -(i - (buttons.Length / 2)) * 2);
+                    buttons[i].transform.anchoredPosition = new Vector2(0, -(i - (buttons.Length / 2)) * 2 - 2);
                 }
 
                 ActiveButtonIndex = 0;

@@ -1,7 +1,9 @@
+using System.Threading.Tasks;
 using qb.Shared;
 using qb.Shared.Input;
 using qb.Shared.Mods;
 using UnityEngine;
+using UnityEngine.Advertisements;
 using UnityEngine.UI;
 
 namespace qb.Unity
@@ -14,6 +16,13 @@ namespace qb.Unity
             params IInputManager[] inputManagers) : base(playerGame, autoGame, skinManager, inputManagers)
         {
             ButtonDesign = buttonDesign;
+
+            if (Advertisement.isSupported && !Advertisement.isInitialized) Advertisement.Initialize("3286669", false);
+
+            Debug.Log("Unity Ads is " +
+                (Advertisement.isSupported ? "" : "not ") + "supported, " +
+                (Advertisement.isInitialized ? "" : "not ") + "initialized, " +
+                (Advertisement.IsReady() ? "" : "not ") + "ready");
         }
 
         protected override void SetMenu(IMenu menu)
@@ -80,5 +89,30 @@ namespace qb.Unity
         }
 
         protected override void QuitGame() => Application.Quit();
+
+        protected override async Task<bool> ShowAd()
+        {
+            var completion = new TaskCompletionSource<bool>();
+            var listener = new UnityAdListener(completion);
+
+            Advertisement.AddListener(listener);
+
+            if (!Advertisement.IsReady())
+            {
+                int waitTime = 30;
+                var states = Lock();
+
+                while (!Advertisement.IsReady())
+                {
+                    await Task.Delay(100);
+                    if (--waitTime < 0) return false;
+                }
+
+                Unlock(states);
+            }
+
+            Advertisement.Show();
+            return await completion.Task;
+        }
     }
 }

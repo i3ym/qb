@@ -41,5 +41,8 @@ namespace qb.Unity
         }
 
         TranslatedText _TranslatedText;
+
+        public void Show() => TranslatedText.RawImage.color = new Color(1, 1, 1, 1);
+        public void Hide() => TranslatedText.RawImage.color = new Color(1, 1, 1, 0);
     }
 }
