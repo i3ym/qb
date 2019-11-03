@@ -49,7 +49,7 @@ namespace qb.Unity
 
                 _Buttons = value;
 
-                var buttons = Buttons.OfType<UnityMenuButton>().Cast<UnityMenuButton>().ToArray();
+                var buttons = Buttons.OfType<UnityMenuButton>().ToArray();
 
                 for (int i = 0; i < buttons.Length; i++)
                 {
