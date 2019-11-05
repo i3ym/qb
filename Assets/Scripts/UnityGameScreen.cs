@@ -61,5 +61,8 @@ namespace qb.Unity
         public void UpdateLinesText(int value) => FieldInfo.UpdateLinesText(value);
         public void UpdateScoreText(int value) => FieldInfo.UpdateScoreText(value);
         public void UpdateTimeText(DateTime value) => FieldInfo.UpdateTimeText(value);
+
+        public void Show() => transform.localScale = Vector2.one;
+        public void Hide() => transform.localScale = Vector2.zero;
     }
 }

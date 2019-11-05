@@ -13,11 +13,6 @@ namespace qb.Unity
             RemoveLinesAnimation removelines, GameOverAnimation gameover) : base(field, controls, removelines, gameover)
         {
             OnStartGame += (_, __) => (Field as UnityGameScreen).transform.localScale = Vector3.one;
-            OnPauseStateChange += (pause) =>
-            {
-                (Field as UnityGameScreen).transform.localScale = pause ? Vector3.zero : Vector3.one;
-                return true;
-            };
         }
 
         protected override void StartUpdating() => (Field as MonoBehaviour).StartCoroutine(UpdateCoroutine());
