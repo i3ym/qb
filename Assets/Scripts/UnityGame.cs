@@ -34,9 +34,6 @@ namespace qb.Unity
             AutoGame = new UnityFieldController(Field, new AutoControlsProvider(),
                 new RemoveLinesAnimationSlideDown(), new GameOverFillingAnimation());
 
-            foreach (var inputManager in InputManagers)
-                inputManager.Pause.OnPress += () => PlayerGame.IsPaused = !PlayerGame.IsPaused;
-
             AutoGame.OnGameOver += (_, e) =>
             {
                 AutoGame.StartGame();
