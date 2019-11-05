@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using qb.Shared;
 using qb.Shared.Animations;
+using qb.Shared.Mods;
 using UnityEngine;
 
 namespace qb.Unity
@@ -22,7 +23,7 @@ namespace qb.Unity
 
                 for (int yy = 0; yy < controller.MaxY; yy++)
                 {
-                    if (lines.Any(x => x == yy))
+                    if (lines.Any(y => y == yy))
                     {
                         for (int xx = 0; xx < controller.MaxX; xx++)
                             (gameObjects[xx, yy].transform as RectTransform).anchoredPosition =

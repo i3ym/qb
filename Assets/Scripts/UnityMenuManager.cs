@@ -1,7 +1,9 @@
+using System.Linq;
 using System.Threading.Tasks;
 using qb.Shared;
 using qb.Shared.Input;
 using qb.Shared.Mods;
+using qb.Unity.Mods;
 using UnityEngine;
 using UnityEngine.Advertisements;
 using UnityEngine.UI;
@@ -23,6 +25,8 @@ namespace qb.Unity
                 (Advertisement.isSupported ? "" : "not ") + "supported, " +
                 (Advertisement.isInitialized ? "" : "not ") + "initialized, " +
                 (Advertisement.IsReady() ? "" : "not ") + "ready");
+
+            Mods = Mods.Select(x => x.GetType() == typeof(ModUpsideDown) ? new UnityModUpsideDown() : x).ToArray();
         }
 
         protected override void SetMenu(IMenu menu)

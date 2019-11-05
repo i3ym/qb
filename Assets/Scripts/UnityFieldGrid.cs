@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using qb.Shared;
 using UnityEngine;
 using UnityEngine.UI;
@@ -74,6 +72,8 @@ namespace qb.Unity
 
         protected void SetTile(RawImage obj, CubeTile tile)
         {
+            if (obj == null) return;
+
             if (tile == CubeTile.None) obj.color = Transparent;
             else
             {
