@@ -11,6 +11,6 @@ namespace qb.Unity
         public void UpdateLevelText(int value) => LevelText.Text = value.ToString();
         public void UpdateLinesText(int value) => LinesText.Text = value.ToString();
         public void UpdateScoreText(int value) => ScoreText.Text = value.ToString();
-        public void UpdateTimeText(DateTime value) => TimeText.Text = value.ToLongTimeString();
+        public void UpdateTimeText(TimeSpan value) => TimeText.Text = value.ToString();
     }
 }
