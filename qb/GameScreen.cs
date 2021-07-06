@@ -41,7 +41,7 @@ namespace qb
 
             AddInternal(Playfield);
             AddInternal(NextGrid);
-            AddInternal(new GameInfo() { X = NextGrid.X - 2, Y = 5 });
+            AddInternal(new GameInfo() { X = NextGrid.X - 2, Y = 6 });
 
 
             Controller.OnGameOver += () =>

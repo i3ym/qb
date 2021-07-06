@@ -4,23 +4,16 @@ using System.Linq;
 
 namespace qb.Gui
 {
-    public abstract class SkinnedTexture
+    public static class SkinnedTexture
     {
-        readonly byte[,] Tiles;
-
-        public SkinnedTexture(byte[,] tiles) => Tiles = tiles;
-
-
-        public static IEnumerable<(int x, int y, int index, CubeTile[,] tiles)> GetSkinnedTextures(int maxx, int maxy)
-        {
-            return Enumerable.Empty<Func<int, int, (int, int, int, CubeTile[,])>>()
+        public static IEnumerable<(int x, int y, int index, CubeTile[,] tiles)> GetSkinnedTextures(int maxx, int maxy) =>
+            Enumerable.Empty<Func<int, int, (int, int, int, CubeTile[,])>>()
                 .Append(GetInfoBackground)
                 .Append(GetBottomWallBackground)
                 .Append(GetBottomWallForeground)
                 .Append(GetVerticalWall)
                 .Append(GetTopHorizontalWall)
                 .Select(func => func(maxx, maxy));
-        }
 
         public static (int x, int y, int index, CubeTile[,] tiles) GetInfoBackground(int maxx, int maxy) =>
             (maxx, 0, 999, new GameMatrix<CubeTile>(7, maxy, CubeTile.Background));
@@ -57,6 +50,5 @@ namespace qb.Gui
         }
         public static (int x, int y, int index, CubeTile[,] tiles) GetTopHorizontalWall(int maxx, int maxy) =>
             (maxx + 1, 4, -9, new GameMatrix<CubeTile>(6, 1, (CubeTile) CubeTile.HorizontalWall));
-
     }
 }
