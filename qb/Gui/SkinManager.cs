@@ -10,7 +10,7 @@ namespace qb.Gui
         public readonly BindableInt SelectedSkinIndex = new BindableInt() { MinValue = 0 };
         public ImmutableArray<Skin> Skins;
 
-        public SkinManager(qbTexture atlas)
+        public SkinManager(Texture atlas)
         {
             int skinidx = 0;
             Skin newSkin(TranslatedString name) => new Skin(name, atlas, 16, skinidx++);

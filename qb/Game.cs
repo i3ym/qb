@@ -3,9 +3,8 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
+using osuTK.Graphics.ES30;
 using qb.Gui;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
 
 namespace qb
 {
@@ -22,7 +21,10 @@ namespace qb
             Fonts.AddStore(pixelfontstore);
             AddFont(Resources, "Resources/PixelFont", pixelfontstore);
 
-            var atlas = new qbTexture(Image.Load<Rgba32>(Textures.GetStream("Resources/Atlas.png")));
+            var atlasStore = new TextureStore(Textures, false, All.Nearest, true, 1);
+            Textures.AddStore(atlasStore);
+
+            var atlas = atlasStore.Get("Resources/Atlas");
             var skin = new SkinManager(atlas);
             Host.Dependencies.Cache(skin);
 
