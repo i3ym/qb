@@ -1,31 +1,29 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 
 namespace qb
 {
     public class RandomPieceGetter
     {
-        readonly IEnumerator<Shape> Randomizer;
+        IEnumerator<Shape> Randomizer;
 
-        public RandomPieceGetter() => Randomizer = PieceRandomizer();
+        public RandomPieceGetter(int? seed = null) => Randomizer = PieceRandomizer(seed);
 
+        public void Reset(int? seed = null) => Randomizer = PieceRandomizer(seed);
         public Shape Get()
         {
             Randomizer.MoveNext();
             return Randomizer.Current;
         }
 
-        IEnumerator<Shape> PieceRandomizer()
+        IEnumerator<Shape> PieceRandomizer(int? seed)
         {
-            var rnd = new Random();
+            var rnd = seed.HasValue ? new Random(seed.Value) : new Random();
 
-            var pieces = new[] { Shapes.I, Shapes.G, Shapes.GR, Shapes.O, Shapes.ZR, Shapes.T, Shapes.Z }.ToImmutableArray();
             var order = new List<Shape>();
-            var pool = Enumerable.Repeat(pieces, 5).SelectMany(x => x).ToArray();
+            var pool = Enumerable.Repeat(Shapes.ShapesList, 5).SelectMany(x => x).ToArray();
             var firstPiece = new[] { Shapes.I, Shapes.G, Shapes.GR, Shapes.T }[rnd.Next(4)];
-
             yield return firstPiece;
 
             var history = new[] { Shapes.ZR, Shapes.Z, Shapes.ZR, firstPiece };

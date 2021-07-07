@@ -25,11 +25,11 @@ namespace qb.Animations
             {
                 var controller = field.Controller;
 
-                for (int y = controller.Tiles.MaxY - 1; y >= controller.Tiles.MaxY / 2; y--)
-                    for (int x = 0; x < controller.Tiles.MaxX; x++)
+                for (int y = controller.Tiles.Height - 1; y >= controller.Tiles.Height / 2; y--)
+                    for (int x = 0; x < controller.Tiles.Width; x++)
                     {
-                        field[x, y] = CubeTile.Background;
-                        field[controller.Tiles.MaxX - 1 - x, controller.Tiles.MaxY - 1 - y] = CubeTile.Background;
+                        field.Playfield[x, y] = CubeTile.Background;
+                        field.Playfield[controller.Tiles.Width - 1 - x, controller.Tiles.Height - 1 - y] = CubeTile.Background;
 
                         yield return true;
                     }

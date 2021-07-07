@@ -10,14 +10,14 @@ namespace qb.Mods
 
         public override GameMatrix<TileBool> OverrideMatrixRender(FieldController controller, ReadOnlyGameMatrix<TileBool> matrix)
         {
-            var output = new GameMatrix<TileBool>(matrix.MaxX, matrix.MaxY);
+            var output = new GameMatrix<TileBool>(matrix.Width, matrix.Height);
 
             var objPoints = new(int x, int y) [4];
             (int x, int y) point2;
 
             int objindex = 0;
-            for (int x = 0; x < controller.CurrentObject.MaxX; x++)
-                for (int y = controller.CurrentObject.MaxY - 1; y >= 0; y--)
+            for (int x = 0; x < controller.CurrentObject.Width; x++)
+                for (int y = controller.CurrentObject.Height - 1; y >= 0; y--)
                 {
                     if (controller.CurrentObject[x, y])
                         objPoints[objindex++] = (controller.CurrentX + x, controller.CurrentY + y);

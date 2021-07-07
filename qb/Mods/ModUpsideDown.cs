@@ -8,15 +8,15 @@ namespace qb.Mods
         public override TranslatedString Name => ("Upside Down", "Вверх ногами");
         public override int Priority => int.MaxValue;
 
-        public override void OnAdd(FieldController controller)
+        public override void OnAdd(GameScreen controller)
         {
-            controller.Field.Height = -Math.Abs(controller.Field.Height);
-            controller.Field.Anchor = Anchor.BottomCentre;
+            controller.Height = -Math.Abs(controller.Height);
+            controller.Anchor = Anchor.BottomCentre;
         }
-        public override void OnRemove(FieldController controller)
+        public override void OnRemove(GameScreen controller)
         {
-            controller.Field.Height = Math.Abs(controller.Field.Height);
-            controller.Field.Anchor = Anchor.TopLeft;
+            controller.Height = Math.Abs(controller.Height);
+            controller.Anchor = Anchor.TopLeft;
         }
     }
 }

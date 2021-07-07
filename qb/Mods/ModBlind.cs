@@ -7,7 +7,7 @@ namespace qb.Mods
 
         public override GameMatrix<TileBool> OverrideMatrixRender(FieldController controller, ReadOnlyGameMatrix<TileBool> matrix)
         {
-            var output = new GameMatrix<TileBool>(matrix.MaxX, matrix.MaxY);
+            var output = new GameMatrix<TileBool>(matrix.Width, matrix.Height);
 
             for (int x = 0; x < controller.MaxX; x++)
                 for (int y = controller.MaxY - 1; y >= 0; y--)

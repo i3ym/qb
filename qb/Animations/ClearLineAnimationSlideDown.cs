@@ -1,5 +1,6 @@
 using System.Linq;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Threading;
 using osuTK;
 
@@ -21,7 +22,7 @@ namespace qb.Animations
                     if (lines.Any(y => y == yy))
                     {
                         for (int xx = 0; xx < controller.MaxX; xx++)
-                            gameObjects[xx, yy].MoveTo(new Vector2(xx, controller.MaxY), animationTime, Easing.OutQuad);
+                            gameObjects[xx, yy].MoveTo(new Vector2(xx, controller.MaxY), animationTime, Easing.InExpo);
                     }
                     else if (yy > lines[0])
                     {
@@ -31,7 +32,7 @@ namespace qb.Animations
                             else break;
 
                         for (int xx = 0; xx < controller.MaxX; xx++)
-                            gameObjects[xx, yy].MoveTo(new Vector2(xx, count - yy - 1 + controller.MaxY), animationTime, Easing.OutQuad);
+                            gameObjects[xx, yy].MoveTo(new Vector2(xx, count - yy - 1 + controller.MaxY), animationTime, Easing.InExpo);
                     }
                 }
             });
@@ -41,6 +42,15 @@ namespace qb.Animations
                 for (int yy = 0; yy < controller.MaxY; yy++)
                     for (int xx = 0; xx < controller.MaxX; xx++)
                         gameObjects[xx, yy].MoveTo(new Vector2(xx, controller.MaxY - 1 - yy));
+
+                var rnd = new System.Random();
+                var pos = field.Position;
+
+                TransformSequence<GameScreen> transform = field.MoveTo(pos);
+                for (int i = 0; i < 20; i++)
+                    transform = transform.Then().MoveTo(new Vector2(pos.X + (rnd.Next(3) - 1) * (21 - i), pos.Y + (rnd.Next(3) - 1) * (21 - i)) / 20f, 50);
+
+                transform.Then().MoveTo(pos, 100);
             }, animationTime);
         }
     }

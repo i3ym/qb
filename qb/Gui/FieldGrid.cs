@@ -20,7 +20,7 @@ namespace qb.Gui
                 {
                     var sprite = new UvSprite() { Width = 1, Height = 1, X = x, Y = y, Alpha = 0 };
 
-                    _GameObjects[x, _GameObjects.MaxY - 1 - y] = sprite;
+                    _GameObjects[x, _GameObjects.Height - 1 - y] = sprite;
                     AddInternal(sprite);
                 }
         }
