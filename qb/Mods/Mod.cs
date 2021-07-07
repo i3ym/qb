@@ -5,8 +5,8 @@ namespace qb.Mods
         public abstract TranslatedString Name { get; }
         public abstract int Priority { get; }
 
-        public virtual void OnAdd(FieldController controller) { }
-        public virtual void OnRemove(FieldController controller) { }
+        public virtual void OnAdd(GameScreen controller) { }
+        public virtual void OnRemove(GameScreen controller) { }
 
         public virtual GameMatrix<TileBool> OverrideMatrixRender(FieldController controller, ReadOnlyGameMatrix<TileBool> matrix) => matrix;
         public virtual GameMatrix<TileBool> OverrideObjectRender(FieldController controller, ReadOnlyGameMatrix<TileBool> matrix) => matrix;

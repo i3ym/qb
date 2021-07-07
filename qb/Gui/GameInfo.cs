@@ -1,7 +1,7 @@
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Localisation;
 
 namespace qb.Gui
 {
@@ -12,7 +12,7 @@ namespace qb.Gui
         {
             AddInternal(GetNewText(1.5f, controller.Level));
             AddInternal(GetNewText(4.5f, controller.Score));
-            AddInternal(GetNewText(7.5f, controller.Time));
+            AddInternal(GetNewText(7.5f, controller.Frame, t => TimeSpan.FromMilliseconds(t * controller.FramesPerSecond).ToString()));
             AddInternal(GetNewText(10.5f, controller.Lines));
 
             AddInternal(GetNewText(0, ("Level", "Уровень")));
@@ -21,10 +21,12 @@ namespace qb.Gui
             AddInternal(GetNewText(9, ("Lines", "Линии")));
         }
 
-        PixelText GetNewText<T>(float y, Bindable<T> source)
+        PixelText GetNewText<T>(float y, Bindable<T> source, Func<T, string>? formatfunc = null)
         {
+            formatfunc ??= e => e?.ToString() ?? string.Empty;
+
             var tb = GetNewText(y);
-            source.BindValueChanged(e => Schedule(() => tb.Text = e.NewValue?.ToString() ?? string.Empty), true);
+            source.BindValueChanged(e => Schedule(() => tb.Text = formatfunc(e.NewValue)), true);
 
             return tb;
         }

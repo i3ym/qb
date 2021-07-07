@@ -28,7 +28,7 @@ namespace qb.Gui
         {
             var tiles = new GameMatrix<CubeTile>(maxx, 1, (CubeTile) CubeTile.None);
 
-            for (int x = 0; x < tiles.MaxX; x++)
+            for (int x = 0; x < tiles.Width; x++)
                 tiles[x, 0] = (CubeTile) ((byte) CubeTile.LongBottomStart + x);
 
             return (0, maxy, -6, tiles);
@@ -37,7 +37,7 @@ namespace qb.Gui
         {
             var tiles = new GameMatrix<CubeTile>(2, maxy, (CubeTile) CubeTile.None);
 
-            for (int y = 0; y < tiles.MaxY; y++)
+            for (int y = 0; y < tiles.Height; y++)
                 tiles[0, y] = CubeTile.VerticalWall;
 
             tiles[0, 4] = CubeTile.VerticalToRightWall;

@@ -8,78 +8,63 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osuTK.Input;
-using qb.Animations;
 using qb.Mods;
 
 namespace qb
 {
-    public partial class FieldController : CompositeDrawable
+    public class FieldController : CompositeDrawable
     {
         //0R R0 R2 2R 2L L2 L0 0L
-        protected static ImmutableArray<ImmutableArray<(int, int)>> TetrominoWallKickData = new[]
+        static readonly ImmutableArray<ImmutableArray<(int, int)>> TetrominoWallKickData = new[]
         {
             new[] { (0, 0), (-1, 0), (-1, 1), (0, -2), (-1, -2), }.ToImmutableArray(),
             new[] { (0, 0), (1, 0), (1, -1), (0, 2), (1, 2), }.ToImmutableArray(),
             new[] { (0, 0), (1, 0), (1, 1), (0, -2), (1, -2), }.ToImmutableArray(),
             new[] { (0, 0), (-1, 0), (-1, -1), (0, 2), (-1, 2), }.ToImmutableArray(),
         }.ToImmutableArray();
-        protected static ImmutableArray<ImmutableArray<(int, int)>> TetrominoWallKickDataI = new[]
+        static readonly ImmutableArray<ImmutableArray<(int, int)>> TetrominoWallKickDataI = new[]
         {
             new[] { (0, 0), (-2, 0), (1, 0), (-2, -1), (1, 2), }.ToImmutableArray(),
             new[] { (0, 0), (-1, 0), (2, 0), (-1, 2), (2, -1), }.ToImmutableArray(),
             new[] { (0, 0), (2, 0), (-1, 0), (2, 1), (-1, -2), }.ToImmutableArray(),
             new[] { (0, 0), (1, 0), (-2, 0), (1, -2), (-2, 1), }.ToImmutableArray(),
         }.ToImmutableArray();
-
-
-        protected static readonly ImmutableArray<int> Levels = new int[] { 52, 48, 44, 40, 36, 32, 27, 21, 16, 10, 9, 8, 7, 6, 5, 5, 4, 3, 3, 2, 2 }.ToImmutableArray();
+        static readonly ImmutableArray<int> Levels = new int[] { 52, 48, 44, 40, 36, 32, 27, 21, 16, 10, 9, 8, 7, 6, 5, 5, 4, 3, 3, 2, 2 }.ToImmutableArray();
 
         public event EventHandler<CancelEventArgs> OnStartGame = delegate { };
         public event Action OnGameOver = delegate { };
         public event Action<int[]> OnLineClear = delegate { };
-        /// <summary> Returns false if event needs to be cancelled </summary>
-        public Func<bool, bool> OnPauseStateChange = delegate { return true; };
+        public event Action OnFieldUpdate = delegate { };
 
+        int LevelSpeed => Level.Value > Levels.Length ? 1 : Levels[Level.Value];
+
+        public readonly int FramesPerSecond = 1000 / 60;
         public virtual int MaxX => 10;
         public virtual int MaxY => 20;
         public int CurrentX { get; protected set; }
         public int CurrentY { get; protected set; }
         public int CurrentRotation { get; protected set; }
-        public Shape CurrentShape { get; protected set; }
-        public Shape NextShape { get; protected set; }
+        public Mod[]? Mods;
 
-        public readonly BindableInt Score = new BindableInt();
-        public readonly BindableInt Lines = new BindableInt();
-        public readonly BindableInt Level = new BindableInt();
-        public new readonly BindableInt Time = new BindableInt();
+        public readonly Bindable<Shape> CurrentShapeBindable = new();
+        public readonly Bindable<Shape> NextShapeBindable = new();
+        public readonly BindableBool IsPaused = new(true);
+        public readonly BindableInt Score = new(0);
+        public readonly BindableInt Lines = new(0);
+        public readonly BindableInt Level = new(0);
+        public readonly BindableInt Frame = new(0);
 
-        public GameMatrix<TileBool> CurrentObject { get; protected set; }
-        public GameMatrix<TileBool> Tiles { get; protected set; }
+        public GameMatrix<TileBool> CurrentObject { get; protected set; } = new(0, 0, CubeTile.None);
+        public readonly GameMatrix<TileBool> Tiles;
+        public int StartLevel { get => _StartLevel; set => _StartLevel = Math.Clamp(value, 0, 30); }
+        readonly RandomPieceGetter RandomPieceGetter = new();
 
-        public int StartLevel
-        {
-            get => _StartLevel;
-            set => _StartLevel = Math.Max(0, Math.Min(30, value));
-        }
-        public bool IsPaused
-        {
-            get => _IsPaused;
-            set
-            {
-                if (OnPauseStateChange(value)) _IsPaused = value;
 
-                Schedule(() =>
-                {
-                    if (IsPaused) Field.Hide();
-                    else Field.Show();
-                });
-            }
-        }
+        Shape CurrentShape { get => CurrentShapeBindable.Value; set => CurrentShapeBindable.Value = value; }
+        Shape NextShape { get => NextShapeBindable.Value; set => NextShapeBindable.Value = value; }
 
-        protected RandomPieceGetter RandomPieceGetter;
-
-        protected int WaitDownTime = 0, WaitHorizontalTime = 6, WaitLineClearTime = 0;
-        protected State State
+        int WaitDownTime = 0, WaitHorizontalTime = 6, WaitLineClearTime = 0;
+        State State
         {
             get => _State;
             set
@@ -102,33 +87,26 @@ namespace qb
                 }
             }
         }
-        protected HorizontalState HorizontalState = HorizontalState.Waiting;
-        protected RotateState RotateState = RotateState.Waiting;
-        protected int[] LinesToRemove;
-        protected int LevelSpeed => Level.Value > Levels.Length ? 1 : Levels[Level.Value];
+        HorizontalState HorizontalState = HorizontalState.Waiting;
+        RotateState RotateState = RotateState.Waiting;
+        int[] LinesToRemove = Array.Empty<int>();
 
-        public Mod[] Mods;
+        int _StartLevel;
+        State _State;
 
-        protected bool _IsPaused = false;
-        protected int _Score, _Lines, _Level, _StartLevel;
-        protected TimeSpan _Time;
-        protected State _State = State.Falling;
-
-        public FieldController(GameScreen field)
+        public FieldController()
         {
-            Field = field;
-            IsPaused = true;
-
+            Tiles = new GameMatrix<TileBool>(MaxX, MaxY, CubeTile.None);
             StartUpdating();
         }
 
-        protected void StartUpdating()
+        void StartUpdating()
         {
             var updateThread = new Thread(() =>
             {
                 while (true)
                 {
-                    Thread.Sleep(1000 / 60);
+                    Thread.Sleep(FramesPerSecond);
                     Update();
                 }
             });
@@ -139,10 +117,10 @@ namespace qb
 
         public new void Update()
         {
-            if (IsPaused) return;
+            if (IsPaused.Value) return;
             if (State == State.GameOver) return;
 
-            Time.Value++;
+            Frame.Value++;
             if (State == State.LineClearAnimation)
             {
                 WaitLineClearTime--;
@@ -170,19 +148,19 @@ namespace qb
             Score.Value = 0;
             Lines.Value = 0;
             Level.Value = StartLevel;
-            Time.Value = 0;
+            Frame.Value = 0;
 
             CurrentObject = new GameMatrix<TileBool>(0, 0, CubeTile.None);
-            Tiles = new GameMatrix<TileBool>(MaxX, MaxY, CubeTile.None);
+            Tiles.Clear();
 
-            IsPaused = true;
-            RandomPieceGetter = new RandomPieceGetter();
+            IsPaused.Value = true;
+            RandomPieceGetter.Reset();
 
             WaitDownTime = 0;
             WaitHorizontalTime = 6;
             State = State.Falling;
 
-            UpdateField();
+            OnFieldUpdate();
         }
         public void StartGame()
         {
@@ -191,9 +169,9 @@ namespace qb
             if (args.Cancel) return;
 
             SetDefaults();
-            IsPaused = false;
+            IsPaused.Value = false;
 
-            NextShape = Shapes.ShapesList[new Random().Next(Shapes.ShapesList.Count)];
+            NextShape = RandomPieceGetter.Get();
             SpawnBlock();
         }
 
@@ -298,7 +276,7 @@ namespace qb
             }
 
             CurrentY--;
-            UpdateField();
+            OnFieldUpdate();
 
             WaitDownTime = LevelSpeed;
 
@@ -306,11 +284,11 @@ namespace qb
         }
         protected bool NeedStop()
         {
-            for (int y = 0; y < CurrentObject.MaxY; y++)
-                for (int x = 0; x < CurrentObject.MaxX; x++)
+            for (int y = 0; y < CurrentObject.Height; y++)
+                for (int x = 0; x < CurrentObject.Width; x++)
                 {
-                    if (x + CurrentX >= Tiles.MaxX ||
-                        y + CurrentY - 1 >= Tiles.MaxY ||
+                    if (x + CurrentX >= Tiles.Width ||
+                        y + CurrentY - 1 >= Tiles.Height ||
                         x + CurrentX < 0) continue;
 
                     if (CurrentObject[x, y] && (y + CurrentY - 1 < 0 || Tiles[x + CurrentX, y + CurrentY - 1]))
@@ -327,11 +305,11 @@ namespace qb
             CurrentObject = CurrentShape.Matrix;
 
             CurrentX = 4;
-            CurrentY = Tiles.MaxY - CurrentObject.MaxY;
+            CurrentY = Tiles.Height - CurrentObject.Height;
 
-            for (int y = CurrentObject.MaxY - 1; y >= 0; y--)
+            for (int y = CurrentObject.Height - 1; y >= 0; y--)
             {
-                for (int x = 0; x < CurrentObject.MaxX; x++)
+                for (int x = 0; x < CurrentObject.Width; x++)
                     if (CurrentObject[x, y])
                         goto end;
 
@@ -340,46 +318,45 @@ namespace qb
             end:;
 
             NextShape = RandomPieceGetter.Get();
-            ShowNextShape();
 
-            for (int y = 0; y < CurrentObject.MaxY; y++)
-                for (int x = 0; x < CurrentObject.MaxX; x++)
+            for (int y = 0; y < CurrentObject.Height; y++)
+                for (int x = 0; x < CurrentObject.Width; x++)
                     if (CurrentObject[x, y] && Tiles[x + CurrentX, y + CurrentY])
                     {
                         GameOver();
                         return;
                     }
 
-            UpdateField();
+            OnFieldUpdate();
         }
         protected void SetBlockToField()
         {
-            for (int x = 0; x < CurrentObject.MaxX; x++)
-                for (int y = 0; y < CurrentObject.MaxY; y++)
+            for (int x = 0; x < CurrentObject.Width; x++)
+                for (int y = 0; y < CurrentObject.Height; y++)
                     if (CurrentObject[x, y])
                         Tiles[CurrentX + x, CurrentY + y] = CurrentShape.Tile;
 
-            UpdateField();
+            OnFieldUpdate();
         }
         protected void MoveRight()
         {
-            for (int y = 0; y < CurrentObject.MaxY; y++)
-                for (int x = 0; x < CurrentObject.MaxX; x++)
-                    if (CurrentObject.GetWithoutChecks(x, y) && (CurrentX + x + 1 >= Tiles.MaxX || Tiles[CurrentX + x + 1, CurrentY + y]))
+            for (int y = 0; y < CurrentObject.Height; y++)
+                for (int x = 0; x < CurrentObject.Width; x++)
+                    if (CurrentObject.GetWithoutChecks(x, y) && (CurrentX + x + 1 >= Tiles.Width || Tiles[CurrentX + x + 1, CurrentY + y]))
                         return;
 
             CurrentX++;
-            UpdateField();
+            OnFieldUpdate();
         }
         protected void MoveLeft()
         {
-            for (int y = 0; y < CurrentObject.MaxY; y++)
-                for (int x = 0; x < CurrentObject.MaxX; x++)
+            for (int y = 0; y < CurrentObject.Height; y++)
+                for (int x = 0; x < CurrentObject.Width; x++)
                     if (CurrentObject.GetWithoutChecks(x, y) && (CurrentX + x - 1 < 0 || Tiles[CurrentX + x - 1, CurrentY + y]))
                         return;
 
             CurrentX--;
-            UpdateField();
+            OnFieldUpdate();
         }
         protected void RotateBlock(bool clockwise)
         {
@@ -417,7 +394,7 @@ namespace qb
             while (CurrentRotation < 0) CurrentRotation += 4;
             if (CurrentRotation > 3) CurrentRotation %= 4;
 
-            UpdateField();
+            OnFieldUpdate();
         }
 
         protected static int GetScoreForLine(int linesCount, int minHeight, int level)
@@ -435,7 +412,7 @@ namespace qb
 
         protected int[] GetLinesToRemove()
         {
-            var lines = new List<int>(Tiles.MaxY);
+            var lines = new List<int>(Tiles.Height);
 
             for (int y = 0; y < MaxY; y++)
                 if (IsLineFull(y))
@@ -474,10 +451,10 @@ namespace qb
         protected void RemoveTopLines(int count)
         {
             for (int y = 0; y < count; y++)
-                for (int x = 0; x < Tiles.MaxX; x++)
-                    Tiles[x, Tiles.MaxY - 1 - y] = CubeTile.None;
+                for (int x = 0; x < Tiles.Width; x++)
+                    Tiles[x, Tiles.Height - 1 - y] = CubeTile.None;
 
-            UpdateField();
+            OnFieldUpdate();
         }
 
         protected void GameOver()

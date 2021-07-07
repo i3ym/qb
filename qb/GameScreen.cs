@@ -1,3 +1,4 @@
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -9,20 +10,17 @@ namespace qb
     public class GameScreen : CompositeDrawable
     {
         [Resolved] public FieldController Controller { get; private init; } = null!;
-        public readonly FieldGrid Playfield, NextGrid;
 
-        readonly int FieldWidth, FieldHeight;
+        public readonly int FieldWidth, FieldHeight;
+        public readonly FieldGrid Playfield, NextGrid;
 
         public GameScreen(int width, int height)
         {
             FieldWidth = width;
             FieldHeight = height;
 
-            Width = width + 7;
-            Height = height + 1;
-
             Playfield = new FieldGrid(width, height);
-            NextGrid = new FieldGrid(4, 4) { X = (int) Width - 5, Y = -1 };
+            NextGrid = new FieldGrid(4, 4) { Anchor = Anchor.TopRight, Origin = Anchor.TopRight, X = -1, Y = -1 };
         }
 
         [BackgroundDependencyLoader]
@@ -41,7 +39,7 @@ namespace qb
 
             AddInternal(Playfield);
             AddInternal(NextGrid);
-            AddInternal(new GameInfo() { X = NextGrid.X - 2, Y = 6 });
+            AddInternal(new GameInfo() { Anchor = Anchor.TopRight, Origin = Anchor.TopRight, X = -7, Y = 6 });
 
 
             Controller.OnGameOver += () =>
@@ -52,11 +50,45 @@ namespace qb
             {
                 new ClearLineAnimationSlideDown().Animation(lines, Scheduler, this);
             };
+            Controller.OnFieldUpdate += UpdateField;
+            Controller.NextShapeBindable.ValueChanged += e => SetNextShape(e.NewValue);
         }
 
+        void UpdateField()
+        {
+            var matrix = Controller.Tiles;
+            var objectMatrix = Controller.CurrentObject;
+            var currentX = Controller.CurrentX;
+            var currentY = Controller.CurrentY;
 
-        public CubeTile this[int x, int y] { set => Playfield[x, y] = value; }
+            if (Controller.Mods is not null)
+                foreach (var mod in Controller.Mods.Where(x => x != null))
+                {
+                    matrix = mod.OverrideMatrixRender(Controller, matrix);
+                    objectMatrix = mod.OverrideObjectRender(Controller, objectMatrix);
+                    mod.OverrideObjectRenderPositions(Controller, ref currentX, ref currentY);
+                }
 
-        public void SetNextTile(int x, int y, CubeTile tile) => NextGrid[x, y] = tile;
+            for (int y = 0; y < Controller.MaxY; y++)
+                for (int x = 0; x < Controller.MaxX; x++)
+                    Playfield[x, y] = matrix[x, y];
+
+            for (int y = 0; y < objectMatrix.Height; y++)
+                for (int x = 0; x < objectMatrix.Width; x++)
+                    if (objectMatrix[x, y])
+                        Playfield[x + currentX, y + currentY] = objectMatrix[x, y];
+        }
+        void SetNextShape(Shape shape)
+        {
+            int addx = 0;
+            int addy = 0;
+
+            if (shape == Shapes.O) addx = 1;
+            else addy = -1;
+
+            for (int y = 0; y < 4; y++)
+                for (int x = 0; x < 4; x++)
+                    NextGrid[x, y] = shape.Matrix[x - addx, y - addy] ? shape.Tile : CubeTile.None;
+        }
     }
 }

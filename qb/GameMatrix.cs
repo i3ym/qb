@@ -6,21 +6,21 @@ namespace qb
 {
     public class GameMatrix<T> : IEnumerable<T>, IGameMatrix<T>
     {
-        public readonly int MaxX, MaxY;
+        public readonly int Width, Height;
         readonly T Default;
         T[,] Matrix;
 
-        public GameMatrix(int maxx, int maxy, T defaultValue = default!)
+        public GameMatrix(int width, int height, T defaultValue = default!)
         {
-            MaxX = maxx;
-            MaxY = maxy;
+            Width = width;
+            Height = height;
 
-            Matrix = new T[MaxX, MaxY];
+            Matrix = new T[Width, Height];
 
             Default = defaultValue;
 
-            for (int y = 0; y < maxy; y++)
-                for (int x = 0; x < maxx; x++)
+            for (int y = 0; y < height; y++)
+                for (int x = 0; x < width; x++)
                     Matrix[x, y] = defaultValue;
         }
 
@@ -35,13 +35,13 @@ namespace qb
         }
 
         public T GetWithoutChecks(int x, int y) => Matrix[x, y];
-        public bool IsInBounds(int x, int y) => x >= 0 && y >= 0 && x < MaxX && y < MaxY;
+        public bool IsInBounds(int x, int y) => x >= 0 && y >= 0 && x < Width && y < Height;
 
         /// <returns> True if there is at least one cell where both objects is not equals to GameMatrix<T>.Default </returns>
         public bool Intersects<T2>(GameMatrix<T2> matrix)
         {
-            var maxx = Math.Max(MaxX, matrix.MaxX);
-            var maxy = Math.Max(MaxY, matrix.MaxY);
+            var maxx = Math.Max(Width, matrix.Width);
+            var maxy = Math.Max(Height, matrix.Height);
 
             for (int y = 0; y < maxy; y++)
                 for (int x = 0; x < maxx; x++)
@@ -55,8 +55,8 @@ namespace qb
         /// <summary> Returns true if <c>matrix</c> can fit inside <c>this</c> without touch anything that is not GameMatrix<T>.Default </summary>
         public bool Fits<T2>(int x, int y, GameMatrix<T2> matrix)
         {
-            for (int yy = 0; yy < matrix.MaxY; yy++)
-                for (int xx = 0; xx < matrix.MaxX; xx++)
+            for (int yy = 0; yy < matrix.Height; yy++)
+                for (int xx = 0; xx < matrix.Width; xx++)
                     if (!EqualityComparer<T2>.Default.Equals(matrix[xx, yy], matrix.Default) &&
                         (!IsInBounds(x + xx, y + yy) || !EqualityComparer<T>.Default.Equals(this[x + xx, y + yy], Default)))
                         return false;
@@ -66,21 +66,21 @@ namespace qb
 
         public GameMatrix<T> RotateClockwise() // TODO caching
         {
-            var newMatrix = new GameMatrix<T>(MaxX, MaxY, Default);
+            var newMatrix = new GameMatrix<T>(Width, Height, Default);
 
-            for (int y = 0; y < MaxY; y++)
-                for (int x = 0; x < MaxX; x++)
-                    newMatrix[y, MaxX - 1 - x] = Matrix[x, y];
+            for (int y = 0; y < Height; y++)
+                for (int x = 0; x < Width; x++)
+                    newMatrix[y, Width - 1 - x] = Matrix[x, y];
 
             return newMatrix;
         }
         public GameMatrix<T> RotateAntiClockwise() // TODO caching
         {
-            var newMatrix = new GameMatrix<T>(MaxX, MaxY, Default);
+            var newMatrix = new GameMatrix<T>(Width, Height, Default);
 
-            for (int y = 0; y < MaxY; y++)
-                for (int x = 0; x < MaxX; x++)
-                    newMatrix[MaxY - 1 - y, x] = Matrix[x, y];
+            for (int y = 0; y < Height; y++)
+                for (int x = 0; x < Width; x++)
+                    newMatrix[Height - 1 - y, x] = Matrix[x, y];
 
             return newMatrix;
         }
@@ -96,13 +96,20 @@ namespace qb
             return output;
         }
 
-        public void Clear() => Matrix = new T[MaxX, MaxY];
+        public void Clear()
+        {
+            Matrix = new T[Width, Height];
+
+            for (int y = 0; y < Height; y++)
+                for (int x = 0; x < Width; x++)
+                    Matrix[x, y] = Default;
+        }
         public GameMatrix<T> Clone()
         {
-            var matrix = new GameMatrix<T>(MaxX, MaxY);
+            var matrix = new GameMatrix<T>(Width, Height);
 
-            for (int y = 0; y < MaxY; y++)
-                for (int x = 0; x < MaxX; x++)
+            for (int y = 0; y < Height; y++)
+                for (int x = 0; x < Width; x++)
                     matrix.Matrix[x, y] = Matrix[x, y];
 
             return matrix;
@@ -110,8 +117,8 @@ namespace qb
 
         public IEnumerator<T> GetEnumerator()
         {
-            for (int x = 0; x < MaxX; x++)
-                for (int y = 0; y < MaxY; y++)
+            for (int x = 0; x < Width; x++)
+                for (int y = 0; y < Height; y++)
                     yield return Matrix[x, y];
         }
         IEnumerator IEnumerable.GetEnumerator() => Matrix.GetEnumerator();

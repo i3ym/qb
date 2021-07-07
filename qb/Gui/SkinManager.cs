@@ -10,7 +10,7 @@ namespace qb.Gui
         public readonly BindableInt SelectedSkinIndex = new BindableInt() { MinValue = 0 };
         public ImmutableArray<Skin> Skins;
 
-        public SkinManager(Texture atlas)
+        public SkinManager(Texture atlas, Bindable<int> selectedSkinBindable)
         {
             int skinidx = 0;
             Skin newSkin(TranslatedString name) => new Skin(name, atlas, 16, skinidx++);
@@ -33,7 +33,7 @@ namespace qb.Gui
 
             SelectedSkin.BindValueChanged(e => SelectedSkinIndex.Value = Skins.IndexOf(e.NewValue), true);
             SelectedSkinIndex.BindValueChanged(e => SelectedSkin.Value = Skins[e.NewValue], true);
-            SelectedSkinIndex.BindTo(Config.SelectedSkin);
+            selectedSkinBindable.BindTo(SelectedSkinIndex);
         }
     }
 }
