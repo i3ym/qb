@@ -6,6 +6,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osuTK.Graphics.ES30;
 using qb.Gui;
+using qb.Gui.Menu;
 
 namespace qb
 {
@@ -14,6 +15,8 @@ namespace qb
         [BackgroundDependencyLoader]
         void Load(FrameworkConfigManager config)
         {
+            Window.Title = "qb";
+
             Resources.AddStore(new DllResourceStore("qb.dll"));
             Textures.AddStore(new TextureStore(Host.CreateTextureLoaderStore(new DllResourceStore("qb"))));
 
@@ -32,14 +35,14 @@ namespace qb
             Host.Dependencies.Cache(skin);
 
 
-            var menu = new MainMenu() { RelativeSizeAxes = Axes.Both };
 
-            var gamesc = new GameScreen(10, 20) { RelativeSizeAxes = Axes.Both, Alpha = 0 };
-            var controller = new FieldController();
+            var gamesc = new GameScreen() { RelativeSizeAxes = Axes.Both };
             Host.Dependencies.Cache(gamesc);
-            Host.Dependencies.Cache(controller);
 
-            var targetsize = new osuTK.Vector2(gamesc.FieldWidth + 7, gamesc.FieldHeight + 1);
+            var rndgc = new RandomGameController(gamesc);
+            Host.Dependencies.Cache(rndgc);
+
+            var targetsize = new osuTK.Vector2(17, 21);
             var container = new DrawSizePreservingFillContainer()
             {
                 TargetDrawSize = targetsize,
@@ -51,16 +54,11 @@ namespace qb
                     Children = new Drawable[]
                     {
                         gamesc,
-                        controller,
-
-                        menu,
+                        new PixelScreenStack(new MainMenu()).With(Host.Dependencies.Cache),
                     },
                 },
             };
-
             Add(container);
-
-            // new MousePositionAbsoluteInput() { Position = new osuTK.Vector2() }.Apply(mgr.CurrentState, mgr);
         }
     }
 }

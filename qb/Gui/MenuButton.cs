@@ -7,6 +7,13 @@ namespace qb.Gui
     {
         public Action Action = delegate { };
 
+        public MenuButton() { }
+        public MenuButton(TranslatedString text, Action action)
+        {
+            TranslatedText = text;
+            Action = action;
+        }
+
         protected override bool OnClick(ClickEvent e)
         {
             base.OnClick(e);

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using osu.Framework.Bindables;
@@ -31,21 +30,22 @@ namespace qb
         }.ToImmutableArray();
         static readonly ImmutableArray<int> Levels = new int[] { 52, 48, 44, 40, 36, 32, 27, 21, 16, 10, 9, 8, 7, 6, 5, 5, 4, 3, 3, 2, 2 }.ToImmutableArray();
 
-        public event EventHandler<CancelEventArgs> OnStartGame = delegate { };
+        public event Action BeforeUpdate = delegate { };
+        public event Action OnStartGame = delegate { };
         public event Action OnGameOver = delegate { };
         public event Action<int[]> OnLineClear = delegate { };
         public event Action OnFieldUpdate = delegate { };
 
         int LevelSpeed => Level.Value > Levels.Length ? 1 : Levels[Level.Value];
 
-        public readonly int FramesPerSecond = 1000 / 60;
-        public virtual int MaxX => 10;
-        public virtual int MaxY => 20;
         public int CurrentX { get; protected set; }
         public int CurrentY { get; protected set; }
         public int CurrentRotation { get; protected set; }
-        public Mod[]? Mods;
+        public readonly List<Mod> Mods = new();
+        public bool RestartOnDeath = false;
 
+        public readonly int FrameInterval = 1000 / 60;
+        public readonly int MaxX, MaxY;
         public readonly Bindable<Shape> CurrentShapeBindable = new();
         public readonly Bindable<Shape> NextShapeBindable = new();
         public readonly BindableBool IsPaused = new(true);
@@ -53,10 +53,10 @@ namespace qb
         public readonly BindableInt Lines = new(0);
         public readonly BindableInt Level = new(0);
         public readonly BindableInt Frame = new(0);
+        public readonly BindableInt StartLevel = new(0) { MinValue = 0, MaxValue = 30 };
 
         public GameMatrix<TileBool> CurrentObject { get; protected set; } = new(0, 0, CubeTile.None);
         public readonly GameMatrix<TileBool> Tiles;
-        public int StartLevel { get => _StartLevel; set => _StartLevel = Math.Clamp(value, 0, 30); }
         readonly RandomPieceGetter RandomPieceGetter = new();
 
 
@@ -91,11 +91,13 @@ namespace qb
         RotateState RotateState = RotateState.Waiting;
         int[] LinesToRemove = Array.Empty<int>();
 
-        int _StartLevel;
         State _State;
 
-        public FieldController()
+        public FieldController(int maxx, int maxy)
         {
+            MaxX = maxx;
+            MaxY = maxy;
+
             Tiles = new GameMatrix<TileBool>(MaxX, MaxY, CubeTile.None);
             StartUpdating();
         }
@@ -106,7 +108,7 @@ namespace qb
             {
                 while (true)
                 {
-                    Thread.Sleep(FramesPerSecond);
+                    Thread.Sleep(FrameInterval);
                     Update();
                 }
             });
@@ -117,6 +119,8 @@ namespace qb
 
         public new void Update()
         {
+            BeforeUpdate();
+
             if (IsPaused.Value) return;
             if (State == State.GameOver) return;
 
@@ -140,15 +144,15 @@ namespace qb
             MoveDown();
         }
 
-        public void SetDefaults()
+        public void Reset()
         {
             CurrentX = MaxX / 2 - 1;
             CurrentY = MaxY - 1;
             CurrentRotation = 0;
-            Score.Value = 0;
-            Lines.Value = 0;
-            Level.Value = StartLevel;
-            Frame.Value = 0;
+            Score.SetDefault();
+            Lines.SetDefault();
+            Level.Value = StartLevel.Value;
+            Frame.SetDefault();
 
             CurrentObject = new GameMatrix<TileBool>(0, 0, CubeTile.None);
             Tiles.Clear();
@@ -164,11 +168,8 @@ namespace qb
         }
         public void StartGame()
         {
-            var args = new CancelEventArgs(false);
-            OnStartGame(this, args);
-            if (args.Cancel) return;
-
-            SetDefaults();
+            OnStartGame();
+            Reset();
             IsPaused.Value = false;
 
             NextShape = RandomPieceGetter.Get();
@@ -263,7 +264,7 @@ namespace qb
                 {
                     Lines.Value += LinesToRemove.Length;
                     Score.Value += GetScoreForLine(LinesToRemove.Length, LinesToRemove[0], Level.Value);
-                    Level.Value = GetLvlFor(Lines.Value, StartLevel);
+                    Level.Value = GetLvlFor(Lines.Value, StartLevel.Value);
 
                     State = State.LineClearAnimation;
                     WaitDownTime = 20;
@@ -459,6 +460,15 @@ namespace qb
 
         protected void GameOver()
         {
+            if (RestartOnDeath)
+            {
+                Reset();
+                SpawnBlock();
+                IsPaused.Value = false;
+
+                return;
+            }
+
             OnGameOver();
             State = State.GameOver;
         }

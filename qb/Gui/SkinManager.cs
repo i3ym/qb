@@ -33,7 +33,7 @@ namespace qb.Gui
 
             SelectedSkin.BindValueChanged(e => SelectedSkinIndex.Value = Skins.IndexOf(e.NewValue), true);
             SelectedSkinIndex.BindValueChanged(e => SelectedSkin.Value = Skins[e.NewValue], true);
-            selectedSkinBindable.BindTo(SelectedSkinIndex);
+            SelectedSkinIndex.BindTo(selectedSkinBindable);
         }
     }
 }
