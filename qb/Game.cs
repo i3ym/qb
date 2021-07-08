@@ -46,15 +46,19 @@ namespace qb
             var container = new DrawSizePreservingFillContainer()
             {
                 TargetDrawSize = targetsize,
-                Child = new Container()
+                Children = new Drawable[]
                 {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                    Size = targetsize,
-                    Children = new Drawable[]
+                    new FloatingTetromino() { RelativeSizeAxes = Axes.Both },
+                    new Container()
                     {
-                        gamesc,
-                        new PixelScreenStack(new MainMenu()).With(Host.Dependencies.Cache),
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                        Size = targetsize,
+                        Children = new Drawable[]
+                        {
+                            gamesc,
+                            new PixelScreenStack(new MainMenu()).With(Host.Dependencies.Cache),
+                        },
                     },
                 },
             };

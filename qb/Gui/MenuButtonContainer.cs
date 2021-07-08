@@ -7,12 +7,15 @@ namespace qb.Gui
     public class MenuButtonContainer : MenuButtonContainer<MenuButton> { }
     public class MenuButtonContainer<T> : Container<T> where T : MenuButton
     {
-        protected override Container<T> Content { get; } = new PixelFlowContainer<T>() { RelativeSizeAxes = Axes.X, AutoSizeAxes = Axes.Y, Direction = FillDirection.Vertical, Spacing = new(1) };
+        public Anchor ChildAxes { get => PixelContent.ChildAxes; set => PixelContent.ChildAxes = value; }
+
+        readonly PixelFlowContainer<T> PixelContent = new PixelFlowContainer<T>() { AutoSizeAxes = Axes.Both, Direction = FillDirection.Vertical, Spacing = new(1) };
+        protected override Container<T> Content => PixelContent;
 
         [BackgroundDependencyLoader]
         void Load()
         {
-            InternalChild = new PixelScrollContainer() { RelativeSizeAxes = Axes.Both, Child = Content, ScrollDistance = 2f };
+            InternalChild = Content;
         }
 
         public override void Add(T drawable)

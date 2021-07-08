@@ -43,6 +43,7 @@ namespace qb
                         bg[x, tex.tiles.GetLength(1) - 1 - y] = tex.tiles[x, y];
             }
 
+            AddInternal(new Background(Colour4.Black));
             InputManager.Add(Controller);
             AddInternal(InputManager);
             AddInternal(Playfield);
@@ -59,7 +60,7 @@ namespace qb
                 new ClearLineAnimationSlideDown().Animation(lines, Scheduler, this);
             };
             Controller.OnFieldUpdate += UpdateField;
-            Controller.NextShapeBindable.ValueChanged += e => SetNextShape(e.NewValue);
+            Controller.NextShapeBindable.BindValueChanged(e => SetNextShape(e.NewValue), true);
         }
 
         void UpdateField()
