@@ -1,7 +1,13 @@
+using System.Collections.Immutable;
+
 namespace qb.Mods
 {
     public abstract class Mod
     {
+        public static readonly ImmutableArray<Mod> Mods;
+
+        static Mod() => Mods = new Mod[] { new ModBlind(), new ModFlashlight(), new ModRandom(), new ModUpsideDown() }.ToImmutableArray();
+
         public abstract TranslatedString Name { get; }
         public abstract int Priority { get; }
 

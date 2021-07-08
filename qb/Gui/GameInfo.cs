@@ -12,7 +12,7 @@ namespace qb.Gui
         {
             AddInternal(GetNewText(1.5f, controller.Level));
             AddInternal(GetNewText(4.5f, controller.Score));
-            AddInternal(GetNewText(7.5f, controller.Frame, t => TimeSpan.FromMilliseconds(t * controller.FramesPerSecond).ToString()));
+            AddInternal(GetNewText(7.5f, controller.Frame, t => TimeSpan.FromMilliseconds(t * controller.FrameInterval).ToString()));
             AddInternal(GetNewText(10.5f, controller.Lines));
 
             AddInternal(GetNewText(0, ("Level", "Уровень")));
