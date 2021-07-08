@@ -36,15 +36,11 @@ namespace qb
 
         void Run()
         {
-            try
-            {
-                if (PreviousInput is not null)
-                    new KeyboardKeyInput(PreviousInput.Entries[0].Button, false).Apply(GameScreen.InputManager.CurrentState, GameScreen.InputManager);
+            if (PreviousInput is not null)
+                new KeyboardKeyInput(PreviousInput.Entries[0].Button, false).Apply(GameScreen.InputManager.CurrentState, GameScreen.InputManager);
 
-                PreviousInput = new KeyboardKeyInput(Randomizer.Next(), true);
-                PreviousInput.Apply(GameScreen.InputManager.CurrentState, GameScreen.InputManager);
-            }
-            catch { }
+            PreviousInput = new KeyboardKeyInput(Randomizer.Next(), true);
+            PreviousInput.Apply(GameScreen.InputManager.CurrentState, GameScreen.InputManager);
         }
     }
 }

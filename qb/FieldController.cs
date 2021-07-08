@@ -2,17 +2,21 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Threading;
+using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
+using osu.Framework.Timing;
 using osuTK.Input;
 using qb.Mods;
 
 namespace qb
 {
-    public class FieldController : CompositeDrawable
+    public class FieldController : Drawable
     {
+        public const int MaxFps = 60;
+        public const double FrameInterval = 1000d / MaxFps;
+
         //0R R0 R2 2R 2L L2 L0 0L
         static readonly ImmutableArray<ImmutableArray<(int, int)>> TetrominoWallKickData = new[]
         {
@@ -44,7 +48,6 @@ namespace qb
         public readonly List<Mod> Mods = new();
         public bool RestartOnDeath = false;
 
-        public readonly int FrameInterval = 1000 / 60;
         public readonly int MaxX, MaxY;
         public readonly Bindable<Shape> CurrentShapeBindable = new();
         public readonly Bindable<Shape> NextShapeBindable = new();
@@ -97,28 +100,21 @@ namespace qb
         {
             MaxX = maxx;
             MaxY = maxy;
-
             Tiles = new GameMatrix<TileBool>(MaxX, MaxY, CubeTile.None);
-            StartUpdating();
         }
 
-        void StartUpdating()
+        [BackgroundDependencyLoader]
+        void Load()
         {
-            var updateThread = new Thread(() =>
-            {
-                while (true)
-                {
-                    Thread.Sleep(FrameInterval);
-                    Update();
-                }
-            });
-            updateThread.IsBackground = true;
-            updateThread.Name = "Update Thread";
-            updateThread.Start();
+            Clock = new ThrottledFrameClock() { MaximumUpdateHz = MaxFps };
+
+            StartGame();
+            IsPaused.Value = true;
         }
 
-        public new void Update()
+        protected override void Update()
         {
+            base.Update();
             BeforeUpdate();
 
             if (IsPaused.Value) return;
@@ -166,10 +162,10 @@ namespace qb
 
             OnFieldUpdate();
         }
-        public void StartGame()
+        public void StartGame(bool reset = true)
         {
             OnStartGame();
-            Reset();
+            if (reset) Reset();
             IsPaused.Value = false;
 
             NextShape = RandomPieceGetter.Get();

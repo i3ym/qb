@@ -11,7 +11,7 @@ namespace qb.Gui.Menu
         {
             var buttons = new MenuButtonContainer()
             {
-                RelativeSizeAxes = Axes.Both,
+                AutoSizeAxes = Axes.Both,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Children = new[]
@@ -24,7 +24,7 @@ namespace qb.Gui.Menu
 
             AddInternal(buttons);
 
-            gamesc.Controller.StartGame();
+            gamesc.Controller.IsPaused.Value = false;
             rndgamecontroller.Start();
         }
     }
