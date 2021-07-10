@@ -1,34 +1,28 @@
-using System;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input.Events;
 
 namespace qb.Gui
 {
-    public class ControllerButton : Box
+    public class ControllerButton : PixelButton
     {
-        public Action MouseDown = delegate { };
-        public Action MouseUp = delegate { };
+        readonly QbKey Key;
 
-        public ControllerButton()
+        public ControllerButton(QbKey key)
         {
-
+            Key = key;
+            Size = new(1);
+            Background = Colour4.BlueViolet;
         }
-        public ControllerButton(Anchor anchor) : this()
+        public ControllerButton(QbKey key, Anchor anchor) : this(key)
         {
             Anchor = Origin = anchor;
         }
 
-
-        protected override bool OnMouseDown(MouseDownEvent e)
+        [BackgroundDependencyLoader]
+        void Load(GameScreen gamesc)
         {
-            MouseDown();
-            return base.OnMouseDown(e);
-        }
-        protected override void OnMouseUp(MouseUpEvent e)
-        {
-            MouseUp();
-            base.OnMouseUp(e);
+            MouseDown += () => gamesc.Controller.TriggerPressed(Key);
+            MouseUp += () => gamesc.Controller.TriggerReleased(Key);
         }
     }
 }

@@ -5,15 +5,14 @@ using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Graphics;
-using osu.Framework.Input.Events;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Timing;
 using osuTK.Input;
 using qb.Mods;
 
 namespace qb
 {
-    public class FieldController : Drawable
+    public class FieldController : KeyBindingContainer<QbKey>
     {
         public const int MaxFps = 60;
         public const double FrameInterval = 1000d / MaxFps;
@@ -34,6 +33,19 @@ namespace qb
             new[] { (0, 0), (1, 0), (-2, 0), (1, -2), (-2, 1), }.ToImmutableArray(),
         }.ToImmutableArray();
         static readonly ImmutableArray<int> Levels = new int[] { 52, 48, 44, 40, 36, 32, 27, 21, 16, 10, 9, 8, 7, 6, 5, 5, 4, 3, 3, 2, 2 }.ToImmutableArray();
+
+
+        public override IEnumerable<IKeyBinding> DefaultKeyBindings { get; } = new IKeyBinding[]
+        {
+            new KeyBinding(KeyCombination.FromKey(Key.W), QbKey.Up),
+            new KeyBinding(KeyCombination.FromKey(Key.S), QbKey.Down),
+            new KeyBinding(KeyCombination.FromKey(Key.A), QbKey.Left),
+            new KeyBinding(KeyCombination.FromKey(Key.D), QbKey.Right),
+
+            new KeyBinding(KeyCombination.FromKey(Key.E), QbKey.A),
+            new KeyBinding(KeyCombination.FromKey(Key.Q), QbKey.B),
+            new KeyBinding(KeyCombination.FromKey(Key.Escape), QbKey.Back),
+        };
 
         public event Action BeforeUpdate = delegate { };
         public event Action OnStartGame = delegate { };
@@ -98,7 +110,7 @@ namespace qb
 
         State _State;
 
-        public FieldController(int maxx, int maxy)
+        public FieldController(int maxx, int maxy) : base(SimultaneousBindingMode.Unique)
         {
             MaxX = maxx;
             MaxY = maxy;
@@ -187,8 +199,8 @@ namespace qb
         {
             var wasWaiting = State == State.WaitingOnGround;
 
-            var rotate = A;
-            var rotatec = B;
+            var rotate = Check(QbKey.A);
+            var rotatec = Check(QbKey.B);
 
             if (RotateState == RotateState.Waiting)
             {
@@ -218,8 +230,8 @@ namespace qb
 
             var wasWaiting = State == State.WaitingOnGround;
 
-            var right = Right;
-            var left = Left;
+            var right = Check(QbKey.Right);
+            var left = Check(QbKey.Left);
 
             if (HorizontalState == HorizontalState.Waiting && (right || left))
             {
@@ -245,11 +257,11 @@ namespace qb
         {
             WaitDownTime--;
 
-            if (State == State.Falling && Down)
+            if (State == State.Falling && Check(QbKey.Down))
                 WaitDownTime -= LevelSpeed / 3 + 1;
-            else if (State == State.WaitingOnGround && Down)
+            else if (State == State.WaitingOnGround && Check(QbKey.Down))
                 WaitDownTime = 0;
-            else if (State == State.HoldingOnTop && (Left || Right || A || B))
+            else if (State == State.HoldingOnTop && (Check(QbKey.Left) || Check(QbKey.Right) || Check(QbKey.A) || Check(QbKey.B)))
                 WaitDownTime = 0;
 
             if (WaitDownTime > 0) return;
@@ -481,26 +493,7 @@ namespace qb
         }
 
 
-        IEnumerable<Key>? PressedKeys;
-        protected override bool OnKeyDown(KeyDownEvent e)
-        {
-            PressedKeys = e.PressedKeys;
-            return base.OnKeyDown(e);
-        }
-        protected override void OnKeyUp(KeyUpEvent e)
-        {
-            PressedKeys = e.PressedKeys;
-            base.OnKeyUp(e);
-        }
-
-        bool Left => Check(Key.A) || Check(Key.Left);
-        bool Right => Check(Key.D) || Check(Key.Right);
-        bool Up => Check(Key.W) || Check(Key.Up);
-        bool Down => Check(Key.S) || Check(Key.Down);
-        bool A => Check(Key.E);
-        bool B => Check(Key.Q);
-
-        bool Check(Key key) => PressedKeys?.Contains(key) ?? false;
+        bool Check(QbKey key) => PressedActions.Contains(key);
     }
 
     public enum State : byte

@@ -19,10 +19,14 @@ namespace qb.Gui
                 Texture = PixelTextureStore.Get("Resources/ControllerArrows"),
             });
 
-            AddInternal(new ControllerButton(Anchor.CentreLeft));
-            AddInternal(new ControllerButton(Anchor.TopCentre));
-            AddInternal(new ControllerButton(Anchor.CentreRight));
-            AddInternal(new ControllerButton(Anchor.BottomCentre));
+
+            add(QbKey.Up, Anchor.TopCentre);
+            add(QbKey.Down, Anchor.BottomCentre);
+            add(QbKey.Left, Anchor.CentreLeft);
+            add(QbKey.Right, Anchor.CentreRight);
+
+            void add(QbKey key, Anchor anchor) =>
+                AddInternal(new ControllerButton(key, anchor) { RelativeSizeAxes = Axes.Both, Size = new(1 / 3f) });
         }
     }
 }

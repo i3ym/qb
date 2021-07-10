@@ -5,6 +5,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
+using osu.Framework.Platform;
 using osuTK.Graphics.ES30;
 using qb.Gui;
 using qb.Gui.Menu;
@@ -17,6 +18,7 @@ namespace qb
         void Load(FrameworkConfigManager config)
         {
             Window.Title = "qb";
+            config.SetValue(FrameworkSetting.ExecutionMode, ExecutionMode.SingleThread);
 
             Resources.AddStore(new DllResourceStore("qb.dll"));
             Textures.AddStore(new TextureStore(Host.CreateTextureLoaderStore(new DllResourceStore("qb"))));
@@ -54,7 +56,7 @@ namespace qb
             var rndgc = new RandomGameController(gamesc);
             Host.Dependencies.Cache(rndgc);
 
-            var controllerArrows = new ControllerArrows() { Anchor = Anchor.BottomLeft, Origin = Anchor.BottomLeft, Size = new(4) };
+            var controllerArrows = new ControllerArrows() { Anchor = Anchor.BottomLeft, Origin = Anchor.BottomLeft, Size = new(5) };
 
             var targetsize = new osuTK.Vector2(17, 21);
             var container = new DrawSizePreservingFillContainer()
