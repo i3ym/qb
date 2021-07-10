@@ -14,7 +14,7 @@ namespace qb.Gui
         [BackgroundDependencyLoader]
         void Load()
         {
-            Spacing = new(1);
+            Spacing = new(1, 0);
             ChildAxesBindable.BindValueChanged(e =>
             {
                 foreach (var child in Children)

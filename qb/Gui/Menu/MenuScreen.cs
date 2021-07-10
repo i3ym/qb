@@ -7,7 +7,8 @@ namespace qb.Gui.Menu
 {
     public class MenuScreen : Screen
     {
-        protected readonly Background Background = new(Colour4.Black.MultiplyAlpha(.5f));
+        [Resolved] PixelScreenStack PixelScreenStack { get; init; } = null!;
+        protected readonly Background Background = new(Colour4.Black.MultiplyAlpha(.7f));
 
         [BackgroundDependencyLoader]
         void Load() => AddInternal(Background);
@@ -15,6 +16,28 @@ namespace qb.Gui.Menu
         protected override bool Handle(UIEvent e) => true;
 
         protected void Push<T>() where T : Screen, new() => this.Push(new T());
-        protected void Back() => this.GetParentScreen().MakeCurrent();
+        protected void Back() => BackTo(this.GetParentScreen());
+        protected void BackToRoot() => BackTo(Root);
+        void BackTo(IScreen screen)
+        {
+            (screen as Drawable)?.FadeIn();
+            screen.MakeCurrent();
+        }
+
+        protected IScreen Root
+        {
+            get
+            {
+                var parent = this as IScreen;
+
+                while (true)
+                {
+                    var p = parent.GetParentScreen();
+                    if (p is null) return parent;
+
+                    parent = p;
+                }
+            }
+        }
     }
 }

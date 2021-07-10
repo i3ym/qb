@@ -1,4 +1,3 @@
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 
@@ -7,18 +6,25 @@ namespace qb.Gui.Menu
     public class SettingsMenu : MenuScreen
     {
         [BackgroundDependencyLoader]
-        void Load(SkinManager skinmgr)
+        void Load(GameScreen gamesc, RandomGameController rndgamecontroller)
         {
-            var skinButtons = new MenuButtonContainer()
+            var buttons = new MenuButtonContainer()
             {
-                RelativeSizeAxes = Axes.Both,
+                AutoSizeAxes = Axes.Both,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Children = skinmgr.Skins.Select(s => new MenuButton(s.Name, () => skinmgr.SelectedSkin.Value = s)).ToArray(),
+                Children = new[]
+                {
+                    new PixelButton(("Skin", "Скин"), Push<SkinChooseMenu>),
+                    new PixelButton(("Language", "Язык"), Push<ChooseLanguageMenu>),
+                    new PixelButton(("Back", "Назад"), Back),
+                },
             };
 
-            AddInternal(skinButtons);
-            AddInternal(new MenuButton(("Back", "Назад"), Back) { Anchor = Anchor.BottomLeft, Origin = Anchor.BottomLeft, X = 1, Y = -1 });
+            AddInternal(buttons);
+
+            gamesc.Controller.IsPaused.Value = false;
+            rndgamecontroller.Start();
         }
     }
 }

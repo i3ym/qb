@@ -12,7 +12,7 @@ namespace qb.Gui
         {
             AddInternal(GetNewText(1.5f, controller.Level));
             AddInternal(GetNewText(4.5f, controller.Score));
-            AddInternal(GetNewText(7.5f, controller.Frame, t => TimeSpan.FromMilliseconds(t * FieldController.FrameInterval).ToString()));
+            AddInternal(GetNewText(7.5f, controller.Frame, t => TimeSpan.FromMilliseconds(t * FieldController.FrameInterval).ToString(@"mm\:ss")));
             AddInternal(GetNewText(10.5f, controller.Lines));
 
             AddInternal(GetNewText(0, ("Level", "Уровень")));
@@ -26,7 +26,7 @@ namespace qb.Gui
             formatfunc ??= e => e?.ToString() ?? string.Empty;
 
             var tb = GetNewText(y);
-            source.BindValueChanged(e => Schedule(() => tb.Text = formatfunc(e.NewValue)), true);
+            source.BindValueChanged(e => tb.Text = formatfunc(e.NewValue), true);
 
             return tb;
         }

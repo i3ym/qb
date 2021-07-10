@@ -13,8 +13,8 @@ namespace qb
     public class GameScreen : CompositeDrawable
     {
         [Cached] public readonly FieldController Controller;
-        public readonly PassThroughInputManager InputManager = new PassThroughInputManager();
         [Resolved] PixelScreenStack ScreenStack { get; init; } = null!;
+        public readonly PassThroughInputManager InputManager = new PassThroughInputManager();
 
         public readonly int FieldWidth, FieldHeight;
         public readonly FieldGrid Playfield, NextGrid;
@@ -31,7 +31,7 @@ namespace qb
         }
 
         [BackgroundDependencyLoader]
-        void Load(SkinManager skinmanager)
+        void Load(PixelScreenStack menus)
         {
             foreach (var tex in SkinnedTexture.GetSkinnedTextures(FieldWidth, FieldHeight))
             {
@@ -51,14 +51,11 @@ namespace qb
             AddInternal(new GameInfo() { Anchor = Anchor.TopRight, Origin = Anchor.TopRight, X = -7, Y = 6 });
 
 
-            Controller.OnGameOver += () =>
-            {
-                new GameOverFillingAnimation().Animation(Scheduler, this);
-            };
-            Controller.OnLineClear += lines =>
-            {
-                new ClearLineAnimationSlideDown().Animation(lines, Scheduler, this);
-            };
+            var gameoveranim = new GameOverFillingAnimation();
+            var clearlineanim = new ClearLineAnimationSlideDown();
+
+            Controller.OnGameOver += () => gameoveranim.Animation(Scheduler, this, () => menus.Push(new GameOverMenu()));
+            Controller.OnLineClear += lines => clearlineanim.Animation(lines, Scheduler, this);
             Controller.OnFieldUpdate += UpdateField;
             Controller.NextShapeBindable.BindValueChanged(e => SetNextShape(e.NewValue), true);
         }

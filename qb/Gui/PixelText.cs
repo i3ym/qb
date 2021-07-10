@@ -1,3 +1,4 @@
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Configuration;
@@ -18,6 +19,7 @@ namespace qb.Gui
             Truncate = true;
             EllipsisString = "-";
         }
+        public PixelText(TranslatedString text) : this() => TranslatedText = text;
 
         [BackgroundDependencyLoader]
         void Load(FrameworkConfigManager config)
@@ -33,6 +35,17 @@ namespace qb.Gui
                 if (TranslatedText.IsEmpty) return;
                 Text = TranslatedText[localeb.Value];
             }
+        }
+
+
+        public static PixelText Create<T>(Bindable<T> source, Func<T, string>? formatfunc = null)
+        {
+            formatfunc ??= e => e?.ToString() ?? string.Empty;
+
+            var tb = new PixelText();
+            source.BindValueChanged(e => tb.Text = formatfunc(e.NewValue), true);
+
+            return tb;
         }
     }
 }

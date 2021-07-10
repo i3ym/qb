@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ppy.osu.Framework" Version="2021.628.0" />
+    <PackageReference Include="ppy.osu.Framework" Version="2021.707.0" />
   </ItemGroup>
 
   <ItemGroup>
