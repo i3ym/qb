@@ -4,7 +4,7 @@ using osu.Framework.Graphics;
 
 namespace qb.Gui
 {
-    public class ToggleMenuButtonContainer<T> : MenuButtonContainer<ToggleMenuButton<T>>
+    public class ToggleMenuButtonContainer<T> : MenuButtonContainer<ValueMenuButton<T>>
     {
         public Action<T> OnEnable = delegate { };
         public Action<T> OnDisable = delegate { };
@@ -12,9 +12,9 @@ namespace qb.Gui
         public IReadOnlyList<T> Selected => _Selected;
         readonly List<T> _Selected = new();
 
-        public override void Add(ToggleMenuButton<T> drawable)
+        public override void Add(ValueMenuButton<T> drawable)
         {
-            void fade(bool enabled, float duration = 250) => drawable.FadeTo(enabled ? 1f : .5f, duration, Easing.OutQuad);
+            void fade(bool enabled, float duration = 250) => drawable.Text.FadeColour(enabled ? Colour4.White : Colour4.Gray, duration, Easing.OutQuad);
 
             drawable.Action += () =>
             {

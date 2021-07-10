@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -39,6 +40,7 @@ namespace qb
         public event Action OnGameOver = delegate { };
         public event Action<int[]> OnLineClear = delegate { };
         public event Action OnFieldUpdate = delegate { };
+        public event Action OnClearLineAnimationStop = delegate { };
 
         int LevelSpeed => Level.Value > Levels.Length ? 1 : Levels[Level.Value];
 
@@ -106,15 +108,23 @@ namespace qb
         [BackgroundDependencyLoader]
         void Load()
         {
-            Clock = new ThrottledFrameClock() { MaximumUpdateHz = MaxFps };
+            new Thread(() =>
+            {
+                var tfc = new ThrottledFrameClock() { MaximumUpdateHz = MaxFps };
+                while (true)
+                {
+                    tfc.ProcessFrame();
+                    Schedule(UpdateField);
+                }
+            })
+            { IsBackground = true }.Start();
 
             StartGame();
             IsPaused.Value = true;
         }
 
-        protected override void Update()
+        void UpdateField()
         {
-            base.Update();
             BeforeUpdate();
 
             if (IsPaused.Value) return;
@@ -130,6 +140,7 @@ namespace qb
 
                     SpawnBlock();
                     State = State.HoldingOnTop;
+                    OnClearLineAnimationStop();
                 }
 
                 return;

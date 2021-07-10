@@ -15,21 +15,21 @@ namespace qb.Gui.Menu
             {
                 AutoSizeAxes = Axes.Both,
                 Direction = FillDirection.Horizontal,
-                ChildAxes = Anchor.TopCentre,
+                ChildAxes = Anchor.Centre,
                 Children = new Drawable[]
                 {
-                    new MenuButton(("-"), leveldown),
-                    new PixelText().With(x => gamesc.Controller.StartLevel.BindValueChanged(e => x.Text = e.NewValue.ToString(), true)),
-                    new MenuButton(("+"), levelup),
+                    new PixelButton(("-"), leveldown) { Width = 2 },
+                    PixelText.Create(gamesc.Controller.StartLevel, x => x.ToString("00")),
+                    new PixelButton(("+"), levelup) { Width = 2 },
                 },
             };
             var mods = new ToggleMenuButtonContainer<Mod>()
             {
                 AutoSizeAxes = Axes.Both,
-                ChildAxes = Anchor.Centre,
+                ChildrenAnchor = Anchor.Centre,
                 OnEnable = v => gamesc.Controller.Mods.Add(v),
                 OnDisable = v => gamesc.Controller.Mods.Remove(v),
-                Children = Mod.Mods.Select(x => new ToggleMenuButton<Mod>(x, x.Name)).ToArray(),
+                Children = Mod.Mods.Select(x => new ValueMenuButton<Mod>(x, x.Name)).ToArray(),
             };
 
             var ffc = new PixelFlowContainer()
@@ -41,10 +41,10 @@ namespace qb.Gui.Menu
                 Direction = FillDirection.Vertical,
                 Children = new Drawable[]
                 {
-                    new MenuButton(("Start", "Начать"), start),
+                    new PixelButton(("Start", "Начать"), start),
                     level,
                     mods,
-                    new MenuButton(("Back", "Назад"), Back),
+                    new PixelButton(("Back", "Назад"), Back),
                 },
             };
             AddInternal(ffc);

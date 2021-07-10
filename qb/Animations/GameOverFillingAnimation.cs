@@ -6,19 +6,18 @@ namespace qb.Animations
 {
     public class GameOverFillingAnimation : IGameOverAnimation
     {
-        public void Animation(Scheduler scheduler, GameScreen field)
+        public void Animation(Scheduler scheduler, GameScreen field, Action after)
         {
             var enumerator = animation();
+            field.Controller.BeforeUpdate += update;
 
-            ScheduledDelegate deleg = null!;
-            Action action = () =>
+            void update()
             {
-                if (!enumerator.MoveNext())
-                    deleg.Cancel();
-            };
+                if (enumerator.MoveNext()) return;
 
-            deleg = new ScheduledDelegate(action, repeatInterval: 1_000 / 60) { PerformRepeatCatchUpExecutions = false };
-            scheduler.Add(deleg);
+                field.Controller.BeforeUpdate -= update;
+                after();
+            }
 
 
             IEnumerator<bool> animation()

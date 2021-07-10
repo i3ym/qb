@@ -1,3 +1,4 @@
+using System.Globalization;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
@@ -24,6 +25,11 @@ namespace qb
             Fonts.AddStore(pixelfontstore);
             AddFont(Resources, "Resources/PixelFont", pixelfontstore);
 
+            var pixeltexturestore = new TextureStore(Textures, true, All.Nearest, true, 1);
+            Textures.AddStore(pixeltexturestore);
+            Host.Dependencies.Cache(pixeltexturestore, new CacheInfo("PixelTextureStore"));
+
+
             var qconfig = new QbConfigManager(Host.Storage);
             Host.Dependencies.Cache(qconfig);
 
@@ -34,6 +40,12 @@ namespace qb
             var skin = new SkinManager(atlas, qconfig.GetBindable<int>(QbConfigField.SelectedSkin));
             Host.Dependencies.Cache(skin);
 
+            if (string.IsNullOrEmpty(config.Get<string>(FrameworkSetting.Locale)))
+            {
+                var culture = CultureInfo.InstalledUICulture.Name;
+                config.SetValue(FrameworkSetting.Locale, culture == "ru-RU" ? culture : "en-US");
+            }
+
 
 
             var gamesc = new GameScreen() { RelativeSizeAxes = Axes.Both };
@@ -42,12 +54,15 @@ namespace qb
             var rndgc = new RandomGameController(gamesc);
             Host.Dependencies.Cache(rndgc);
 
+            var controllerArrows = new ControllerArrows() { Anchor = Anchor.BottomLeft, Origin = Anchor.BottomLeft, Size = new(4) };
+
             var targetsize = new osuTK.Vector2(17, 21);
             var container = new DrawSizePreservingFillContainer()
             {
                 TargetDrawSize = targetsize,
                 Children = new Drawable[]
                 {
+                    rndgc,
                     new FloatingTetromino() { RelativeSizeAxes = Axes.Both },
                     new Container()
                     {
@@ -60,6 +75,7 @@ namespace qb
                             new PixelScreenStack(new MainMenu()).With(Host.Dependencies.Cache),
                         },
                     },
+                    controllerArrows,
                 },
             };
             Add(container);

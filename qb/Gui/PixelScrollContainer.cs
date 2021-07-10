@@ -1,12 +1,36 @@
+using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osuTK;
 
 namespace qb.Gui
 {
-    public class PixelScrollContainer : BasicScrollContainer
+    public class PixelScrollContainer : ScrollContainer<Drawable>
     {
-        public PixelScrollContainer()
+        [BackgroundDependencyLoader]
+        void Load() => ScrollDistance = 2f;
+
+        protected override ScrollbarContainer CreateScrollbar(Direction direction) => new PixelScrollbar(direction);
+
+
+        class PixelScrollbar : ScrollbarContainer
         {
-            ScrollDistance = 2f;
+            public PixelScrollbar(Direction direction) : base(direction) { }
+
+            [BackgroundDependencyLoader]
+            void Load() => Add(new Background(Colour4.White));
+
+            public override void ResizeTo(float val, int duration = 0, Easing easing = Easing.None)
+            {
+                const float thickness = .05f;
+
+                Vector2 size;
+                if (ScrollDirection == Direction.Vertical)
+                    size = new(thickness, val);
+                else size = new(val, thickness);
+
+                this.ResizeTo(size, duration, easing);
+            }
         }
     }
 }

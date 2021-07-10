@@ -23,6 +23,8 @@ namespace qb
 
         public void Start()
         {
+            Stop();
+
             GameScreen.InputManager.UseParentInput = false;
             GameScreen.Controller.RestartOnDeath = true;
             GameScreen.Controller.BeforeUpdate += Run;
