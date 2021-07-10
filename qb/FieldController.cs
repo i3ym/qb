@@ -1,18 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
-using osu.Framework.Input.Bindings;
+using osu.Framework.Graphics;
 using osu.Framework.Timing;
-using osuTK.Input;
 using qb.Mods;
 
 namespace qb
 {
-    public class FieldController : KeyBindingContainer<QbKey>
+    public class FieldController : Drawable
     {
         public const int MaxFps = 60;
         public const double FrameInterval = 1000d / MaxFps;
@@ -35,18 +33,6 @@ namespace qb
         static readonly ImmutableArray<int> Levels = new int[] { 52, 48, 44, 40, 36, 32, 27, 21, 16, 10, 9, 8, 7, 6, 5, 5, 4, 3, 3, 2, 2 }.ToImmutableArray();
 
 
-        public override IEnumerable<IKeyBinding> DefaultKeyBindings { get; } = new IKeyBinding[]
-        {
-            new KeyBinding(KeyCombination.FromKey(Key.W), QbKey.Up),
-            new KeyBinding(KeyCombination.FromKey(Key.S), QbKey.Down),
-            new KeyBinding(KeyCombination.FromKey(Key.A), QbKey.Left),
-            new KeyBinding(KeyCombination.FromKey(Key.D), QbKey.Right),
-
-            new KeyBinding(KeyCombination.FromKey(Key.E), QbKey.A),
-            new KeyBinding(KeyCombination.FromKey(Key.Q), QbKey.B),
-            new KeyBinding(KeyCombination.FromKey(Key.Escape), QbKey.Back),
-        };
-
         public event Action BeforeUpdate = delegate { };
         public event Action OnStartGame = delegate { };
         public event Action OnGameOver = delegate { };
@@ -60,7 +46,6 @@ namespace qb
         public int CurrentY { get; protected set; }
         public int CurrentRotation { get; protected set; }
         public readonly List<Mod> Mods = new();
-        public bool RestartOnDeath = false;
 
         public readonly int MaxX, MaxY;
         public readonly Bindable<Shape> CurrentShapeBindable = new();
@@ -75,6 +60,10 @@ namespace qb
         public GameMatrix<TileBool> CurrentObject { get; protected set; } = new(0, 0, CubeTile.None);
         public readonly GameMatrix<TileBool> Tiles;
         readonly RandomPieceGetter RandomPieceGetter = new();
+
+        public bool RestartOnDeath = false;
+        public IController? Controller;
+        ControllerState ControllerState;
 
 
         Shape CurrentShape { get => CurrentShapeBindable.Value; set => CurrentShapeBindable.Value = value; }
@@ -110,7 +99,7 @@ namespace qb
 
         State _State;
 
-        public FieldController(int maxx, int maxy) : base(SimultaneousBindingMode.Unique)
+        public FieldController(int maxx, int maxy)
         {
             MaxX = maxx;
             MaxY = maxy;
@@ -158,6 +147,7 @@ namespace qb
                 return;
             }
 
+            ControllerState = Controller?.GetState() ?? default;
             Rotate();
             MoveHorizontal();
             MoveDown();
@@ -199,8 +189,8 @@ namespace qb
         {
             var wasWaiting = State == State.WaitingOnGround;
 
-            var rotate = Check(QbKey.A);
-            var rotatec = Check(QbKey.B);
+            var rotate = ControllerState.A;
+            var rotatec = ControllerState.B;
 
             if (RotateState == RotateState.Waiting)
             {
@@ -230,8 +220,8 @@ namespace qb
 
             var wasWaiting = State == State.WaitingOnGround;
 
-            var right = Check(QbKey.Right);
-            var left = Check(QbKey.Left);
+            var right = ControllerState.Right;
+            var left = ControllerState.Left;
 
             if (HorizontalState == HorizontalState.Waiting && (right || left))
             {
@@ -257,11 +247,11 @@ namespace qb
         {
             WaitDownTime--;
 
-            if (State == State.Falling && Check(QbKey.Down))
+            if (State == State.Falling && ControllerState.Down)
                 WaitDownTime -= LevelSpeed / 3 + 1;
-            else if (State == State.WaitingOnGround && Check(QbKey.Down))
+            else if (State == State.WaitingOnGround && ControllerState.Down)
                 WaitDownTime = 0;
-            else if (State == State.HoldingOnTop && (Check(QbKey.Left) || Check(QbKey.Right) || Check(QbKey.A) || Check(QbKey.B)))
+            else if (State == State.HoldingOnTop && (ControllerState.Left || ControllerState.Right || ControllerState.A || ControllerState.B))
                 WaitDownTime = 0;
 
             if (WaitDownTime > 0) return;
@@ -491,27 +481,8 @@ namespace qb
             OnGameOver();
             State = State.GameOver;
         }
-
-
-        bool Check(QbKey key) => PressedActions.Contains(key);
     }
-
-    public enum State : byte
-    {
-        Falling,
-        WaitingOnGround,
-        HoldingOnTop,
-        LineClearAnimation,
-        GameOver
-    }
-    public enum HorizontalState : byte
-    {
-        Waiting,
-        Moving
-    }
-    public enum RotateState : byte
-    {
-        Waiting,
-        Rotated
-    }
+    public enum State { Falling, WaitingOnGround, HoldingOnTop, LineClearAnimation, GameOver, }
+    public enum HorizontalState { Waiting, Moving, }
+    public enum RotateState { Waiting, Rotated, }
 }

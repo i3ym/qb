@@ -18,7 +18,13 @@ namespace qb
         void Load(FrameworkConfigManager config)
         {
             Window.Title = "qb";
+
             config.SetValue(FrameworkSetting.ExecutionMode, ExecutionMode.SingleThread);
+            if (string.IsNullOrEmpty(config.Get<string>(FrameworkSetting.Locale)))
+            {
+                var culture = CultureInfo.InstalledUICulture.Name;
+                config.SetValue(FrameworkSetting.Locale, culture == "ru-RU" ? culture : "en-US");
+            }
 
             Resources.AddStore(new DllResourceStore("qb.dll"));
             Textures.AddStore(new TextureStore(Host.CreateTextureLoaderStore(new DllResourceStore("qb"))));
@@ -42,21 +48,20 @@ namespace qb
             var skin = new SkinManager(atlas, qconfig.GetBindable<int>(QbConfigField.SelectedSkin));
             Host.Dependencies.Cache(skin);
 
-            if (string.IsNullOrEmpty(config.Get<string>(FrameworkSetting.Locale)))
-            {
-                var culture = CultureInfo.InstalledUICulture.Name;
-                config.SetValue(FrameworkSetting.Locale, culture == "ru-RU" ? culture : "en-US");
-            }
+            Host.Dependencies.Cache(new RandomGameController());
+
 
 
 
             var gamesc = new GameScreen() { RelativeSizeAxes = Axes.Both };
             Host.Dependencies.Cache(gamesc);
 
-            var rndgc = new RandomGameController(gamesc);
-            Host.Dependencies.Cache(rndgc);
-
             var controllerArrows = new ControllerArrows() { Anchor = Anchor.BottomLeft, Origin = Anchor.BottomLeft, Size = new(5) };
+            var controllerButtons = new ControllerButtons() { Anchor = Anchor.BottomRight, Origin = Anchor.BottomRight, Size = new(5) };
+
+            var kbinput = new KeyboardController();
+            Host.Dependencies.Cache(new MultiController(controllerArrows, controllerButtons, kbinput));
+
 
             var targetsize = new osuTK.Vector2(17, 21);
             var container = new DrawSizePreservingFillContainer()
@@ -64,7 +69,7 @@ namespace qb
                 TargetDrawSize = targetsize,
                 Children = new Drawable[]
                 {
-                    rndgc,
+                    kbinput,
                     new FloatingTetromino() { RelativeSizeAxes = Axes.Both },
                     new Container()
                     {
@@ -78,6 +83,7 @@ namespace qb
                         },
                     },
                     controllerArrows,
+                    controllerButtons,
                 },
             };
             Add(container);

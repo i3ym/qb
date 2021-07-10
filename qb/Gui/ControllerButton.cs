@@ -1,28 +1,19 @@
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 
 namespace qb.Gui
 {
     public class ControllerButton : PixelButton
     {
-        readonly QbKey Key;
+        public bool IsPressed { get; private set; }
 
-        public ControllerButton(QbKey key)
+        public ControllerButton()
         {
-            Key = key;
             Size = new(1);
             Background = Colour4.BlueViolet;
-        }
-        public ControllerButton(QbKey key, Anchor anchor) : this(key)
-        {
-            Anchor = Origin = anchor;
-        }
 
-        [BackgroundDependencyLoader]
-        void Load(GameScreen gamesc)
-        {
-            MouseDown += () => gamesc.Controller.TriggerPressed(Key);
-            MouseUp += () => gamesc.Controller.TriggerReleased(Key);
+            MouseDown += () => IsPressed = true;
+            MouseUp += () => IsPressed = false;
         }
+        public ControllerButton(Anchor anchor) : this() => Anchor = Origin = anchor;
     }
 }
