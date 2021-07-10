@@ -34,6 +34,7 @@ namespace qb.Gui.Menu
         public override void OnResuming(IScreen last)
         {
             GameScreen.Controller.IsPaused.Value = false;
+            GameScreen.Controller.RestartOnDeath = true;
             GameScreen.Controller.Controller = RandomGameController;
 
             base.OnResuming(last);
@@ -41,6 +42,7 @@ namespace qb.Gui.Menu
         public override void OnEntering(IScreen last)
         {
             GameScreen.Controller.IsPaused.Value = false;
+            GameScreen.Controller.RestartOnDeath = true;
             GameScreen.Controller.Controller = RandomGameController;
 
             base.OnEntering(last);

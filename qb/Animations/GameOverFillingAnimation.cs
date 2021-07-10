@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
-using osu.Framework.Threading;
 
 namespace qb.Animations
 {
     public class GameOverFillingAnimation : IGameOverAnimation
     {
-        public void Animation(Scheduler scheduler, GameScreen field, Action after)
+        public void Animation(GameScreen field, Action after)
         {
             var enumerator = animation();
             field.Controller.BeforeUpdate += update;
