@@ -9,8 +9,11 @@ namespace qb.Gui
 {
     public class PixelButton : CompositeDrawable
     {
+        public Action MouseDown = delegate { };
+        public Action MouseUp = delegate { };
         public Action Action = delegate { };
 
+        public Colour4 TextColour { get => Text.Colour; set => Text.Colour = value; }
         public Colour4 Background
         {
             get => BackgroundBox?.Colour ?? Colour4.Transparent;
@@ -43,6 +46,18 @@ namespace qb.Gui
         }
 
 
+        protected override bool OnMouseDown(MouseDownEvent e)
+        {
+            MouseDown();
+            base.OnMouseDown(e);
+
+            return true;
+        }
+        protected override void OnMouseUp(MouseUpEvent e)
+        {
+            MouseUp();
+            base.OnMouseUp(e);
+        }
         protected override bool OnClick(ClickEvent e)
         {
             base.OnClick(e);

@@ -14,7 +14,6 @@ namespace qb
     {
         [Cached] public readonly FieldController Controller;
         [Resolved] PixelScreenStack ScreenStack { get; init; } = null!;
-        public readonly PassThroughInputManager InputManager = new PassThroughInputManager();
 
         public readonly int FieldWidth, FieldHeight;
         public readonly FieldGrid Playfield, NextGrid;
@@ -44,8 +43,7 @@ namespace qb
             }
 
             AddInternal(new Background(Colour4.Black));
-            InputManager.Add(Controller);
-            AddInternal(InputManager);
+            AddInternal(Controller);
             AddInternal(Playfield);
             AddInternal(NextGrid);
             AddInternal(new GameInfo() { Anchor = Anchor.TopRight, Origin = Anchor.TopRight, X = -7, Y = 6 });
