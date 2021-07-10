@@ -1,6 +1,6 @@
 using System.Collections.Immutable;
 
-namespace qb
+namespace qb.Input
 {
     public class MultiController : IController
     {

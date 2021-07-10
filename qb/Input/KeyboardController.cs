@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using osu.Framework.Input.Bindings;
 
-namespace qb
+namespace qb.Input
 {
     public class KeyboardController : KeyBindingContainer<QbKey>, IController
     {

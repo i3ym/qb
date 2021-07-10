@@ -8,7 +8,7 @@ namespace qb.Gui.Menu
     public class GameOverMenu : MenuScreen
     {
         [BackgroundDependencyLoader]
-        void Load(GameScreen gamesc, RandomGameController rndgamecontroller)
+        void Load(GameScreen gamesc)
         {
             var buttons = new MenuButtonContainer()
             {

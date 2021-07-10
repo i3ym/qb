@@ -9,6 +9,7 @@ using osu.Framework.Platform;
 using osuTK.Graphics.ES30;
 using qb.Gui;
 using qb.Gui.Menu;
+using qb.Input;
 
 namespace qb
 {

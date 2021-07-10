@@ -1,4 +1,4 @@
-namespace qb
+namespace qb.Input
 {
     public class RandomGameController : IController
     {
