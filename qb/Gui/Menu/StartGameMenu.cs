@@ -9,7 +9,7 @@ namespace qb.Gui.Menu
     public class StartGameMenu : MenuScreen
     {
         [BackgroundDependencyLoader]
-        void Load(GameScreen gamesc)
+        void Load(GameScreen gamesc, MultiController maincontroller)
         {
             var level = new PixelFlowContainer()
             {
@@ -53,6 +53,7 @@ namespace qb.Gui.Menu
             void start()
             {
                 Hide();
+                gamesc.Controller.Controller = maincontroller;
                 gamesc.Controller.StartGame();
             }
             void levelup() => gamesc.Controller.StartLevel.Value++;

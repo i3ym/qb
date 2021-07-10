@@ -22,9 +22,6 @@ namespace qb.Gui.Menu
             };
 
             AddInternal(buttons);
-
-            gamesc.Controller.IsPaused.Value = false;
-            rndgamecontroller.Start();
         }
     }
 }
