@@ -28,8 +28,8 @@ namespace qb.Gui.Menu
             {
                 AutoSizeAxes = Axes.Both,
                 ChildrenAnchor = Anchor.Centre,
-                OnEnable = v => gamesc.Controller.Mods.Add(v),
-                OnDisable = v => gamesc.Controller.Mods.Remove(v),
+                OnEnable = v => { v.OnAdd(gamesc); gamesc.Controller.Mods.Add(v); },
+                OnDisable = v => { v.OnRemove(gamesc); gamesc.Controller.Mods.Remove(v); },
                 Children = Mod.Mods.Select(x => new ValueMenuButton<Mod>(x, x.Name)).ToArray(),
             };
 
@@ -55,6 +55,7 @@ namespace qb.Gui.Menu
             {
                 Hide();
                 gamesc.Controller.Controller = maincontroller;
+                gamesc.Controller.RestartOnDeath = false;
                 gamesc.Controller.StartGame();
             }
             void levelup() => gamesc.Controller.StartLevel.Value++;

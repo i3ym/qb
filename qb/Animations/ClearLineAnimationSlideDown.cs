@@ -1,48 +1,55 @@
 using System.Linq;
 using osu.Framework.Graphics;
-using osu.Framework.Threading;
-using osuTK;
 
 namespace qb.Animations
 {
     public class ClearLineAnimationSlideDown : IClearLineAnimation
     {
-        public void Animation(int[] lines, Scheduler scheduler, GameScreen field)
+        public void Animation(int[] lines, GameScreen gamesc)
         {
             const double animationTime = FieldController.MaxFps * FieldController.FrameInterval;
 
-            var controller = field.Controller;
-            var gameObjects = field.Playfield.GameObjects;
+            var controller = gamesc.Controller;
+            var gameObjects = gamesc.Playfield.GameObjects;
 
-            for (int yy = 0; yy < controller.MaxY; yy++)
+            var positions = gameObjects.Select(x => x.Y).ToArray();
+
+            for (int y = 0; y < controller.MaxY; y++)
             {
-                if (lines.Any(y => y == yy))
+                if (lines.Any(l => l == y))
                 {
-                    for (int xx = 0; xx < controller.MaxX; xx++)
-                        gameObjects[xx, yy].MoveTo(new Vector2(xx, controller.MaxY), animationTime, Easing.InExpo);
+                    for (int x = 0; x < controller.MaxX; x++)
+                    {
+                        const int fadeouttime = 50;
+
+                        gameObjects[x, y]
+                            .MoveToY(1, animationTime, Easing.InExpo)
+                            .Delay(1000 - fadeouttime)
+                            .Then()
+                                .FadeOut(fadeouttime);
+                    }
                 }
-                else if (yy > lines[0])
+                else if (y > lines[0])
                 {
                     int count = 0;
                     for (int i = 0; i < lines.Length; i++)
-                        if (lines[i] < yy) count++;
+                        if (lines[i] < y) count++;
                         else break;
 
-                    for (int xx = 0; xx < controller.MaxX; xx++)
-                        gameObjects[xx, yy].MoveTo(new Vector2(xx, count - yy - 1 + controller.MaxY), animationTime, Easing.InExpo);
+                    for (int x = 0; x < controller.MaxX; x++)
+                        gameObjects[x, y].MoveToY(1f - (y - count + 1) / (float) controller.MaxY, animationTime, Easing.InExpo);
                 }
             }
 
-
-            field.Controller.OnClearLineAnimationStop += reset;
+            gamesc.Controller.OnClearLineAnimationStop += reset;
             void reset()
             {
-                field.Controller.OnClearLineAnimationStop -= reset;
+                gamesc.Controller.OnClearLineAnimationStop -= reset;
 
-                for (int yy = 0; yy < controller.MaxY; yy++)
-                    for (int xx = 0; xx < controller.MaxX; xx++)
-                        gameObjects[xx, yy].MoveTo(new Vector2(xx, controller.MaxY - 1 - yy));
-            };
+                for (int y = 0; y < controller.MaxY; y++)
+                    for (int x = 0; x < controller.MaxX; x++)
+                        gameObjects[x, y].FadeIn().MoveToY(positions[y + x * controller.MaxY]);
+            }
         }
     }
 }
