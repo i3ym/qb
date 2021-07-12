@@ -1,12 +1,10 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Input.Events;
-using osu.Framework.Screens;
-using osuTK.Input;
+using osu.Framework.Input.Bindings;
 
 namespace qb.Gui.Menu
 {
-    public class PauseMenu : MenuScreen
+    public class PauseMenu : MenuScreen, IKeyBindingHandler<QbKey>
     {
         [Resolved] GameScreen GameScreen { get; init; } = null!;
 
@@ -34,12 +32,16 @@ namespace qb.Gui.Menu
             GameScreen.Controller.IsPaused.Value = false;
         }
 
-        protected override bool OnKeyDown(KeyDownEvent e)
+        public bool OnPressed(QbKey action)
         {
-            if (e.Key == Key.Escape)
+            if (action == QbKey.Back)
+            {
                 ContinueGame();
+                return true;
+            }
 
-            return base.OnKeyDown(e);
+            return false;
         }
+        public void OnReleased(QbKey action) { }
     }
 }

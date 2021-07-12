@@ -22,6 +22,6 @@ namespace qb.Gui
         }
 
         void ValueChanged(ValueChangedEvent<T> e) => ValueChanged(e.NewValue);
-        void ValueChanged(T value, double duration = 250) => Text.FadeColour(object.Equals(value, Value) ? Colour4.White : Colour4.Gray, duration, Easing.OutQuad);
+        void ValueChanged(T value, double duration = 250) => PixelText.FadeColour(object.Equals(value, Value) ? Colour4.White : Colour4.Gray, duration, Easing.OutQuad);
     }
 }

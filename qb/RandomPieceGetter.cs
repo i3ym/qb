@@ -19,6 +19,7 @@ namespace qb
 
         IEnumerator<Shape> PieceRandomizer(int? seed)
         {
+            seed = 120;
             var rnd = seed.HasValue ? new Random(seed.Value) : new Random();
 
             var order = new List<Shape>();

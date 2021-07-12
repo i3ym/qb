@@ -9,7 +9,7 @@ namespace qb.Gui.Menu
     public class MainMenu : MenuScreen
     {
         [Resolved] GameScreen GameScreen { get; init; } = null!;
-        [Resolved] RandomGameController RandomGameController { get; init; } = null!;
+        [Resolved] BackgroundController BackgroundGameController { get; init; } = null!;
 
         [BackgroundDependencyLoader]
         void Load(GameHost host)
@@ -33,19 +33,22 @@ namespace qb.Gui.Menu
 
         public override void OnResuming(IScreen last)
         {
-            GameScreen.Controller.IsPaused.Value = false;
-            GameScreen.Controller.RestartOnDeath = true;
-            GameScreen.Controller.Controller = RandomGameController;
-
+            ResumeAutoGame();
             base.OnResuming(last);
         }
         public override void OnEntering(IScreen last)
         {
+            ResumeAutoGame();
+            base.OnEntering(last);
+        }
+
+        void ResumeAutoGame()
+        {
             GameScreen.Controller.IsPaused.Value = false;
             GameScreen.Controller.RestartOnDeath = true;
-            GameScreen.Controller.Controller = RandomGameController;
+            GameScreen.Controller.Controller = BackgroundGameController;
+            BackgroundGameController.Controller = new ReplayController(Newtonsoft.Json.JsonConvert.DeserializeObject<ControllerState[]>(System.IO.File.ReadAllText("/tmp/replaye"))!);
 
-            base.OnEntering(last);
         }
     }
 }

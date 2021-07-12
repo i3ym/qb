@@ -14,7 +14,7 @@ namespace qb.Gui
 
         public override void Add(ValueMenuButton<T> drawable)
         {
-            void fade(bool enabled, float duration = 250) => drawable.Text.FadeColour(enabled ? Colour4.White : Colour4.Gray, duration, Easing.OutQuad);
+            void fade(bool enabled, float duration = 250) => drawable.PixelText.FadeColour(enabled ? Colour4.White : Colour4.Gray, duration, Easing.OutQuad);
 
             drawable.Action += () =>
             {

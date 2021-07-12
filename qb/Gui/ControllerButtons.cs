@@ -11,9 +11,9 @@ namespace qb.Gui
 
         public ControllerButtons()
         {
-            A = new ControllerButton() { RelativeSizeAxes = Axes.Both, Size = new(1 / 3f) };
-            B = new ControllerButton() { RelativeSizeAxes = Axes.Both, Size = new(1 / 3f) };
-            Back = new ControllerButton() { RelativeSizeAxes = Axes.Both, Size = new(1 / 3f) };
+            A = new ControllerButton(Anchor.BottomLeft) { Text = "A", RelativeSizeAxes = Axes.Both, Size = new(1 / 2.1f) };
+            B = new ControllerButton(Anchor.BottomRight) { Text = "B", RelativeSizeAxes = Axes.Both, Size = new(1 / 2.1f) };
+            Back = new ControllerButton() { Text = ("Back", "Назад"), RelativeSizeAxes = Axes.Both, Width = 1, Height = (1 / 2.1f) };
         }
 
         [BackgroundDependencyLoader]

@@ -56,6 +56,10 @@ namespace qb.Gui.Menu
                 Hide();
                 gamesc.Controller.Controller = maincontroller;
                 gamesc.Controller.RestartOnDeath = false;
+
+                gamesc.Controller.Recorder = new ReplayRecorder(); // TODO: <
+                gamesc.Controller.OnGameOver += () => { System.IO.File.WriteAllText("/tmp/replay", Newtonsoft.Json.JsonConvert.SerializeObject(gamesc.Controller.Recorder.Frames)); };
+
                 gamesc.Controller.StartGame();
             }
             void levelup() => gamesc.Controller.StartLevel.Value++;

@@ -1,6 +1,6 @@
 namespace qb.Input
 {
-    public class RandomGameController : IController
+    public class RandomController : IController
     {
         readonly Randomizer<QbKey> Randomizer = new Randomizer<QbKey>()
             .AddRange(100, QbKey.Left, QbKey.Right, QbKey.Down)

@@ -49,7 +49,7 @@ namespace qb
             var skin = new SkinManager(atlas, qconfig.GetBindable<int>(QbConfigField.SelectedSkin));
             Host.Dependencies.Cache(skin);
 
-            Host.Dependencies.Cache(new RandomGameController());
+            Host.Dependencies.Cache(new BackgroundController());
 
 
 
@@ -58,7 +58,7 @@ namespace qb
             Host.Dependencies.Cache(gamesc);
 
             var controllerArrows = new ControllerArrows() { Anchor = Anchor.BottomLeft, Origin = Anchor.BottomLeft, Size = new(5) };
-            var controllerButtons = new ControllerButtons() { Anchor = Anchor.BottomRight, Origin = Anchor.BottomRight, Size = new(5) };
+            var controllerButtons = new ControllerButtons() { Anchor = Anchor.BottomRight, Origin = Anchor.BottomRight, Size = new(5, 5) };
 
             var kbinput = new KeyboardController();
             Host.Dependencies.Cache(new MultiController(controllerArrows, controllerButtons, kbinput));

@@ -13,7 +13,8 @@ namespace qb.Gui
         public Action MouseUp = delegate { };
         public Action Action = delegate { };
 
-        public Colour4 TextColour { get => Text.Colour; set => Text.Colour = value; }
+        public TranslatedString Text { get => PixelText.TranslatedText; set => PixelText.TranslatedText = value; }
+        public Colour4 TextColour { get => PixelText.Colour; set => PixelText.Colour = value; }
         public Colour4 Background
         {
             get => BackgroundBox?.Colour ?? Colour4.Transparent;
@@ -30,10 +31,10 @@ namespace qb.Gui
         }
         Box? BackgroundBox;
 
-        public readonly PixelText Text = new PixelText() { Anchor = Anchor.Centre, Origin = Anchor.Centre };
+        public readonly PixelText PixelText = new PixelText() { Anchor = Anchor.Centre, Origin = Anchor.Centre };
 
         public PixelButton() => Height = 2;
-        public PixelButton(TranslatedString text) : this() => Text.TranslatedText = text;
+        public PixelButton(TranslatedString text) : this() => PixelText.TranslatedText = text;
         public PixelButton(TranslatedString text, Action action) : this(text) => Action = action;
 
         [BackgroundDependencyLoader]
@@ -42,7 +43,7 @@ namespace qb.Gui
             if ((RelativeSizeAxes & Axes.X) == 0 && Width == 0)
                 AutoSizeAxes = Axes.X;
 
-            AddInternal(Text);
+            AddInternal(PixelText);
         }
 
 
