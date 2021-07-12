@@ -1,15 +1,14 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input.Events;
-using osuTK.Input;
+using osu.Framework.Input.Bindings;
 using qb.Animations;
 using qb.Gui;
 using qb.Gui.Menu;
 
 namespace qb
 {
-    public class GameScreen : CompositeDrawable
+    public class GameScreen : CompositeDrawable, IKeyBindingHandler<QbKey>
     {
         [Cached] public readonly FieldController Controller;
         [Resolved] PixelScreenStack ScreenStack { get; init; } = null!;
@@ -93,15 +92,18 @@ namespace qb
                     NextGrid[x, y] = shape.Matrix[x - addx, y - addy] ? shape.Tile : CubeTile.None;
         }
 
-        protected override bool OnKeyDown(KeyDownEvent e)
+        public bool OnPressed(QbKey action)
         {
-            if (e.Key == Key.Escape)
+            if (action == QbKey.Back)
             {
                 Controller.IsPaused.Value = true;
                 ScreenStack.Push(new PauseMenu());
+                
+                return true;
             }
 
-            return base.OnKeyDown(e);
+            return false;
         }
+        public void OnReleased(QbKey action)        {        }
     }
 }

@@ -63,6 +63,7 @@ namespace qb
         readonly RandomPieceGetter RandomPieceGetter = new();
 
         public bool RestartOnDeath = false;
+        public ReplayRecorder? Recorder;
         public IController? Controller;
         ControllerState ControllerState;
 
@@ -78,20 +79,13 @@ namespace qb
             {
                 _State = value;
 
-                switch (value)
+                WaitDownTime = value switch
                 {
-                    case State.HoldingOnTop:
-                        WaitDownTime = 20;
-                        break;
-
-                    case State.Falling:
-                        WaitDownTime = LevelSpeed;
-                        break;
-
-                    case State.WaitingOnGround:
-                        WaitDownTime = LevelSpeed + 20;
-                        break;
-                }
+                    State.HoldingOnTop => 20,
+                    State.Falling => LevelSpeed,
+                    State.WaitingOnGround => LevelSpeed + 20,
+                    _ => 20,
+                };
             }
         }
         HorizontalState HorizontalState = HorizontalState.Waiting;
@@ -149,12 +143,13 @@ namespace qb
             }
 
             ControllerState = Controller?.GetState() ?? default;
+            Recorder?.Record(ControllerState);
             Rotate();
             MoveHorizontal();
             MoveDown();
         }
 
-        public void Reset()
+        public void Reset(int? seed = null)
         {
             CurrentX = MaxX / 2 - 1;
             CurrentY = MaxY - 1;
@@ -168,7 +163,7 @@ namespace qb
             Tiles.Clear();
 
             IsPaused.Value = true;
-            RandomPieceGetter.Reset();
+            RandomPieceGetter.Reset(seed);
 
             WaitDownTime = 0;
             WaitHorizontalTime = 6;
@@ -176,10 +171,10 @@ namespace qb
 
             OnFieldUpdate();
         }
-        public void StartGame(bool reset = true)
+        public void StartGame(bool reset = true, int? seed = null)
         {
             OnStartGame();
-            if (reset) Reset();
+            if (reset) Reset(seed);
             IsPaused.Value = false;
 
             NextShape = RandomPieceGetter.Get();

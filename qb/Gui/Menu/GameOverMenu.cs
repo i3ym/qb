@@ -1,11 +1,10 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Input.Events;
-using osuTK.Input;
+using osu.Framework.Input.Bindings;
 
 namespace qb.Gui.Menu
 {
-    public class GameOverMenu : MenuScreen
+    public class GameOverMenu : MenuScreen, IKeyBindingHandler<QbKey>
     {
         [BackgroundDependencyLoader]
         void Load(GameScreen gamesc)
@@ -19,19 +18,30 @@ namespace qb.Gui.Menu
                 {
                     new PixelButton(("Game over", "Вы проиграли")),
                     new PixelButton(),
-                    new PixelButton(("Exit", "Выйти"), BackToRoot),
+                    new PixelButton(("Exit", "Выйти"), exit),
                 },
             };
 
             AddInternal(buttons);
+
+
+            void exit()
+            {
+                gamesc.Controller.StartGame();
+                BackToRoot();
+            }
         }
 
-        protected override bool OnKeyDown(KeyDownEvent e)
+        public bool OnPressed(QbKey action)
         {
-            if (e.Key == Key.Escape)
+            if (action == QbKey.Back)
+            {
                 Back();
+                return true;
+            }
 
-            return base.OnKeyDown(e);
+            return false;
         }
+        public void OnReleased(QbKey action) { }
     }
 }
