@@ -6,22 +6,21 @@ namespace qb
 {
     public class RandomPieceGetter
     {
-        IEnumerator<Shape> Randomizer;
+        public int Seed { get; private set; }
+        IEnumerator<Shape> Randomizer = null!;
 
-        public RandomPieceGetter(int? seed = null) => Randomizer = PieceRandomizer(seed);
+        public RandomPieceGetter(int? seed = null) => Reset(seed);
 
-        public void Reset(int? seed = null) => Randomizer = PieceRandomizer(seed);
+        public void Reset(int? seed = null) => Randomizer = PieceRandomizer(seed ?? Environment.TickCount);
         public Shape Get()
         {
             Randomizer.MoveNext();
             return Randomizer.Current;
         }
 
-        IEnumerator<Shape> PieceRandomizer(int? seed)
+        IEnumerator<Shape> PieceRandomizer(int seed)
         {
-            seed = 120;
-            var rnd = seed.HasValue ? new Random(seed.Value) : new Random();
-
+            var rnd = new Random(Seed = seed);
             var order = new List<Shape>();
             var pool = Enumerable.Repeat(Shapes.ShapesList, 5).SelectMany(x => x).ToArray();
             var firstPiece = new[] { Shapes.I, Shapes.G, Shapes.GR, Shapes.T }[rnd.Next(4)];

@@ -6,5 +6,10 @@
 	<uses-permission android:name="android.permission.WAKE_LOCK" />
 	<uses-permission android:name="android.permission.READ_FRAME_BUFFER" />
 	<uses-permission android:name="android.permission.INTERNET" />
-	<application android:allowBackup="true" android:supportsRtl="true" android:label="qb" />
+	<application android:allowBackup="true" android:supportsRtl="true" android:label="qb" android:icon="@drawable/round" android:roundicon="@drawable/round"/>
+    
+    <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+        <background android:drawable="@drawable/background" />
+        <foreground android:drawable="@drawable/foreground" />
+    </adaptive-icon>
 </manifest>
