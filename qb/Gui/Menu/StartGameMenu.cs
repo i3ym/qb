@@ -1,7 +1,7 @@
 using System.IO;
 using System.Linq;
 using System.Text;
-using Newtonsoft.Json;
+using NuGet.Protocol;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -63,8 +63,12 @@ namespace qb.Gui.Menu
                 gamesc.Controller.Controller = maincontroller;
                 gamesc.Controller.RestartOnDeath = false;
 
-                gamesc.Controller.Recorder = new ReplayRecorder();
-                gamesc.Controller.OnGameOver += () => Storage.GetStream(ReplayController.ReplayPath, FileAccess.Write, FileMode.Create).Write(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(gamesc.Controller.Recorder.Frames)));
+                gamesc.Controller.Recorder = new ReplayRecorder(gamesc.Controller.Seed);
+                gamesc.Controller.OnGameOver += () =>
+                {
+                    Storage.GetStream(ReplayController.ReplayPath, FileAccess.Write, FileMode.Create).Write(Encoding.UTF8.GetBytes(gamesc.Controller.Recorder.AsReplay().ToJson()));
+                    gamesc.Controller.Recorder = null;
+                };
 
                 gamesc.Controller.StartGame();
             }
