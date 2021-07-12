@@ -1,3 +1,5 @@
+using System.IO;
+using Newtonsoft.Json;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Platform;
@@ -10,6 +12,7 @@ namespace qb.Gui.Menu
     {
         [Resolved] GameScreen GameScreen { get; set; } = null!;
         [Resolved] BackgroundController BackgroundGameController { get; set; } = null!;
+        [Resolved] Storage Storage { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         void Load(GameHost host)
@@ -47,8 +50,14 @@ namespace qb.Gui.Menu
             GameScreen.Controller.IsPaused.Value = false;
             GameScreen.Controller.RestartOnDeath = true;
             GameScreen.Controller.Controller = BackgroundGameController;
-            BackgroundGameController.Controller = new ReplayController(Newtonsoft.Json.JsonConvert.DeserializeObject<ControllerState[]>(System.IO.File.ReadAllText("/tmp/replaye"))!);
+            BackgroundGameController = RandomController
 
+            try
+            {
+                if (Storage.Exists(ReplayController.ReplayPath))
+                    BackgroundGameController.Controller = new ReplayController(JsonConvert.DeserializeObject<ControllerState[]>(new StreamReader(Storage.GetStream(ReplayController.ReplayPath)).ReadToEnd())!);
+            }
+            catch { }
         }
     }
 }

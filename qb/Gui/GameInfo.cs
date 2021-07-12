@@ -1,6 +1,7 @@
 using System;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 
 namespace qb.Gui
@@ -10,15 +11,15 @@ namespace qb.Gui
         [BackgroundDependencyLoader]
         void Load(FieldController controller)
         {
-            AddInternal(GetNewText(1.5f, controller.Level));
-            AddInternal(GetNewText(4.5f, controller.Score));
-            AddInternal(GetNewText(7.5f, controller.Frame, t => TimeSpan.FromMilliseconds(t * FieldController.FrameInterval).ToString(@"mm\:ss")));
-            AddInternal(GetNewText(10.5f, controller.Lines));
+            AddInternal(GetNewText(1.5f, controller.Level).With(x => x.Font = x.Font.With(size: 2)));
+            AddInternal(GetNewText(5.5f, controller.Score));
+            AddInternal(GetNewText(8.5f, controller.Frame, t => TimeSpan.FromMilliseconds(t * FieldController.FrameInterval).ToString(@"mm\:ss")));
+            AddInternal(GetNewText(11.5f, controller.Lines));
 
             AddInternal(GetNewText(0, ("Level", "Уровень")));
-            AddInternal(GetNewText(3, ("Score", "Очки")));
-            AddInternal(GetNewText(6, ("Time", "Время")));
-            AddInternal(GetNewText(9, ("Lines", "Линии")));
+            AddInternal(GetNewText(4, ("Score", "Очки")));
+            AddInternal(GetNewText(7, ("Time", "Время")));
+            AddInternal(GetNewText(10, ("Lines", "Линии")));
         }
 
         PixelText GetNewText<T>(float y, Bindable<T> source, Func<T, string>? formatfunc = null)

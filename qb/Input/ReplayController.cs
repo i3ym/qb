@@ -5,6 +5,8 @@ namespace qb.Input
 {
     public class ReplayController : IController
     {
+        public const string ReplayPath = "replay.qbr";
+
         public bool IsFinished { get; private set; } = false;
 
         readonly ImmutableArray<ControllerState> Frames;

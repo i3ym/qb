@@ -33,6 +33,8 @@ namespace qb
         }.ToImmutableArray();
         static readonly ImmutableArray<int> Levels = new int[] { 52, 48, 44, 40, 36, 32, 27, 21, 16, 10, 9, 8, 7, 6, 5, 5, 4, 3, 3, 2, 2 }.ToImmutableArray();
 
+        static readonly ReadOnlyGameMatrix<TileBool> EmptyMatrix = new ReadOnlyGameMatrix<TileBool>(0, 0, CubeTile.None);
+
 
         public event Action BeforeUpdate = delegate { };
         public event Action OnStartGame = delegate { };
@@ -41,11 +43,12 @@ namespace qb
         public event Action OnFieldUpdate = delegate { };
         public event Action OnClearLineAnimationStop = delegate { };
 
+        public int Seed => RandomPieceGetter.Seed;
         int LevelSpeed => Level.Value > Levels.Length ? 1 : Levels[Level.Value];
 
-        public int CurrentX { get; protected set; }
-        public int CurrentY { get; protected set; }
-        public int CurrentRotation { get; protected set; }
+        public int CurrentX { get; private set; }
+        public int CurrentY { get; private set; }
+        public int CurrentRotation { get; private set; }
         public readonly List<Mod> Mods = new List<Mod>();
 
         public readonly int MaxX, MaxY;
@@ -58,7 +61,7 @@ namespace qb
         public readonly BindableInt Frame = new BindableInt(0);
         public readonly BindableInt StartLevel = new BindableInt(0) { MinValue = 0, MaxValue = 30 };
 
-        public GameMatrix<TileBool> CurrentObject { get; protected set; } = new GameMatrix<TileBool>(0, 0, CubeTile.None);
+        public ReadOnlyGameMatrix<TileBool> CurrentObject { get; private set; } = EmptyMatrix;
         public readonly GameMatrix<TileBool> Tiles;
         readonly RandomPieceGetter RandomPieceGetter = new RandomPieceGetter();
 
@@ -156,10 +159,10 @@ namespace qb
             CurrentRotation = 0;
             Score.SetDefault();
             Lines.SetDefault();
-            Level.Value = StartLevel.Value;
             Frame.SetDefault();
+            Level.Value = StartLevel.Value;
 
-            CurrentObject = new GameMatrix<TileBool>(0, 0, CubeTile.None);
+            CurrentObject = EmptyMatrix;
             Tiles.Clear();
 
             IsPaused.Value = true;
@@ -181,7 +184,7 @@ namespace qb
             SpawnBlock();
         }
 
-        protected void Rotate()
+        void Rotate()
         {
             var wasWaiting = State == State.WaitingOnGround;
 
@@ -207,7 +210,7 @@ namespace qb
                 State = State.Falling;
             }
         }
-        protected void MoveHorizontal()
+        void MoveHorizontal()
         {
             if (WaitHorizontalTime > 0)
                 WaitHorizontalTime--;
@@ -239,7 +242,7 @@ namespace qb
             }
             else if (wasWaiting) State = State.Falling;
         }
-        protected void MoveDown()
+        void MoveDown()
         {
             WaitDownTime--;
 
@@ -288,7 +291,7 @@ namespace qb
 
             if (NeedStop()) State = State.WaitingOnGround;
         }
-        protected bool NeedStop()
+        bool NeedStop()
         {
             for (int y = 0; y < CurrentObject.Height; y++)
                 for (int x = 0; x < CurrentObject.Width; x++)
@@ -304,7 +307,7 @@ namespace qb
             return false;
         }
 
-        protected void SpawnBlock()
+        void SpawnBlock()
         {
             CurrentRotation = 0;
             CurrentShape = NextShape;
@@ -335,7 +338,7 @@ namespace qb
 
             OnFieldUpdate();
         }
-        protected void SetBlockToField()
+        void SetBlockToField()
         {
             for (int x = 0; x < CurrentObject.Width; x++)
                 for (int y = 0; y < CurrentObject.Height; y++)
@@ -344,7 +347,7 @@ namespace qb
 
             OnFieldUpdate();
         }
-        protected void MoveRight()
+        void MoveRight()
         {
             for (int y = 0; y < CurrentObject.Height; y++)
                 for (int x = 0; x < CurrentObject.Width; x++)
@@ -354,7 +357,7 @@ namespace qb
             CurrentX++;
             OnFieldUpdate();
         }
-        protected void MoveLeft()
+        void MoveLeft()
         {
             for (int y = 0; y < CurrentObject.Height; y++)
                 for (int x = 0; x < CurrentObject.Width; x++)
@@ -364,7 +367,7 @@ namespace qb
             CurrentX--;
             OnFieldUpdate();
         }
-        protected void RotateBlock(bool clockwise)
+        void RotateBlock(bool clockwise)
         {
             if (CurrentShape == Shapes.O) return;
 
@@ -403,7 +406,7 @@ namespace qb
             OnFieldUpdate();
         }
 
-        protected static int GetScoreForLine(int linesCount, int minHeight, int level)
+        static int GetScoreForLine(int linesCount, int minHeight, int level)
         {
             if (linesCount == 1) return (minHeight + 1) * 40 * level;
             else if (linesCount == 2) return (minHeight + 1) * 100 * level;
@@ -412,11 +415,9 @@ namespace qb
 
             return 0;
         }
-        protected static int GetLvlFor(int linesCount, int startLevel) => linesCount < startLevel * 10 + 10 ?
-            startLevel :
-            linesCount / 10;
+        static int GetLvlFor(int linesCount, int startLevel) => linesCount < startLevel * 10 + 10 ? startLevel : linesCount / 10;
 
-        protected int[] GetLinesToRemove()
+        int[] GetLinesToRemove()
         {
             var lines = new List<int>(Tiles.Height);
 
@@ -426,7 +427,7 @@ namespace qb
 
             return lines.ToArray();
         }
-        protected void RemoveLines(int[] lines)
+        void RemoveLines(int[] lines)
         {
             for (int i = lines.Length - 1; i > -1; i--)
                 for (int y2 = lines[i]; y2 < MaxY - 1; y2++)
@@ -437,7 +438,7 @@ namespace qb
                 Tiles[x2, MaxY - 1] = CubeTile.None;
         }
 
-        protected bool IsLineFull(int y)
+        bool IsLineFull(int y)
         {
             for (int x = 0; x < MaxX; x++)
                 if (!Tiles[x, y])
@@ -445,7 +446,7 @@ namespace qb
 
             return true;
         }
-        protected bool IsLineEmpty(int y)
+        bool IsLineEmpty(int y)
         {
             for (int x = 0; x < MaxX; x++)
                 if (Tiles[x, y])
@@ -454,7 +455,7 @@ namespace qb
             return true;
         }
 
-        protected void RemoveTopLines(int count)
+        void RemoveTopLines(int count)
         {
             for (int y = 0; y < count; y++)
                 for (int x = 0; x < Tiles.Width; x++)
@@ -463,7 +464,7 @@ namespace qb
             OnFieldUpdate();
         }
 
-        protected void GameOver()
+        void GameOver()
         {
             if (RestartOnDeath)
             {

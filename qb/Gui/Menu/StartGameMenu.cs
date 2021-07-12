@@ -1,7 +1,11 @@
+using System.IO;
 using System.Linq;
+using System.Text;
+using Newtonsoft.Json;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Platform;
 using qb.Input;
 using qb.Mods;
 
@@ -9,6 +13,8 @@ namespace qb.Gui.Menu
 {
     public class StartGameMenu : MenuScreen
     {
+        [Resolved] Storage Storage { get; set; } = null!;
+
         [BackgroundDependencyLoader]
         void Load(GameScreen gamesc, MultiController maincontroller)
         {
@@ -57,8 +63,8 @@ namespace qb.Gui.Menu
                 gamesc.Controller.Controller = maincontroller;
                 gamesc.Controller.RestartOnDeath = false;
 
-                gamesc.Controller.Recorder = new ReplayRecorder(); // TODO: <
-                gamesc.Controller.OnGameOver += () => { System.IO.File.WriteAllText("/tmp/replay", Newtonsoft.Json.JsonConvert.SerializeObject(gamesc.Controller.Recorder.Frames)); };
+                gamesc.Controller.Recorder = new ReplayRecorder();
+                gamesc.Controller.OnGameOver += () => Storage.GetStream(ReplayController.ReplayPath, FileAccess.Write, FileMode.Create).Write(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(gamesc.Controller.Recorder.Frames)));
 
                 gamesc.Controller.StartGame();
             }

@@ -19,6 +19,9 @@ namespace qb
         public bool Intersects<T2>(GameMatrix<T2> matrix) => Matrix.Intersects(matrix);
         public bool IsInBounds(int x, int y) => Matrix.IsInBounds(x, y);
 
+        public GameMatrix<T> RotateClockwise() => Matrix.RotateClockwise();
+        public GameMatrix<T> RotateAntiClockwise() => Matrix.RotateAntiClockwise();
+
         public IEnumerator<T> GetEnumerator() => Matrix.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => (Matrix as IEnumerable).GetEnumerator();
 
