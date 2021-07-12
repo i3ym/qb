@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "qb", "qb\qb.csproj", "{4B3A
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "qb.Desktop", "qb.Desktop\qb.Desktop.csproj", "{74568611-E7E8-4673-BD26-2EBFA7167E83}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "qb.Android", "qb.Android\qb.Android.csproj", "{719CDF13-1D96-46FD-A5F2-369EE74AFC13}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,5 +46,17 @@ Global
 		{74568611-E7E8-4673-BD26-2EBFA7167E83}.Release|x64.Build.0 = Release|Any CPU
 		{74568611-E7E8-4673-BD26-2EBFA7167E83}.Release|x86.ActiveCfg = Release|Any CPU
 		{74568611-E7E8-4673-BD26-2EBFA7167E83}.Release|x86.Build.0 = Release|Any CPU
+		{719CDF13-1D96-46FD-A5F2-369EE74AFC13}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{719CDF13-1D96-46FD-A5F2-369EE74AFC13}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{719CDF13-1D96-46FD-A5F2-369EE74AFC13}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{719CDF13-1D96-46FD-A5F2-369EE74AFC13}.Debug|x64.Build.0 = Debug|Any CPU
+		{719CDF13-1D96-46FD-A5F2-369EE74AFC13}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{719CDF13-1D96-46FD-A5F2-369EE74AFC13}.Debug|x86.Build.0 = Debug|Any CPU
+		{719CDF13-1D96-46FD-A5F2-369EE74AFC13}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{719CDF13-1D96-46FD-A5F2-369EE74AFC13}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{719CDF13-1D96-46FD-A5F2-369EE74AFC13}.Release|x64.ActiveCfg = Debug|Any CPU
+		{719CDF13-1D96-46FD-A5F2-369EE74AFC13}.Release|x64.Build.0 = Debug|Any CPU
+		{719CDF13-1D96-46FD-A5F2-369EE74AFC13}.Release|x86.ActiveCfg = Debug|Any CPU
+		{719CDF13-1D96-46FD-A5F2-369EE74AFC13}.Release|x86.Build.0 = Debug|Any CPU
 	EndGlobalSection
 EndGlobal

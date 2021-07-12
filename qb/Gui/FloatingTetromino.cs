@@ -7,7 +7,7 @@ namespace qb.Gui
 {
     public class FloatingTetromino : CompositeDrawable
     {
-        readonly Random Random = new();
+        readonly Random Random = new Random();
 
         [BackgroundDependencyLoader]
         void Load()

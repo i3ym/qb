@@ -6,7 +6,7 @@ namespace qb.Gui.Menu
 {
     public class PauseMenu : MenuScreen, IKeyBindingHandler<QbKey>
     {
-        [Resolved] GameScreen GameScreen { get; init; } = null!;
+        [Resolved] GameScreen GameScreen { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         void Load()

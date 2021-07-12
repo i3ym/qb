@@ -57,8 +57,8 @@ namespace qb
             var gamesc = new GameScreen() { RelativeSizeAxes = Axes.Both };
             Host.Dependencies.Cache(gamesc);
 
-            var controllerArrows = new ControllerArrows() { Anchor = Anchor.BottomLeft, Origin = Anchor.BottomLeft, Size = new(5) };
-            var controllerButtons = new ControllerButtons() { Anchor = Anchor.BottomRight, Origin = Anchor.BottomRight, Size = new(5, 5) };
+            var controllerArrows = new ControllerArrows() { Anchor = Anchor.BottomLeft, Origin = Anchor.BottomLeft, Size = new osuTK.Vector2(5) };
+            var controllerButtons = new ControllerButtons() { Anchor = Anchor.BottomRight, Origin = Anchor.BottomRight, Size = new osuTK.Vector2(5, 5) };
 
             var kbinput = new KeyboardController();
             Host.Dependencies.Cache(new MultiController(controllerArrows, controllerButtons, kbinput));

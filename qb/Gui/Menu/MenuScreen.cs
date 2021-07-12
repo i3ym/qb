@@ -7,8 +7,8 @@ namespace qb.Gui.Menu
 {
     public class MenuScreen : Screen
     {
-        [Resolved] PixelScreenStack PixelScreenStack { get; init; } = null!;
-        protected readonly Background Background = new(Colour4.Black.MultiplyAlpha(.7f));
+        [Resolved] PixelScreenStack PixelScreenStack { get; set; } = null!;
+        protected readonly Background Background = new Background(Colour4.Black.MultiplyAlpha(.7f));
 
         [BackgroundDependencyLoader]
         void Load() => AddInternal(Background);

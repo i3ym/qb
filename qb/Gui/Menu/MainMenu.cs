@@ -8,8 +8,8 @@ namespace qb.Gui.Menu
 {
     public class MainMenu : MenuScreen
     {
-        [Resolved] GameScreen GameScreen { get; init; } = null!;
-        [Resolved] BackgroundController BackgroundGameController { get; init; } = null!;
+        [Resolved] GameScreen GameScreen { get; set; } = null!;
+        [Resolved] BackgroundController BackgroundGameController { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         void Load(GameHost host)

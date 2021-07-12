@@ -26,8 +26,8 @@ namespace qb.Gui
 
                 Vector2 size;
                 if (ScrollDirection == Direction.Vertical)
-                    size = new(thickness, val);
-                else size = new(val, thickness);
+                    size = new Vector2(thickness, val);
+                else size = new Vector2(val, thickness);
 
                 this.ResizeTo(size, duration, easing);
             }

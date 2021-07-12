@@ -1,15 +1,44 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project DefaultTarget="SignAndroidPackage" ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0-android</TargetFramework>
+    <OutputType>Library</OutputType>
+    <OutputPath>bin\$(Configuration)</OutputPath>
+    <TargetFrameworkVersion>v10.0</TargetFrameworkVersion>
+    <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
 
-    <AndroidBuildApplicationPackage>True</AndroidBuildApplicationPackage>
+    <DebugSymbols>false</DebugSymbols>
+    <DebugType>None</DebugType>
+    <Optimize>True</Optimize>
+    <ErrorReport>prompt</ErrorReport>
+    <EnableLLVM>true</EnableLLVM>
+    <MandroidI18n>cjk,mideast,other,rare,west</MandroidI18n>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
+    <AndroidEnableSGenConcurrent>True</AndroidEnableSGenConcurrent>
+    <AndroidLinkMode>SdkOnly</AndroidLinkMode>
+    <AndroidManagedSymbols>false</AndroidManagedSymbols>
+    <AndroidSupportedAbis>armeabi-v7a;x86;arm64-v8a</AndroidSupportedAbis>
+    <AndroidUseSharedRuntime>False</AndroidUseSharedRuntime>
     <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
+    <AndroidSdkDirectory>/home/i3ym/Android/Sdk/</AndroidSdkDirectory>
+    <AndroidNdkDirectory>/home/i3ym/Android/Ndk/</AndroidNdkDirectory>
+    <AndroidEnableMultiDex>False</AndroidEnableMultiDex>
+    <AndroidDexTool>d8</AndroidDexTool>
+    <AndroidLinkTool>r8</AndroidLinkTool>
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="GameActivity.cs" />
+    <Compile Include="GameAndroid.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <AndroidResource Include="Resources\drawable\icon.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Properties\AndroidManifest.xml" />
+    <AndroidNativeLibrary Include="$(OutputPath)\**\*.so" />
   </ItemGroup>
 
   <ItemGroup>
@@ -18,6 +47,8 @@
 
   <ItemGroup>
     <PackageReference Include="ppy.osu.Framework.Android" Version="2021.707.0" />
+    <PackageReference Include="System.Formats.Asn1" Version="5.0.0" />
   </ItemGroup>
 
+  <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
 </Project>

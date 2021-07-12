@@ -5,7 +5,7 @@ namespace qb
     public class ReplayRecorder
     {
         public IReadOnlyList<ControllerState> Frames => _Frames;
-        readonly List<ControllerState> _Frames = new();
+        readonly List<ControllerState> _Frames = new List<ControllerState>();
 
         public void Record(ControllerState state) => _Frames.Add(state);
     }

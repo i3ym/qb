@@ -8,7 +8,7 @@ namespace qb.Gui
 
         public ControllerButton()
         {
-            Size = new(1);
+            Size = new osuTK.Vector2(1);
             Background = Colour4.BlueViolet;
 
             MouseDown += () => IsPressed = true;

@@ -9,7 +9,7 @@ namespace qb.Gui
     public class PixelText : SpriteText
     {
         public TranslatedString TranslatedText { get => TranslatedTextBindable.Value; set => TranslatedTextBindable.Value = value; }
-        readonly Bindable<TranslatedString> TranslatedTextBindable = new();
+        readonly Bindable<TranslatedString> TranslatedTextBindable = new Bindable<TranslatedString>();
 
         public PixelText()
         {

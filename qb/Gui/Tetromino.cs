@@ -17,8 +17,8 @@ namespace qb.Gui
         public Shape Shape { get => ShapeBindable.Value; set => ShapeBindable.Value = value; }
         public new Colour4? Colour { get => ColourBindable.Value; set => ColourBindable.Value = value; }
 
-        public readonly Bindable<Shape> ShapeBindable = new();
-        public readonly Bindable<Colour4?> ColourBindable = new();
+        public readonly Bindable<Shape> ShapeBindable = new Bindable<Shape>();
+        public readonly Bindable<Colour4?> ColourBindable = new Bindable<Colour4?>();
 
         static Tetromino()
         {
@@ -49,7 +49,7 @@ namespace qb.Gui
             ShapeBindable.BindValueChanged(_ => RegenerateDrawable(), true);
             ColourBindable.BindValueChanged(e =>
             {
-                if (e.NewValue is not null)
+                if (e.NewValue != null)
                     base.Colour = e.NewValue.Value;
             }, true);
 

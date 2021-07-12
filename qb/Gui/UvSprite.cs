@@ -13,7 +13,7 @@ namespace qb.Gui
     {
         static readonly Random Random = new Random();
 
-        public readonly BindableInt Tile = new(0);
+        public readonly BindableInt Tile = new BindableInt(0);
         RectangleF Uv = new RectangleF();
 
         public UvSprite() => Height = Width = 1;

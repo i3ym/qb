@@ -9,12 +9,12 @@ namespace qb.Gui
     public class PixelFlowContainer<T> : FillFlowContainer<T> where T : Drawable
     {
         public Anchor ChildAxes { get => ChildAxesBindable.Value; set => ChildAxesBindable.Value = value; }
-        public readonly Bindable<Anchor> ChildAxesBindable = new(Anchor.TopCentre);
+        public readonly Bindable<Anchor> ChildAxesBindable = new Bindable<Anchor>(Anchor.TopCentre);
 
         [BackgroundDependencyLoader]
         void Load()
         {
-            Spacing = new(1, 0);
+            Spacing = new osuTK.Vector2(1, 0);
             ChildAxesBindable.BindValueChanged(e =>
             {
                 foreach (var child in Children)

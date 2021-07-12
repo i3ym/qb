@@ -19,7 +19,7 @@ namespace qb.Gui
             for (int x = 0; x < width; x++)
                 for (int y = 0; y < height; y++)
                 {
-                    var sprite = new UvSprite() { RelativePositionAxes = Axes.Both, Size = new(1), X = x / Width, Y = y / Height, Alpha = 0 };
+                    var sprite = new UvSprite() { RelativePositionAxes = Axes.Both, Size = new osuTK.Vector2(1), X = x / Width, Y = y / Height, Alpha = 0 };
 
                     _GameObjects[x, _GameObjects.Height - 1 - y] = sprite;
                     AddInternal(sprite);
