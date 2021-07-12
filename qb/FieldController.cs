@@ -46,21 +46,21 @@ namespace qb
         public int CurrentX { get; protected set; }
         public int CurrentY { get; protected set; }
         public int CurrentRotation { get; protected set; }
-        public readonly List<Mod> Mods = new();
+        public readonly List<Mod> Mods = new List<Mod>();
 
         public readonly int MaxX, MaxY;
-        public readonly Bindable<Shape> CurrentShapeBindable = new();
-        public readonly Bindable<Shape> NextShapeBindable = new();
-        public readonly BindableBool IsPaused = new(true);
-        public readonly BindableInt Score = new(0);
-        public readonly BindableInt Lines = new(0);
-        public readonly BindableInt Level = new(0);
-        public readonly BindableInt Frame = new(0);
-        public readonly BindableInt StartLevel = new(0) { MinValue = 0, MaxValue = 30 };
+        public readonly Bindable<Shape> CurrentShapeBindable = new Bindable<Shape>();
+        public readonly Bindable<Shape> NextShapeBindable = new Bindable<Shape>();
+        public readonly BindableBool IsPaused = new BindableBool(true);
+        public readonly BindableInt Score = new BindableInt(0);
+        public readonly BindableInt Lines = new BindableInt(0);
+        public readonly BindableInt Level = new BindableInt(0);
+        public readonly BindableInt Frame = new BindableInt(0);
+        public readonly BindableInt StartLevel = new BindableInt(0) { MinValue = 0, MaxValue = 30 };
 
-        public GameMatrix<TileBool> CurrentObject { get; protected set; } = new(0, 0, CubeTile.None);
+        public GameMatrix<TileBool> CurrentObject { get; protected set; } = new GameMatrix<TileBool>(0, 0, CubeTile.None);
         public readonly GameMatrix<TileBool> Tiles;
-        readonly RandomPieceGetter RandomPieceGetter = new();
+        readonly RandomPieceGetter RandomPieceGetter = new RandomPieceGetter();
 
         public bool RestartOnDeath = false;
         public ReplayRecorder? Recorder;

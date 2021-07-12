@@ -9,7 +9,7 @@ namespace qb.Gui
 {
     public class ControllerArrows : CompositeDrawable, IController
     {
-        [Resolved(name: nameof(PixelTextureStore))] TextureStore PixelTextureStore { get; init; } = null!;
+        [Resolved(name: nameof(PixelTextureStore))] TextureStore PixelTextureStore { get; set; } = null!;
 
         readonly ControllerButton Up, Down, Left, Right;
 
@@ -20,7 +20,7 @@ namespace qb.Gui
             Left = create(Anchor.CentreLeft);
             Right = create(Anchor.CentreRight);
 
-            ControllerButton create(Anchor anchor) => new ControllerButton(anchor) { RelativeSizeAxes = Axes.Both, Size = new(1 / 3f) };
+            ControllerButton create(Anchor anchor) => new ControllerButton(anchor) { RelativeSizeAxes = Axes.Both, Size = new osuTK.Vector2(1 / 3f) };
         }
 
         [BackgroundDependencyLoader]
@@ -39,12 +39,12 @@ namespace qb.Gui
         }
 
         public ControllerState GetState() =>
-            new ControllerState()
-            {
-                Up = Up.IsPressed,
-                Down = Down.IsPressed,
-                Left = Left.IsPressed,
-                Right = Right.IsPressed,
-            };
+            new ControllerState
+            (
+                up: Up.IsPressed,
+                down: Down.IsPressed,
+                left: Left.IsPressed,
+                right: Right.IsPressed
+            );
     }
 }

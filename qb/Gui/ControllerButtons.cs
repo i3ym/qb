@@ -11,8 +11,8 @@ namespace qb.Gui
 
         public ControllerButtons()
         {
-            A = new ControllerButton(Anchor.BottomLeft) { Text = "A", RelativeSizeAxes = Axes.Both, Size = new(1 / 2.1f) };
-            B = new ControllerButton(Anchor.BottomRight) { Text = "B", RelativeSizeAxes = Axes.Both, Size = new(1 / 2.1f) };
+            A = new ControllerButton(Anchor.BottomLeft) { Text = "A", RelativeSizeAxes = Axes.Both, Size = new osuTK.Vector2(1 / 2.1f) };
+            B = new ControllerButton(Anchor.BottomRight) { Text = "B", RelativeSizeAxes = Axes.Both, Size = new osuTK.Vector2(1 / 2.1f) };
             Back = new ControllerButton() { Text = ("Back", "Назад"), RelativeSizeAxes = Axes.Both, Width = 1, Height = (1 / 2.1f) };
         }
 
@@ -25,11 +25,11 @@ namespace qb.Gui
         }
 
         public ControllerState GetState() =>
-            new ControllerState()
-            {
-                A = A.IsPressed,
-                B = B.IsPressed,
-                Back = Back.IsPressed,
-            };
+            new ControllerState
+            (
+                a: A.IsPressed,
+                b: B.IsPressed,
+                back: Back.IsPressed
+            );
     }
 }

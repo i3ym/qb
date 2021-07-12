@@ -7,7 +7,7 @@ namespace qb
     public class Randomizer<T>
     {
         readonly Random Random = new Random();
-        readonly List<(T item, Range chance)> Items = new();
+        readonly List<(T item, Range chance)> Items = new List<(T item, Range chance)>();
 
         public Randomizer<T> Add(T item) => Add(item, 100);
         public Randomizer<T> Add(T item, int chance)

@@ -11,7 +11,7 @@ namespace qb
     public class GameScreen : CompositeDrawable, IKeyBindingHandler<QbKey>
     {
         [Cached] public readonly FieldController Controller;
-        [Resolved] PixelScreenStack ScreenStack { get; init; } = null!;
+        [Resolved] PixelScreenStack ScreenStack { get; set; } = null!;
 
         public readonly int FieldWidth, FieldHeight;
         public readonly FieldGrid Playfield, NextGrid;

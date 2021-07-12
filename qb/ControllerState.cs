@@ -2,15 +2,9 @@ namespace qb
 {
     public readonly struct ControllerState
     {
-        public bool Up { get; init; }
-        public bool Down { get; init; }
-        public bool Left { get; init; }
-        public bool Right { get; init; }
-        public bool A { get; init; }
-        public bool B { get; init; }
-        public bool Back { get; init; }
+        public readonly bool Up, Down, Left, Right, A, B, Back;
 
-        public ControllerState(bool up, bool down, bool left, bool right, bool a, bool b, bool back)
+        public ControllerState(bool up = false, bool down = false, bool left = false, bool right = false, bool a = false, bool b = false, bool back = false)
         {
             Up = up;
             Down = down;

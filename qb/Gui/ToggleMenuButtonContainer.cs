@@ -10,7 +10,7 @@ namespace qb.Gui
         public Action<T> OnDisable = delegate { };
 
         public IReadOnlyList<T> Selected => _Selected;
-        readonly List<T> _Selected = new();
+        readonly List<T> _Selected = new List<T>();
 
         public override void Add(ValueMenuButton<T> drawable)
         {

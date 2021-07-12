@@ -9,7 +9,7 @@ namespace qb.Gui
     {
         public Anchor ChildrenAnchor { get => PixelContent.ChildAxes; set => PixelContent.ChildAxes = value; }
 
-        readonly PixelFlowContainer<T> PixelContent = new PixelFlowContainer<T>() { AutoSizeAxes = Axes.Both, Direction = FillDirection.Vertical, Spacing = new(1) };
+        readonly PixelFlowContainer<T> PixelContent = new PixelFlowContainer<T>() { AutoSizeAxes = Axes.Both, Direction = FillDirection.Vertical, Spacing = new osuTK.Vector2(1) };
         protected override Container<T> Content => PixelContent;
 
         [BackgroundDependencyLoader]
