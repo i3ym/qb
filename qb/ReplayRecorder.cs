@@ -1,12 +1,16 @@
 using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace qb
 {
     public class ReplayRecorder
     {
-        public IReadOnlyList<ControllerState> Frames => _Frames;
-        readonly List<ControllerState> _Frames = new List<ControllerState>();
+        readonly int Seed;
+        readonly List<ControllerState> Frames = new List<ControllerState>();
 
-        public void Record(ControllerState state) => _Frames.Add(state);
+        public ReplayRecorder(int seed) => Seed = seed;
+
+        public void Record(ControllerState state) => Frames.Add(state);
+        public Replay AsReplay() => new Replay(Seed, Frames.ToImmutableArray());
     }
 }

@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Collections.Immutable;
 
 namespace qb.Input
@@ -9,12 +8,12 @@ namespace qb.Input
 
         public bool IsFinished { get; private set; } = false;
 
-        readonly ImmutableArray<ControllerState> Frames;
+        readonly Replay Replay;
         ImmutableArray<ControllerState>.Enumerator Enumerator;
 
-        public ReplayController(IEnumerable<ControllerState> frames)
+        public ReplayController(Replay replay)
         {
-            Frames = frames.ToImmutableArray();
+            Replay = replay;
             Restart();
         }
 
@@ -30,7 +29,7 @@ namespace qb.Input
         public void Restart()
         {
             IsFinished = false;
-            Enumerator = Frames.GetEnumerator();
+            Enumerator = Replay.Frames.GetEnumerator();
         }
     }
 }

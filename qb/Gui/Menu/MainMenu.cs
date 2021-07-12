@@ -50,12 +50,11 @@ namespace qb.Gui.Menu
             GameScreen.Controller.IsPaused.Value = false;
             GameScreen.Controller.RestartOnDeath = true;
             GameScreen.Controller.Controller = BackgroundGameController;
-            BackgroundGameController = RandomController
 
             try
             {
                 if (Storage.Exists(ReplayController.ReplayPath))
-                    BackgroundGameController.Controller = new ReplayController(JsonConvert.DeserializeObject<ControllerState[]>(new StreamReader(Storage.GetStream(ReplayController.ReplayPath)).ReadToEnd())!);
+                    BackgroundGameController.Controller = new ReplayController(Replay.FromJson(Storage.GetStream(ReplayController.ReplayPath)));
             }
             catch { }
         }
