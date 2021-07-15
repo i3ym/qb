@@ -57,32 +57,37 @@ namespace qb
             var gamesc = new GameScreen() { RelativeSizeAxes = Axes.Both };
             Host.Dependencies.Cache(gamesc);
 
-            var controllerArrows = new ControllerArrows() { Anchor = Anchor.BottomLeft, Origin = Anchor.BottomLeft, Size = new osuTK.Vector2(7) };
-            var controllerButtons = new ControllerButtons() { Anchor = Anchor.BottomRight, Origin = Anchor.BottomRight, Size = new osuTK.Vector2(7) };
-
+            var controllerArrows = new ControllerArrows() { Anchor = Anchor.BottomLeft, Origin = Anchor.BottomLeft, Size = new osuTK.Vector2(1) };
+            var controllerButtons = new ControllerButtons() { Anchor = Anchor.BottomRight, Origin = Anchor.BottomRight, Size = new osuTK.Vector2(1) };
             var kbinput = new KeyboardController();
             Host.Dependencies.Cache(new MultiController(controllerArrows, controllerButtons, kbinput));
 
 
             var targetsize = new osuTK.Vector2(17, 21);
-            var container = new DrawSizePreservingFillContainer()
+            var container = new Container()
             {
-                TargetDrawSize = targetsize,
+                RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
-                    kbinput,
-                    new FloatingTetromino() { RelativeSizeAxes = Axes.Both },
-                    new Container()
+                    new DrawSizePreservingFillContainer()
                     {
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
-                        Size = targetsize,
+                        TargetDrawSize = targetsize,
                         Children = new Drawable[]
                         {
-                            gamesc,
-                            new PixelScreenStack(new MainMenu()).With(Host.Dependencies.Cache),
+                            new Container()
+                            {
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
+                                Size = targetsize,
+                                Children = new Drawable[]
+                                {
+                                    gamesc,
+                                    new PixelScreenStack(new MainMenu()).With(Host.Dependencies.Cache),
+                                },
+                            },
                         },
                     },
+                    kbinput,
                     controllerArrows,
                     controllerButtons,
                 },
