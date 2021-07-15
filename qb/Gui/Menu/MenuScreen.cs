@@ -1,6 +1,5 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Input.Events;
 using osu.Framework.Screens;
 
 namespace qb.Gui.Menu
@@ -12,8 +11,6 @@ namespace qb.Gui.Menu
 
         [BackgroundDependencyLoader]
         void Load() => AddInternal(Background);
-
-        protected override bool Handle(UIEvent e) => true;
 
         protected void Push<T>() where T : Screen, new() => this.Push(new T());
         protected void Back() => BackTo(this.GetParentScreen());

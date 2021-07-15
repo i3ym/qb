@@ -1,19 +1,22 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using qb.Input;
 
 namespace qb.Gui
 {
-    public class ControllerButtons : CompositeDrawable, IController
+    public class ControllerButtons : ControllerButtonsBase, IController
     {
         readonly ControllerButton A, B, Back;
 
         public ControllerButtons()
         {
-            A = new ControllerButton(Anchor.BottomLeft) { Text = "A", RelativeSizeAxes = Axes.Both, Size = new osuTK.Vector2(1 / 2.1f) };
-            B = new ControllerButton(Anchor.BottomRight) { Text = "B", RelativeSizeAxes = Axes.Both, Size = new osuTK.Vector2(1 / 2.1f) };
-            Back = new ControllerButton() { Text = ("Back", "Назад"), RelativeSizeAxes = Axes.Both, Width = 1, Height = (1 / 2.1f) };
+            A = create("A", Anchor.BottomRight);
+            B = create("B", Anchor.BottomLeft);
+            Back = create(("Back", "Назад"), fontSize: .2f).With(x => x.Width = 1);
+
+            ControllerButton create(TranslatedString text, Anchor anchor = Anchor.TopLeft, float fontSize = .4f) =>
+                new ControllerButton(anchor) { Text = text, Background = Colour4.White, TextColour = Colour4.Black, RelativeSizeAxes = Axes.Both, Size = new osuTK.Vector2(1 / 2.1f) }
+                .With(x => x.PixelText.Font = x.PixelText.Font.With(size: fontSize));
         }
 
         [BackgroundDependencyLoader]

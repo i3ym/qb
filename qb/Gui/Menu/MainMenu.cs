@@ -1,5 +1,3 @@
-using System.IO;
-using Newtonsoft.Json;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Platform;

@@ -59,6 +59,17 @@ namespace qb.Gui
             MouseUp();
             base.OnMouseUp(e);
         }
+        protected override bool OnTouchDown(TouchDownEvent e)
+        {
+            MouseDown();
+            return base.OnTouchDown(e);
+        }
+        protected override void OnTouchUp(TouchUpEvent e)
+        {
+            MouseUp();
+            base.OnTouchUp(e);
+        }
+
         protected override bool OnClick(ClickEvent e)
         {
             base.OnClick(e);
