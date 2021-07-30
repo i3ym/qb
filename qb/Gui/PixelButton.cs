@@ -3,12 +3,31 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input;
 using osu.Framework.Input.Events;
+using osuTK.Input;
 
 namespace qb.Gui
 {
     public class PixelButton : CompositeDrawable
     {
+        public bool IsMouseOverPressed
+        {
+            get
+            {
+                InputManager ??= GetContainingInputManager();
+
+                var state = InputManager.CurrentState;
+                if (state.Mouse.IsPressed(MouseButton.Left) && Contains(state.Mouse.Position))
+                    return true;
+
+                foreach (var pos in state.Touch.TouchPositions)
+                    if (Contains(pos))
+                        return true;
+
+                return false;
+            }
+        }
         public Action MouseDown = delegate { };
         public Action MouseUp = delegate { };
         public Action Action = delegate { };
@@ -32,6 +51,7 @@ namespace qb.Gui
         Box? BackgroundBox;
 
         public readonly PixelText PixelText = new PixelText() { Anchor = Anchor.Centre, Origin = Anchor.Centre };
+        InputManager? InputManager;
 
         public PixelButton() => Height = 2;
         public PixelButton(TranslatedString text) : this() => PixelText.TranslatedText = text;
