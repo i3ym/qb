@@ -4,15 +4,9 @@ namespace qb.Gui
 {
     public class ControllerButton : PixelButton
     {
-        public bool IsPressed { get; private set; }
+        public bool IsPressed => IsMouseOverPressed;
 
-        public ControllerButton()
-        {
-            Size = new osuTK.Vector2(1);
-
-            MouseDown += () => IsPressed = true;
-            MouseUp += () => IsPressed = false;
-        }
+        public ControllerButton() => Size = new osuTK.Vector2(1);
         public ControllerButton(Anchor anchor) : this() => Anchor = Origin = anchor;
     }
 }
