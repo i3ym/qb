@@ -98,12 +98,12 @@ namespace qb
             {
                 Controller.IsPaused.Value = true;
                 ScreenStack.Push(new PauseMenu());
-                
+
                 return true;
             }
 
             return false;
         }
-        public void OnReleased(QbKey action)        {        }
+        public void OnReleased(QbKey action) { }
     }
 }

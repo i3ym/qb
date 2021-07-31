@@ -1,5 +1,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Input.Events;
 using osu.Framework.Screens;
 
 namespace qb.Gui.Menu
@@ -36,5 +37,7 @@ namespace qb.Gui.Menu
                 }
             }
         }
+
+        protected override bool Handle(UIEvent e) => true;
     }
 }
