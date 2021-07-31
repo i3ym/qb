@@ -86,7 +86,7 @@ namespace qb
                                 Children = new Drawable[]
                                 {
                                     gamesc,
-                                    new PixelScreenStack(new MainMenu()).With(Host.Dependencies.Cache),
+                                    new PixelScreenStack().With(x => x.Push(new MainMenu())).With(Host.Dependencies.Cache),
                                 },
                             },
                         },

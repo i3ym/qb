@@ -1,42 +1,37 @@
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
-using osu.Framework.Screens;
 
 namespace qb.Gui.Menu
 {
-    public class MenuScreen : Screen
+    public class MenuScreen : CompositeDrawable
     {
         [Resolved] PixelScreenStack PixelScreenStack { get; set; } = null!;
         protected readonly Background Background = new Background(Colour4.Black.MultiplyAlpha(.7f));
 
         [BackgroundDependencyLoader]
-        void Load() => AddInternal(Background);
-
-        protected void Push<T>() where T : Screen, new() => this.Push(new T());
-        protected void Back() => BackTo(this.GetParentScreen());
-        protected void BackToRoot() => BackTo(Root);
-        void BackTo(IScreen screen)
+        void Load()
         {
-            (screen as Drawable)?.FadeIn();
-            screen.MakeCurrent();
+            RelativeSizeAxes = Axes.Both;
+            AddInternal(Background);
         }
 
-        protected IScreen Root
+        protected void Push<T>() where T : MenuScreen, new()
         {
-            get
-            {
-                var parent = this as IScreen;
+            var screen = PixelScreenStack.OfType<T>().FirstOrDefault();
 
-                while (true)
-                {
-                    var p = parent.GetParentScreen();
-                    if (p is null) return parent;
-
-                    parent = p;
-                }
-            }
+            if (screen is { }) PixelScreenStack.Push(screen);
+            else PixelScreenStack.Push(new T());
         }
+        protected void Push<T>(T screen) where T : MenuScreen => PixelScreenStack.Push(screen);
+        protected void Back() => PixelScreenStack.Pop();
+        protected void BackToRoot() => BackTo(PixelScreenStack.Root);
+        void BackTo(MenuScreen? screen) => PixelScreenStack.PopTo(screen);
+
+        public virtual void OnShow(MenuScreen? last) { }
+
 
         protected override bool Handle(UIEvent e) => true;
     }

@@ -1,7 +1,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Platform;
-using osu.Framework.Screens;
 using qb.Input;
 
 namespace qb.Gui.Menu
@@ -32,15 +31,10 @@ namespace qb.Gui.Menu
         }
 
 
-        public override void OnResuming(IScreen last)
+        public override void OnShow(MenuScreen? last)
         {
             ResumeAutoGame();
-            base.OnResuming(last);
-        }
-        public override void OnEntering(IScreen last)
-        {
-            ResumeAutoGame();
-            base.OnEntering(last);
+            base.OnShow(last);
         }
 
         void ResumeAutoGame()
