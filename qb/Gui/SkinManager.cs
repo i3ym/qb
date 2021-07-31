@@ -7,7 +7,6 @@ namespace qb.Gui
     public class SkinManager
     {
         public readonly Bindable<Skin> SelectedSkin = new Bindable<Skin>();
-        public readonly BindableInt SelectedSkinIndex = new BindableInt() { MinValue = 0 };
         public ImmutableArray<Skin> Skins;
 
         public SkinManager(Texture atlas, Bindable<int> selectedSkinBindable)
@@ -29,11 +28,9 @@ namespace qb.Gui
                 newSkin(("New Year", "Новый год")),
             }.ToImmutableArray();
 
-            SelectedSkinIndex.MaxValue = Skins.Length;
 
-            SelectedSkin.BindValueChanged(e => SelectedSkinIndex.Value = Skins.IndexOf(e.NewValue), true);
-            SelectedSkinIndex.BindValueChanged(e => SelectedSkin.Value = Skins[e.NewValue], true);
-            SelectedSkinIndex.BindTo(selectedSkinBindable);
+            SelectedSkin.BindValueChanged(e => selectedSkinBindable.Value = Skins.IndexOf(e.NewValue));
+            selectedSkinBindable.BindValueChanged(e => SelectedSkin.Value = Skins[e.NewValue], true);
         }
     }
 }

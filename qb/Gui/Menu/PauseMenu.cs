@@ -29,6 +29,8 @@ namespace qb.Gui.Menu
         void ContinueGame()
         {
             Hide();
+            Expire();
+
             GameScreen.Controller.IsPaused.Value = false;
         }
 

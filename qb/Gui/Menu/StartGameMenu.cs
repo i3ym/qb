@@ -60,6 +60,8 @@ namespace qb.Gui.Menu
             void start()
             {
                 Hide();
+                Expire();
+
                 gamesc.Controller.Controller = maincontroller;
                 gamesc.Controller.RestartOnDeath = false;
 

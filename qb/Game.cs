@@ -91,12 +91,11 @@ namespace qb
                             },
                         },
                     },
-                    kbinput,
                     controllerArrows,
                     controllerButtons,
                 },
             };
-            Add(container);
+            Add(kbinput.WithChild(container));
         }
     }
 }
