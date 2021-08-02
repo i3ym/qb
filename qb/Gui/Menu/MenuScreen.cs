@@ -1,14 +1,14 @@
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 
 namespace qb.Gui.Menu
 {
-    public class MenuScreen : CompositeDrawable
+    public class MenuScreen : CompositeDrawable, IKeyBindingHandler<QbKey>
     {
-        [Resolved] PixelScreenStack PixelScreenStack { get; set; } = null!;
+        [Resolved] protected PixelScreenStack PixelScreenStack { get; private set; } = null!;
         protected readonly Background Background = new Background(Colour4.Black.MultiplyAlpha(.7f));
 
         [BackgroundDependencyLoader]
@@ -18,21 +18,16 @@ namespace qb.Gui.Menu
             AddInternal(Background);
         }
 
-        protected void Push<T>() where T : MenuScreen, new()
-        {
-            var screen = PixelScreenStack.OfType<T>().FirstOrDefault();
-
-            if (screen is { }) PixelScreenStack.Push(screen);
-            else PixelScreenStack.Push(new T());
-        }
-        protected void Push<T>(T screen) where T : MenuScreen => PixelScreenStack.Push(screen);
+        protected void Push<T>() where T : MenuScreen, new() => PixelScreenStack.Push<T>();
         protected void Back() => PixelScreenStack.Pop();
-        protected void BackToRoot() => BackTo(PixelScreenStack.Root);
-        void BackTo(MenuScreen? screen) => PixelScreenStack.PopTo(screen);
 
         public virtual void OnShow(MenuScreen? last) { }
 
 
+
+        // block further event propagation
         protected override bool Handle(UIEvent e) => true;
+        public virtual bool OnPressed(QbKey action) => IsAlive && Alpha != 0;
+        public virtual void OnReleased(QbKey action) { }
     }
 }

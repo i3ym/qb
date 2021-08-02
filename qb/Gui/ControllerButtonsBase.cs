@@ -21,15 +21,18 @@ namespace qb.Gui
         {
             if ((invalidation & Invalidation.Layout) != 0)
             {
-                var gameScreenSize = GameScreen.ScreenSpaceDrawQuad.Size;
-                var gameSize = Game.ScreenSpaceDrawQuad.Size;
-                var diff = gameScreenSize - gameSize;
+                Schedule(() =>
+                {
+                    var gameScreenSize = GameScreen.ScreenSpaceDrawQuad.Size;
+                    var gameSize = Game.ScreenSpaceDrawQuad.Size;
+                    var diff = gameScreenSize - gameSize;
 
-                var dx = Math.Abs(diff.X);
-                var dy = Math.Abs(diff.Y);
+                    var dx = Math.Abs(diff.X);
+                    var dy = Math.Abs(diff.Y);
 
-                if (dx > dy) Scale = new osuTK.Vector2(Math.Min(dx, (gameSize.X - gameScreenSize.X) / 2));
-                else Scale = new osuTK.Vector2(Math.Min(Math.Min(dy, gameSize.Y), gameSize.X / 2.2f));
+                    if (dx > dy) Scale = new osuTK.Vector2(Math.Min(dx, (gameSize.X - gameScreenSize.X) / 2));
+                    else Scale = new osuTK.Vector2(Math.Min(Math.Min(dy, gameSize.Y), gameSize.X / 2.2f));
+                });
             }
 
             return base.OnInvalidate(invalidation, source);

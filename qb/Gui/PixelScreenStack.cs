@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Platform;
 using qb.Gui.Menu;
 
 namespace qb.Gui
@@ -10,7 +10,9 @@ namespace qb.Gui
     [Cached]
     public class PixelScreenStack : Container<MenuScreen>
     {
-        public MenuScreen? Root => ScreensPushed?.FirstOrDefault();
+        [Resolved] GameHost Host { get; set; } = null!;
+
+        public bool IsScreenVisible => ScreensPushed.TryPeek(out var screen) && screen.Alpha != 0;
         readonly Stack<MenuScreen> ScreensPushed = new Stack<MenuScreen>();
 
         [BackgroundDependencyLoader]
@@ -23,9 +25,10 @@ namespace qb.Gui
         }
 
 
-        public void Push(MenuScreen screen)
+        public void Push<T>() where T : MenuScreen, new() => Push(new T());
+        void Push(MenuScreen screen)
         {
-            if (!Contains(screen)) Add(screen);
+            Add(screen);
 
             screen.Show();
             ScreensPushed.TryPeek(out var last);
@@ -36,21 +39,25 @@ namespace qb.Gui
         }
         public void Pop()
         {
-            if (ScreensPushed.TryPop(out var screen))
-            {
-                screen.Hide();
+            if (!ScreensPushed.TryPop(out var screen)) return;
+            Remove(screen);
 
-                if (ScreensPushed.TryPeek(out var newscreen))
-                    newscreen.Show();
-            }
+            if (!ScreensPushed.TryPeek(out var newscreen)) return;
+            newscreen.Show();
         }
+        public void Set(MenuScreen screen)
+        {
+            if (ScreensPushed.Contains(screen))
+                PopTo(null);
 
+            Push(screen);
+        }
         public void PopTo(MenuScreen? screen)
         {
             if (screen is null)
             {
-                while (ScreensPushed.Count != 0)
-                    Pop();
+                ScreensPushed.Clear();
+                Clear();
 
                 return;
             }
