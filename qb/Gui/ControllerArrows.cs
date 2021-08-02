@@ -2,11 +2,10 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using qb.Input;
 
 namespace qb.Gui
 {
-    public class ControllerArrows : ControllerButtonsBase, IController
+    public class ControllerArrows : ControllerButtonsBase
     {
         [Resolved(name: nameof(PixelTextureStore))] TextureStore PixelTextureStore { get; set; } = null!;
 
@@ -14,12 +13,12 @@ namespace qb.Gui
 
         public ControllerArrows()
         {
-            Up = create(Anchor.TopCentre);
-            Down = create(Anchor.BottomCentre);
-            Left = create(Anchor.CentreLeft);
-            Right = create(Anchor.CentreRight);
+            Up = create(QbKey.Up, Anchor.TopCentre).With(AddInternal);
+            Down = create(QbKey.Down, Anchor.BottomCentre).With(AddInternal);
+            Left = create(QbKey.Left, Anchor.CentreLeft).With(AddInternal);
+            Right = create(QbKey.Right, Anchor.CentreRight).With(AddInternal);
 
-            ControllerButton create(Anchor anchor) => new ControllerButton(anchor) { RelativeSizeAxes = Axes.Both, Size = new osuTK.Vector2(1 / 2.5f) };
+            ControllerButton create(QbKey key, Anchor anchor) => new ControllerButton(key, anchor) { RelativeSizeAxes = Axes.Both, Size = new osuTK.Vector2(1 / 2.5f) };
         }
 
         [BackgroundDependencyLoader]
@@ -30,20 +29,6 @@ namespace qb.Gui
                 RelativeSizeAxes = Axes.Both,
                 Texture = PixelTextureStore.Get("Resources/ControllerArrows"),
             });
-
-            AddInternal(Up);
-            AddInternal(Down);
-            AddInternal(Left);
-            AddInternal(Right);
         }
-
-        public ControllerState GetState() =>
-            new ControllerState
-            (
-                up: Up.IsPressed,
-                down: Down.IsPressed,
-                left: Left.IsPressed,
-                right: Right.IsPressed
-            );
     }
 }

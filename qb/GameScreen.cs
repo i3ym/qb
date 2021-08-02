@@ -50,7 +50,7 @@ namespace qb
             var gameoveranim = new GameOverFillingAnimation();
             var clearlineanim = new ClearLineAnimationSlideDown();
 
-            Controller.OnGameOver += () => gameoveranim.Animation(this, () => menus.Push(new GameOverMenu()));
+            Controller.OnGameOver += () => gameoveranim.Animation(this, menus.Push<GameOverMenu>);
             Controller.OnLineClear += lines => clearlineanim.Animation(lines, this);
             Controller.OnFieldUpdate += UpdateField;
             Controller.NextShapeBindable.BindValueChanged(e => SetNextShape(e.NewValue), true);
@@ -97,7 +97,7 @@ namespace qb
             if (action == QbKey.Back)
             {
                 Controller.IsPaused.Value = true;
-                ScreenStack.Push(new PauseMenu());
+                ScreenStack.Push<PauseMenu>();
 
                 return true;
             }

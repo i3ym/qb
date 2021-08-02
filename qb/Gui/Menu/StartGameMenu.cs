@@ -16,7 +16,7 @@ namespace qb.Gui.Menu
         [Resolved] Storage Storage { get; set; } = null!;
 
         [BackgroundDependencyLoader]
-        void Load(GameScreen gamesc, MultiController maincontroller)
+        void Load(GameScreen gamesc, KeyboardController maincontroller)
         {
             var level = new PixelFlowContainer()
             {
@@ -59,8 +59,7 @@ namespace qb.Gui.Menu
 
             void start()
             {
-                Hide();
-                Expire();
+                PixelScreenStack.PopTo(null);
 
                 gamesc.Controller.Controller = maincontroller;
                 gamesc.Controller.RestartOnDeath = false;

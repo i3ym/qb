@@ -28,13 +28,11 @@ namespace qb.Gui.Menu
         }
         void ContinueGame()
         {
-            Hide();
-            Expire();
-
+            PixelScreenStack.PopTo(null);
             GameScreen.Controller.IsPaused.Value = false;
         }
 
-        public bool OnPressed(QbKey action)
+        public override bool OnPressed(QbKey action)
         {
             if (action == QbKey.Back)
             {
@@ -42,8 +40,7 @@ namespace qb.Gui.Menu
                 return true;
             }
 
-            return false;
+            return base.OnPressed(action);
         }
-        public void OnReleased(QbKey action) { }
     }
 }

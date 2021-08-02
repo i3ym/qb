@@ -28,11 +28,11 @@ namespace qb.Gui.Menu
             void exit()
             {
                 gamesc.Controller.StartGame();
-                BackToRoot();
+                Push<MainMenu>();
             }
         }
 
-        public bool OnPressed(QbKey action)
+        public override bool OnPressed(QbKey action)
         {
             if (action == QbKey.Back)
             {
@@ -40,8 +40,7 @@ namespace qb.Gui.Menu
                 return true;
             }
 
-            return false;
+            return base.OnPressed(action);
         }
-        public void OnReleased(QbKey action) { }
     }
 }

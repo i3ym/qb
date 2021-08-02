@@ -3,10 +3,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input.Events;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osuTK;
@@ -42,60 +39,50 @@ namespace qb
             Textures.AddStore(pixeltexturestore);
             Host.Dependencies.Cache(pixeltexturestore, new CacheInfo("PixelTextureStore"));
 
+            var atlasStore = new TextureStore(Textures, false, All.Nearest, true, 1);
+            Textures.AddStore(atlasStore);
 
             var qconfig = new QbConfigManager(Host.Storage);
             Host.Dependencies.Cache(qconfig);
 
-            var atlasStore = new TextureStore(Textures, false, All.Nearest, true, 1);
-            Textures.AddStore(atlasStore);
-
-            var atlas = atlasStore.Get("Resources/Atlas");
-            var skin = new SkinManager(atlas, qconfig.GetBindable<int>(QbConfigField.SelectedSkin));
-            Host.Dependencies.Cache(skin);
-
+            Host.Dependencies.Cache(new SkinManager(atlasStore.Get("Resources/Atlas"), qconfig.GetBindable<int>(QbConfigField.SelectedSkin)));
             Host.Dependencies.Cache(new BackgroundController());
 
 
-
-
-            var gamesc = new GameScreen() { RelativeSizeAxes = Axes.Both };
-            Host.Dependencies.Cache(gamesc);
-
-            var controllerArrows = new ControllerArrows() { Anchor = Anchor.BottomLeft, Origin = Anchor.BottomLeft, Size = new osuTK.Vector2(1) };
-            var controllerButtons = new ControllerButtons() { Anchor = Anchor.BottomRight, Origin = Anchor.BottomRight, Size = new osuTK.Vector2(1) };
-            var kbinput = new KeyboardController();
-            Host.Dependencies.Cache(new MultiController(controllerArrows, controllerButtons, kbinput));
-
-
             var targetsize = new osuTK.Vector2(17, 21);
-            var container = new Container()
+            var kb = new KeyboardController()
             {
-                RelativeSizeAxes = Axes.Both,
-                Children = new Drawable[]
+                Child = new Container()
                 {
-                    new DrawSizePreservingFillContainer()
+                    RelativeSizeAxes = Axes.Both,
+                    Children = new Drawable[]
                     {
-                        TargetDrawSize = targetsize,
-                        Children = new Drawable[]
+                        new DrawSizePreservingFillContainer()
                         {
-                            new Container()
+                            TargetDrawSize = targetsize,
+                            Children = new Drawable[]
                             {
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
-                                Size = targetsize,
-                                Children = new Drawable[]
+                                new Container()
                                 {
-                                    gamesc,
-                                    new PixelScreenStack().With(x => x.Push(new MainMenu())).With(Host.Dependencies.Cache),
+                                    Anchor = Anchor.TopCentre,
+                                    Origin = Anchor.TopCentre,
+                                    Size = targetsize,
+                                    Children = new Drawable[]
+                                    {
+                                        new GameScreen() { RelativeSizeAxes = Axes.Both }.With(Host.Dependencies.Cache),
+                                        new PixelScreenStack().With(x => x.Push<MainMenu>()).With(Host.Dependencies.Cache),
+                                    },
                                 },
                             },
                         },
+                        new ControllerArrows() { Anchor = Anchor.BottomLeft, Origin = Anchor.BottomLeft, Size = new Vector2(1) },
+                        new ControllerButtons() { Anchor = Anchor.BottomRight, Origin = Anchor.BottomRight, Size = new Vector2(1) },
                     },
-                    controllerArrows,
-                    controllerButtons,
-                },
+                }
             };
-            Add(kbinput.WithChild(container));
+
+            Host.Dependencies.Cache(kb);
+            Add(kb);
         }
     }
 }
