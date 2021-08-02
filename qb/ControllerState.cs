@@ -31,12 +31,12 @@ namespace qb
         public static ControllerState FromBitMask(byte mask) =>
             new ControllerState
             (
-                up: ((mask << (int) QbKey.Up) & 1) == 1,
-                down: ((mask << (int) QbKey.Down) & 1) == 1,
-                left: ((mask << (int) QbKey.Left) & 1) == 1,
-                right: ((mask << (int) QbKey.Right) & 1) == 1,
-                a: ((mask << (int) QbKey.A) & 1) == 1,
-                b: ((mask << (int) QbKey.B) & 1) == 1
+                up: ((mask >> (int) QbKey.Up) & 1) == 1,
+                down: ((mask >> (int) QbKey.Down) & 1) == 1,
+                left: ((mask >> (int) QbKey.Left) & 1) == 1,
+                right: ((mask >> (int) QbKey.Right) & 1) == 1,
+                a: ((mask >> (int) QbKey.A) & 1) == 1,
+                b: ((mask >> (int) QbKey.B) & 1) == 1
             );
         public byte ToBitMask() =>
             (byte)

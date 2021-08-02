@@ -39,16 +39,25 @@ namespace qb.Gui.Menu
 
         void ResumeAutoGame()
         {
-            GameScreen.Controller.IsPaused.Value = false;
             GameScreen.Controller.RestartOnDeath = true;
-            GameScreen.Controller.Controller = BackgroundGameController;
 
             try
             {
                 if (Storage.Exists(ReplayController.ReplayPath))
-                    BackgroundGameController.Controller = new ReplayController(Replay.FromJson(Storage.GetStream(ReplayController.ReplayPath)));
+                {
+                    var replay = Replay.Deserialize(Storage.GetStream(ReplayController.ReplayPath));
+                    // replay = Newtonsoft.Json.JsonConvert.DeserializeObject<Replay>(new System.IO.StreamReader( Storage.GetStream(ReplayController.ReplayPath+"j")).ReadToEnd());
+
+                    GameScreen.Controller.Controller = new ReplayController(replay);
+                    GameScreen.Controller.StartGame(seed: replay.Seed);
+
+                    return;
+                }
             }
             catch { }
+
+            GameScreen.Controller.IsPaused.Value = false;
+            GameScreen.Controller.Controller = BackgroundGameController;
         }
     }
 }
