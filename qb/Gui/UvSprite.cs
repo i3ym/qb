@@ -31,9 +31,9 @@ namespace qb.Gui
         {
             Texture = skin.Atlas;
 
-            Uv.X = Tile.Value * skin.Size;
-            Uv.Y = skin.Index * skin.Size;
-            Uv.Width = Uv.Height = skin.Size;
+            Uv.X = Tile.Value * skin.Size - float.Epsilon * 2;
+            Uv.Y = skin.Index * skin.Size - float.Epsilon * 2;
+            Uv.Width = Uv.Height = skin.Size - float.Epsilon * 2;
         }
 
         protected override DrawNode CreateDrawNode() => new CubeSpriteDrawNode(this);
