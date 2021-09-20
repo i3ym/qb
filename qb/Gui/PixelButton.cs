@@ -21,9 +21,12 @@ namespace qb.Gui
                 if (state.Mouse.IsPressed(MouseButton.Left) && Contains(state.Mouse.Position))
                     return true;
 
-                foreach (var pos in state.Touch.TouchPositions)
-                    if (Contains(pos))
+                foreach (var source in state.Touch.ActiveSources)
+                {
+                    var pos = state.Touch.GetTouchPosition(source);
+                    if (pos.HasValue && Contains(pos.Value))
                         return true;
+                }
 
                 return false;
             }
