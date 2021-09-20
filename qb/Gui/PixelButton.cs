@@ -70,6 +70,7 @@ namespace qb.Gui
         protected override bool OnMouseDown(MouseDownEvent e)
         {
             MouseDown();
+            Action();
             base.OnMouseDown(e);
 
             return true;
@@ -82,20 +83,13 @@ namespace qb.Gui
         protected override bool OnTouchDown(TouchDownEvent e)
         {
             MouseDown();
+            Action();
             return base.OnTouchDown(e);
         }
         protected override void OnTouchUp(TouchUpEvent e)
         {
             MouseUp();
             base.OnTouchUp(e);
-        }
-
-        protected override bool OnClick(ClickEvent e)
-        {
-            base.OnClick(e);
-            Action();
-
-            return true;
         }
     }
 }
