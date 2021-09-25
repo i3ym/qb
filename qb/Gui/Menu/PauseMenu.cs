@@ -18,9 +18,9 @@ namespace qb.Gui.Menu
                 Origin = Anchor.Centre,
                 Children = new[]
                 {
-                    new PixelButton(("Continue", "Продолжить"), ContinueGame),
-                    new PixelButton(("Settings", "Настройки"), Push<SettingsMenu>),
-                    new PixelButton(("Exit", "Выйти"), Push<MainMenu>),
+                    new PixelTextButton(("Continue", "Продолжить"), ContinueGame),
+                    new PixelTextButton(("Settings", "Настройки"), Push<SettingsMenu>),
+                    new PixelTextButton(("Exit", "Выйти"), Push<MainMenu>),
                 },
             };
 

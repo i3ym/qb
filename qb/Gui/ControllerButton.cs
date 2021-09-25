@@ -4,20 +4,23 @@ using qb.Input;
 
 namespace qb.Gui
 {
-    public class ControllerButton : PixelButton
+    public interface IControllerButton : IHandleable
+    {
+        QbKey Key { get; }
+    }
+    public class ControllerButton<T> : PixelButton<T>, IControllerButton where T : Drawable
     {
         [Resolved] KeyboardController KeyboardController { get; set; } = null!;
 
         public bool IsPressed => IsMouseOverPressed;
-        public readonly QbKey Key;
+        public QbKey Key { get; }
         bool WasPressedLastFrame = false;
 
-        public ControllerButton(QbKey key)
+        public ControllerButton(QbKey key, T child) : base(child)
         {
             Size = new osuTK.Vector2(1);
             Key = key;
         }
-        public ControllerButton(QbKey key, Anchor anchor) : this(key) => Anchor = Origin = anchor;
 
         protected override void Update()
         {

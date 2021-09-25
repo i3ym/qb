@@ -41,6 +41,7 @@ namespace qb.Gui
         {
             if (!ScreensPushed.TryPop(out var screen)) return;
             Remove(screen);
+            Schedule(screen.OnRemove);
 
             if (!ScreensPushed.TryPeek(out var newscreen)) return;
             newscreen.Show();

@@ -24,9 +24,9 @@ namespace qb.Gui.Menu
                 ChildAxes = Anchor.Centre,
                 Children = new Drawable[]
                 {
-                    new PixelButton(("-"), leveldown) { Width = 2 },
+                    new PixelTextButton(("-"), leveldown) { Width = 2 },
                     PixelText.Create(gamesc.Controller.StartLevel, x => x.ToString("00")),
-                    new PixelButton(("+"), levelup) { Width = 2 },
+                    new PixelTextButton(("+"), levelup) { Width = 2 },
                 },
             };
             var mods = new ToggleMenuButtonContainer<Mod>()
@@ -47,10 +47,10 @@ namespace qb.Gui.Menu
                 Direction = FillDirection.Vertical,
                 Children = new Drawable[]
                 {
-                    new PixelButton(("Start", "Начать"), start),
+                    new PixelTextButton(("Start", "Начать"), start),
                     level,
                     mods,
-                    new PixelButton(("Back", "Назад"), Back),
+                    new PixelTextButton(("Back", "Назад"), Back),
                 },
             };
             AddInternal(ffc);

@@ -9,7 +9,13 @@ using osuTK.Input;
 
 namespace qb.Gui
 {
-    public class PixelButton : CompositeDrawable
+    public class PixelButton<T> : PixelButton, IHandleable where T : Drawable
+    {
+        public readonly T Child;
+
+        public PixelButton(T child) => AddInternal(Child = child);
+    }
+    public class PixelButton : CompositeDrawable, IHandleable
     {
         public bool IsMouseOverPressed
         {
@@ -35,8 +41,7 @@ namespace qb.Gui
         public Action MouseUp = delegate { };
         public Action Action = delegate { };
 
-        public TranslatedString Text { get => PixelText.TranslatedText; set => PixelText.TranslatedText = value; }
-        public Colour4 TextColour { get => PixelText.Colour; set => PixelText.Colour = value; }
+        public bool HandleEvents { get; set; } = true;
         public Colour4 Background
         {
             get => BackgroundBox?.Colour ?? Colour4.Transparent;
@@ -52,31 +57,27 @@ namespace qb.Gui
             }
         }
         Box? BackgroundBox;
-
-        public readonly PixelText PixelText = new PixelText() { Anchor = Anchor.Centre, Origin = Anchor.Centre };
         InputManager? InputManager;
 
+
         public PixelButton() => Height = 2;
-        public PixelButton(TranslatedString text) : this() => PixelText.TranslatedText = text;
-        public PixelButton(TranslatedString text, Action action) : this(text) => Action = action;
 
         [BackgroundDependencyLoader]
         void Load()
         {
             if ((RelativeSizeAxes & Axes.X) == 0 && Width == 0)
                 AutoSizeAxes = Axes.X;
-
-            AddInternal(PixelText);
         }
 
 
+        protected override bool Handle(UIEvent e) => HandleEvents;
         protected override bool OnMouseDown(MouseDownEvent e)
         {
             MouseDown();
             Action();
             base.OnMouseDown(e);
 
-            return true;
+            return Handle(e);
         }
         protected override void OnMouseUp(MouseUpEvent e)
         {
@@ -87,7 +88,9 @@ namespace qb.Gui
         {
             MouseDown();
             Action();
-            return base.OnTouchDown(e);
+            base.OnTouchDown(e);
+
+            return Handle(e);
         }
         protected override void OnTouchUp(TouchUpEvent e)
         {

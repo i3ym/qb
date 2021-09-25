@@ -30,12 +30,12 @@ namespace qb.Gui.Menu
             };
 
 
-            AddInternal(new PixelButton(Title) { RelativeSizeAxes = Axes.X, Height = 2, Background = Colour4.Black });
-            AddInternal(new PixelButton(("Back", "Назад"), Back) { RelativeSizeAxes = Axes.X, Height = 2, Anchor = Anchor.BottomLeft, Origin = Anchor.BottomLeft, Background = Colour4.Black });
+            AddInternal(new PixelTextButton(Title) { RelativeSizeAxes = Axes.X, Height = 2, Background = Colour4.Black });
+            AddInternal(new PixelTextButton(("Back", "Назад"), Back) { RelativeSizeAxes = Axes.X, Height = 2, Anchor = Anchor.BottomLeft, Origin = Anchor.BottomLeft, Background = Colour4.Black });
             AddInternal(buttons);
         }
 
-        protected void AddButtons(params PixelButton[] buttons) => AddButtons(buttons.AsEnumerable());
-        protected void AddButtons(IEnumerable<PixelButton> buttons) => ButtonContainer.AddRange(buttons);
+        protected void AddButtons(params PixelTextButton[] buttons) => AddButtons(buttons.AsEnumerable());
+        protected void AddButtons(IEnumerable<PixelTextButton> buttons) => ButtonContainer.AddRange(buttons);
     }
 }

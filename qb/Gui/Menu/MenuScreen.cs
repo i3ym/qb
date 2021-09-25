@@ -21,6 +21,7 @@ namespace qb.Gui.Menu
         protected void Back() => PixelScreenStack.Pop();
 
         public virtual void OnShow(MenuScreen? last) { }
+        public virtual void OnRemove() { }
         public virtual bool OnPressed(QbKey action) => IsAlive && Alpha != 0;
         public virtual void OnReleased(QbKey action) { }
     }
