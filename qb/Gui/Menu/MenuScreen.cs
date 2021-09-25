@@ -2,7 +2,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
-using osu.Framework.Input.Events;
 
 namespace qb.Gui.Menu
 {
@@ -22,11 +21,6 @@ namespace qb.Gui.Menu
         protected void Back() => PixelScreenStack.Pop();
 
         public virtual void OnShow(MenuScreen? last) { }
-
-
-
-        // block further event propagation
-        protected override bool Handle(UIEvent e) => true;
         public virtual bool OnPressed(QbKey action) => IsAlive && Alpha != 0;
         public virtual void OnReleased(QbKey action) { }
     }
