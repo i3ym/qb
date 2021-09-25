@@ -2,7 +2,7 @@ using System;
 
 namespace qb.Gui
 {
-    public class ValueMenuButton<T> : PixelButton
+    public class ValueMenuButton<T> : PixelTextButton
     {
         public readonly T Value;
 

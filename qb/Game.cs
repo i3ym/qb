@@ -45,7 +45,7 @@ namespace qb
             var qconfig = new QbConfigManager(Host.Storage);
             Host.Dependencies.Cache(qconfig);
 
-            Host.Dependencies.Cache(new SkinManager(atlasStore.Get("Resources/Atlas"), qconfig.GetBindable<int>(QbConfigField.SelectedSkin)));
+            Host.Dependencies.Cache(new SkinManager(atlasStore.Get("Resources/Atlas"), qconfig.GetBindable("skin", 0)));
             Host.Dependencies.Cache(new BackgroundController());
 
 
@@ -73,10 +73,11 @@ namespace qb
                                         new PixelScreenStack().With(x => x.Push<MainMenu>()).With(Host.Dependencies.Cache),
                                     },
                                 },
+                                new Controller() { RelativeSizeAxes = Axes.Both, }.With(Host.Dependencies.Cache),
                             },
                         },
-                        new ControllerArrows() { Anchor = Anchor.BottomLeft, Origin = Anchor.BottomLeft, Size = new Vector2(1) },
-                        new ControllerButtons() { Anchor = Anchor.BottomRight, Origin = Anchor.BottomRight, Size = new Vector2(1) },
+                        // new ControllerArrows() { Anchor = Anchor.BottomLeft, Origin = Anchor.BottomLeft, Size = new Vector2(1) },
+                        // new ControllerButtons() { Anchor = Anchor.BottomRight, Origin = Anchor.BottomRight, Size = new Vector2(1) },
                     },
                 }
             };

@@ -15,9 +15,10 @@ namespace qb.Gui.Menu
                 Origin = Anchor.Centre,
                 Children = new[]
                 {
-                    new PixelButton(("Skin", "Скин"), Push<SkinChooseMenu>),
-                    new PixelButton(("Language", "Язык"), Push<ChooseLanguageMenu>),
-                    new PixelButton(("Back", "Назад"), Back),
+                    new PixelTextButton(("Skin", "Скин"), Push<SkinChooseMenu>),
+                    new PixelTextButton(("Language", "Язык"), Push<ChooseLanguageMenu>),
+                    new PixelTextButton(("Controlls", "Управление"), Push<EditControlsMenu>),
+                    new PixelTextButton(("Back", "Назад"), Back),
                 },
             };
 
