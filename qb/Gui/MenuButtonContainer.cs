@@ -4,8 +4,8 @@ using osu.Framework.Graphics.Containers;
 
 namespace qb.Gui
 {
-    public class MenuButtonContainer : MenuButtonContainer<PixelButton> { }
-    public class MenuButtonContainer<T> : Container<T> where T : PixelButton
+    public class MenuButtonContainer : MenuButtonContainer<Drawable> { }
+    public class MenuButtonContainer<T> : Container<T> where T : Drawable
     {
         public Anchor ChildrenAnchor { get => PixelContent.ChildAxes; set => PixelContent.ChildAxes = value; }
 

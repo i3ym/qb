@@ -15,10 +15,10 @@ namespace qb.Gui.Menu
                 AutoSizeAxes = Axes.Both,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Children = new PixelButton[]
+                Children = new Drawable[]
                 {
                     new PixelTextButton(("move padla", "двигай ало")),
-                    new PixelSliderButton(("Scale", "Размер"), 1, 5, e => Controller.ChildrenScale = e.NewValue) { Current = { Value = Controller.ChildrenScale } },
+                    new PixelSliderBar(("Scale", "Размер"), 1, 5, e => Controller.ChildrenScale = e.NewValue) { RelativeSizeAxes = Axes.X, Height = 2, Current = { Value = Controller.ChildrenScale } },
                     new PixelTextButton(("Back", "Назад"), Back),
                 },
             };
