@@ -25,7 +25,9 @@ namespace qb.Gui
                 newSkin(("Leaf Fall", "Листопад")),
                 newSkin(("Hot Dog", "Хот дог")),
                 newSkin(("Vending Machine", "Торговый автомат")),
+                newSkin(("Medicine", "Аптечка")),
                 newSkin(("New Year", "Новый год")),
+                newSkin(("Beach", "Пляж")),
             }.ToImmutableArray();
 
 
