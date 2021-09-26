@@ -19,10 +19,17 @@ namespace qb
         {
             Storage = storage;
 
-            using (var stream = storage.GetStream(Filename))
-            using (var reader = new StreamReader(stream))
-            using (var jreader = new JsonTextReader(reader))
-                JsonData = JObject.Load(jreader);
+            using var stream = storage.GetStream(Filename);
+            if (stream is null)
+            {
+                JsonData = new JObject();
+                return;
+            }
+
+            using var reader = new StreamReader(stream);
+            using var jreader = new JsonTextReader(reader);
+
+            JsonData = JObject.Load(jreader);
         }
 
         public void Set<T>(string path, T value)
