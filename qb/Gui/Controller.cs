@@ -22,10 +22,6 @@ namespace qb.Gui
             {
                 _EditMode = value;
 
-                foreach (var child in InternalChildren)
-                    if (child is IHandleable h)
-                        h.HandleEvents = !value;
-
                 if (!value)
                 {
                     foreach (var child in InternalChildren.OfType<IControllerButton>())
@@ -38,7 +34,7 @@ namespace qb.Gui
                 }
             }
         }
-        bool _EditMode = false;
+        bool _EditMode;
 
         public float ChildrenScale
         {
@@ -61,6 +57,8 @@ namespace qb.Gui
             AddInternal(createText(QbKey.A, "A", new Vector2(0, 0), Anchor.BottomRight));
             AddInternal(createText(QbKey.B, "B", new Vector2(-1.1f, 0), Anchor.BottomRight));
             AddInternal(createText(QbKey.Back, ("Back", "Назад"), new Vector2(-.05f, -1.1f), Anchor.BottomRight, fontSize: .4f).With(x => x.Width = 2));
+
+            EditMode = false;
 
 
 
