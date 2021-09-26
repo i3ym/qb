@@ -1,6 +1,5 @@
 using System.IO;
 using System.Linq;
-using System.Text;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -69,8 +68,12 @@ namespace qb.Gui.Menu
                 {
                     if (gamesc.Controller.Recorder is null) return;
 
-                    using var stream = Storage.GetStream(ReplayController.ReplayPath, FileAccess.Write, FileMode.Create);
-                    stream.Write(gamesc.Controller.Recorder.AsReplay().Serialize(0));
+                    try
+                    {
+                        using var stream = Storage.GetStream(ReplayController.ReplayPath, FileAccess.Write, FileMode.Create);
+                        stream.Write(gamesc.Controller.Recorder.AsReplay().Serialize(0));
+                    }
+                    catch { }
 
                     gamesc.Controller.Recorder = null;
                 };
