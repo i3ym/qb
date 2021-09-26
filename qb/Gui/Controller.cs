@@ -13,6 +13,7 @@ namespace qb.Gui
     public class Controller : CompositeDrawable
     {
         [Resolved] QbConfigManager ConfigManager { get; set; } = null!;
+        [Resolved(name: "PixelTextureStore")] TextureStore TextureStore { get; set; } = null!;
 
         public bool EditMode
         {
@@ -50,7 +51,7 @@ namespace qb.Gui
         }
 
         [BackgroundDependencyLoader]
-        void Load(TextureStore textureStore)
+        void Load()
         {
             AddInternal(createArrow(QbKey.Up, 0, new Vector2(0, 0), Anchor.BottomLeft));
             AddInternal(createArrow(QbKey.Down, 180, new Vector2(1, 0), Anchor.BottomLeft));
@@ -68,7 +69,7 @@ namespace qb.Gui
             {
                 var cfg = getCfg(key, defaultPos, defaultAnchor);
                 return new ControllerButton<Sprite>(key,
-                    new Sprite() { RelativeSizeAxes = Axes.Both, Anchor = Anchor.Centre, Origin = Anchor.Centre, Rotation = angle, Texture = textureStore.Get("Resources/ControllerArrow") })
+                    new Sprite() { RelativeSizeAxes = Axes.Both, Anchor = Anchor.Centre, Origin = Anchor.Centre, Rotation = angle, Texture = TextureStore.Get("Resources/ControllerArrow") })
                 {
                     Position = cfg.Position,
                     Scale = new Vector2(cfg.Scale),
