@@ -6,7 +6,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
-using osuTK;
 using osuTK.Graphics.ES30;
 using qb.Gui;
 using qb.Gui.Menu;
@@ -39,13 +38,10 @@ namespace qb
             Textures.AddStore(pixeltexturestore);
             Host.Dependencies.Cache(pixeltexturestore, new CacheInfo("PixelTextureStore"));
 
-            var atlasStore = new TextureStore(Textures, false, All.Nearest, true, 1);
-            Textures.AddStore(atlasStore);
-
             var qconfig = new QbConfigManager(Host.Storage);
             Host.Dependencies.Cache(qconfig);
 
-            Host.Dependencies.Cache(new SkinManager(atlasStore.Get("Resources/Atlas"), qconfig.GetBindable("skin", 0)));
+            Host.Dependencies.Cache(new SkinManager(Textures, qconfig.GetBindable("skin", 0)));
             Host.Dependencies.Cache(new BackgroundController());
 
 
