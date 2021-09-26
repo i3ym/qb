@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -30,7 +31,7 @@ namespace qb
         [BackgroundDependencyLoader]
         void Load(PixelScreenStack menus)
         {
-            foreach (var tex in SkinnedTexture.GetSkinnedTextures(FieldWidth, FieldHeight))
+            foreach (var tex in getSkinnedTextures(FieldWidth, FieldHeight))
             {
                 var bg = new FieldGrid(tex.tiles.GetLength(0), tex.tiles.GetLength(1)) { X = tex.x, Y = tex.y, Depth = tex.index };
                 AddInternal(bg);
@@ -54,6 +55,49 @@ namespace qb
             Controller.OnLineClear += lines => clearlineanim.Animation(lines, this);
             Controller.OnFieldUpdate += UpdateField;
             Controller.NextShapeBindable.BindValueChanged(e => SetNextShape(e.NewValue), true);
+
+
+
+            static IEnumerable<(int x, int y, int index, CubeTile[,] tiles)> getSkinnedTextures(int maxx, int maxy)
+            {
+                // info bg
+                yield return (maxx, 0, 999, new GameMatrix<CubeTile>(7, maxy, CubeTile.Background));
+
+                // bottom wall bg
+                {
+                    var tiles = new GameMatrix<CubeTile>(maxx + 7, 1, (CubeTile) CubeTile.HorizontalWall);
+                    tiles[maxx, 0] = CubeTile.HorizontalToUpWall;
+
+                    yield return (0, maxy, -5, tiles);
+                }
+
+                // bottom wall fg
+                {
+                    var tiles = new GameMatrix<CubeTile>(maxx, 1, (CubeTile) CubeTile.None);
+                    for (int x = 0; x < tiles.Width; x++)
+                        tiles[x, 0] = (CubeTile) ((byte) CubeTile.LongBottomStart + x);
+
+                    yield return (0, maxy, -6, tiles);
+                }
+
+                // vertical wall
+                {
+                    var tiles = new GameMatrix<CubeTile>(2, maxy, (CubeTile) CubeTile.None);
+
+                    for (int y = 0; y < tiles.Height; y++)
+                        tiles[0, y] = CubeTile.VerticalWall;
+
+                    tiles[0, 4] = CubeTile.VerticalToRightWall;
+                    tiles[1, 3] = CubeTile.BottomLeftCorner;
+                    tiles[1, 5] = CubeTile.TopLeftCorner;
+                    tiles[1, maxy - 1] = CubeTile.BottomLeftCorner;
+
+                    yield return (maxx, 0, -9, tiles);
+                }
+
+                // horizontal wall
+                yield return (maxx + 1, 4, -9, new GameMatrix<CubeTile>(6, 1, (CubeTile) CubeTile.HorizontalWall));
+            }
         }
 
         void UpdateField()
