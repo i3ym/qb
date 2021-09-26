@@ -40,7 +40,7 @@ namespace qb
                         bg[x, tex.tiles.GetLength(1) - 1 - y] = tex.tiles[x, y];
             }
 
-            AddInternal(new Background(Colour4.Black));
+            AddInternal(new Background(Colour4.Black) { Depth = 9999 });
             AddInternal(Controller);
             AddInternal(Playfield);
             AddInternal(NextGrid);
