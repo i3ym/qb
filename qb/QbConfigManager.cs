@@ -34,11 +34,11 @@ namespace qb
 
         public void Set<T>(string path, T value)
         {
-            var bindable = GetBindable<T>(path);
+            var bindable = GetBindable<T>(path, value);
             bindable.Value = value;
         }
-        public T Get<T>(string path, T defaultValue = default!) => GetBindable<T>(path, defaultValue).Value;
-        public Bindable<T> GetBindable<T>(string path, T defaultValue = default!)
+        public T Get<T>(string path, T defaultValue) => GetBindable<T>(path, defaultValue).Value;
+        public Bindable<T> GetBindable<T>(string path, T defaultValue)
         {
             if (LoadedBindables.TryGetValue(path, out var loaded) && loaded is Bindable<T> lb) return lb;
 
