@@ -46,7 +46,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="ppy.osu.Framework.Android" Version="2021.707.0" />
+    <PackageReference Include="ppy.osu.Framework.Android" Version="2021.927.0" />
     <PackageReference Include="System.Formats.Asn1" Version="5.0.0" />
   </ItemGroup>
 
