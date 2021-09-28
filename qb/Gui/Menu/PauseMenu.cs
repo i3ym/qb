@@ -1,6 +1,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 
 namespace qb.Gui.Menu
 {
@@ -32,15 +33,15 @@ namespace qb.Gui.Menu
             GameScreen.Controller.IsPaused.Value = false;
         }
 
-        public override bool OnPressed(QbKey action)
+        public override bool OnPressed(KeyBindingPressEvent<QbKey> e)
         {
-            if (action == QbKey.Back)
+            if (e.Action == QbKey.Back)
             {
                 ContinueGame();
                 return true;
             }
 
-            return base.OnPressed(action);
+            return base.OnPressed(e);
         }
     }
 }
