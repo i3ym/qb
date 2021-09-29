@@ -1,4 +1,5 @@
-﻿using osu.Framework;
+﻿using System.Linq;
+using osu.Framework;
 
 namespace qb.Desktop
 {
@@ -7,7 +8,7 @@ namespace qb.Desktop
         static void Main(string[] args)
         {
             using var host = Host.GetSuitableHost("qb");
-            host.Run(new DesktopGame());
+            host.Run(new DesktopGame(args.Contains("test")));
         }
     }
 }

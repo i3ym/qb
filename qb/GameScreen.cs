@@ -2,7 +2,9 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using qb.Animations;
 using qb.Gui;
 using qb.Gui.Menu;
@@ -13,9 +15,12 @@ namespace qb
     {
         [Cached] public readonly FieldController Controller;
         [Resolved] PixelScreenStack ScreenStack { get; set; } = null!;
+        [Resolved] SkinManager SkinManager { get; set; } = null!;
+        [Resolved] Game Game { get; set; } = null!;
 
         public readonly int FieldWidth, FieldHeight;
         public readonly FieldGrid Playfield, NextGrid;
+        Sprite Bg;
 
         public GameScreen() : this(10, 20) { }
         public GameScreen(int width, int height)
@@ -26,6 +31,8 @@ namespace qb
 
             Playfield = new FieldGrid(width, height);
             NextGrid = new FieldGrid(4, 4) { Anchor = Anchor.TopRight, Origin = Anchor.TopRight, X = -1, Y = -1 };
+
+            Bg = new Sprite() { Width = width, Height = height };
         }
 
         [BackgroundDependencyLoader]
@@ -42,6 +49,7 @@ namespace qb
             }
 
             AddInternal(new Background(Colour4.Black) { Depth = 9999 });
+            AddInternal(Bg);
             AddInternal(Controller);
             AddInternal(Playfield);
             AddInternal(NextGrid);
@@ -136,9 +144,9 @@ namespace qb
                     NextGrid[x, y] = shape.Matrix[x - addx, y - addy] ? shape.Tile : CubeTile.None;
         }
 
-        public bool OnPressed(QbKey action)
+        public bool OnPressed(KeyBindingPressEvent<QbKey> e)
         {
-            if (action == QbKey.Back)
+            if (e.Action == QbKey.Back)
             {
                 Controller.IsPaused.Value = true;
                 ScreenStack.Push<PauseMenu>();
@@ -148,6 +156,26 @@ namespace qb
 
             return false;
         }
-        public void OnReleased(QbKey action) { }
+        public void OnReleased(KeyBindingReleaseEvent<QbKey> e) { }
+
+        protected override bool OnMouseDown(MouseDownEvent e)
+        {
+            if (Game.IsTest)
+            {
+                var img1 = SixLabors.ImageSharp.Image.Load<SixLabors.ImageSharp.PixelFormats.Rgba32>(System.IO.File.ReadAllBytes("bg.png"));
+                var texture = new osu.Framework.Graphics.Textures.Texture(img1.Width, img1.Height, true, osuTK.Graphics.ES30.All.Nearest);
+                texture.SetData(new osu.Framework.Graphics.Textures.TextureUpload(img1));
+
+                Bg.Texture = texture;
+
+
+                var img2 = SixLabors.ImageSharp.Image.Load<SixLabors.ImageSharp.PixelFormats.Rgba32>(System.IO.File.ReadAllBytes("atlas.png"));
+                foreach (var skin in SkinManager.Skins)
+                    skin.SetAtlas(img2);
+                SkinManager.SelectedSkin.TriggerChange();
+            }
+
+            return base.OnMouseDown(e);
+        }
     }
 }
