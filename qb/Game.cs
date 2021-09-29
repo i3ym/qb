@@ -13,8 +13,13 @@ using qb.Input;
 
 namespace qb
 {
+    [Cached]
     public class Game : osu.Framework.Game
     {
+        public bool IsTest { get; private set; }
+
+        public Game(bool istest = false) => IsTest = istest;
+
         [BackgroundDependencyLoader]
         void Load(FrameworkConfigManager config)
         {
