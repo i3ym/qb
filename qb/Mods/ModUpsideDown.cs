@@ -16,7 +16,7 @@ namespace qb.Mods
         }
         public override void OnRemove(GameScreen gamesc)
         {
-            gamesc.Playfield.X = 0;
+            gamesc.Playfield.Y = 0;
             gamesc.Playfield.Anchor = Anchor.TopLeft;
             gamesc.Playfield.Height = Math.Abs(gamesc.Playfield.Height);
         }
