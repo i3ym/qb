@@ -49,10 +49,10 @@ namespace qb.Gui
         [BackgroundDependencyLoader]
         void Load()
         {
-            AddInternal(createArrow(QbKey.Up, 0, new Vector2(0, 0), Anchor.BottomLeft));
-            AddInternal(createArrow(QbKey.Down, 180, new Vector2(1, 0), Anchor.BottomLeft));
-            AddInternal(createArrow(QbKey.Left, 270, new Vector2(2, 0), Anchor.BottomLeft));
-            AddInternal(createArrow(QbKey.Right, 90, new Vector2(3, 0), Anchor.BottomLeft));
+            AddInternal(createArrow(QbKey.Up, "arrowup", new Vector2(0, 0), Anchor.BottomLeft));
+            AddInternal(createArrow(QbKey.Down, "arrowdown", new Vector2(1, 0), Anchor.BottomLeft));
+            AddInternal(createArrow(QbKey.Left, "arrowleft", new Vector2(2, 0), Anchor.BottomLeft));
+            AddInternal(createArrow(QbKey.Right, "arrowright", new Vector2(3, 0), Anchor.BottomLeft));
 
             AddInternal(createText(QbKey.A, "A", new Vector2(0, 0), Anchor.BottomRight));
             AddInternal(createText(QbKey.B, "B", new Vector2(-1.1f, 0), Anchor.BottomRight));
@@ -63,11 +63,11 @@ namespace qb.Gui
 
 
             ControllerButtonData getCfg(QbKey key, Vector2 defaultPos, Anchor defaultAnchor) => ConfigManager.Get("keys." + key, new ControllerButtonData(defaultPos, 1, defaultAnchor));
-            ControllerButton<Sprite> createArrow(QbKey key, int angle, Vector2 defaultPos, Anchor defaultAnchor)
+            ControllerButton<Sprite> createArrow(QbKey key, string texture, Vector2 defaultPos, Anchor defaultAnchor)
             {
                 var cfg = getCfg(key, defaultPos, defaultAnchor);
                 return new ControllerButton<Sprite>(key,
-                    new Sprite() { RelativeSizeAxes = Axes.Both, Anchor = Anchor.Centre, Origin = Anchor.Centre, Rotation = angle, Texture = TextureStore.Get("Resources/ControllerArrow") })
+                    new Sprite() { RelativeSizeAxes = Axes.Both, Anchor = Anchor.Centre, Origin = Anchor.Centre, Texture = TextureStore.Get("Resources/" + texture) })
                 {
                     Position = cfg.Position,
                     Scale = new Vector2(cfg.Scale),

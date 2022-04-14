@@ -7,7 +7,7 @@ namespace qb.Desktop
     {
         static void Main(string[] args)
         {
-            using var host = Host.GetSuitableHost("qb");
+            using var host = Host.GetSuitableDesktopHost("qb");
             host.Run(new DesktopGame(args.Contains("test")));
         }
     }

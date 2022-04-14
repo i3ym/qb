@@ -15,9 +15,7 @@ namespace qb.Gui
         public SkinManager(TextureStore store, Bindable<int> selectedSkinBindable)
         {
             using var upload = ((ResourceStore<TextureUpload>) store).Get("Resources/Atlas16");
-            using var atlas16 = new Image<Rgba32>(upload.Width, upload.Height);
-            atlas16.TryGetSinglePixelSpan(out var span);
-            upload.Data.CopyTo(span);
+            using var atlas16 = Image<Rgba32>.LoadPixelData(upload.Data, upload.Width, upload.Height);
 
             Skins = new[]
             {
