@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Platform;
 using qb.Gui.Menu;
 
 namespace qb.Gui
@@ -10,8 +9,6 @@ namespace qb.Gui
     [Cached]
     public class PixelScreenStack : Container<MenuScreen>
     {
-        [Resolved] GameHost Host { get; set; } = null!;
-
         public bool IsScreenVisible => ScreensPushed.TryPeek(out var screen) && screen.Alpha != 0;
         readonly Stack<MenuScreen> ScreensPushed = new Stack<MenuScreen>();
 

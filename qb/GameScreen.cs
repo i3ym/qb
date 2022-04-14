@@ -36,7 +36,7 @@ namespace qb
         }
 
         [BackgroundDependencyLoader]
-        void Load(PixelScreenStack menus)
+        void Load(Game game, PixelScreenStack menus)
         {
             foreach (var tex in getSkinnedTextures(FieldWidth, FieldHeight))
             {
@@ -59,6 +59,8 @@ namespace qb
             var gameoveranim = new GameOverFillingAnimation();
             var clearlineanim = new ClearLineAnimationSlideDown();
 
+            game.OnAndroidPause += () => Schedule(() => Controller.IsPaused.Value = true);
+            game.OnAndroidResume += () => Schedule(() => Controller.IsPaused.Value = false);
             Controller.OnGameOver += () => gameoveranim.Animation(this, menus.Push<GameOverMenu>);
             Controller.OnLineClear += lines => clearlineanim.Animation(lines, this);
             Controller.OnFieldUpdate += UpdateField;

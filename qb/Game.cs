@@ -1,3 +1,4 @@
+using System;
 using System.Globalization;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
@@ -17,6 +18,8 @@ namespace qb
     public class Game : osu.Framework.Game
     {
         public bool IsTest { get; private set; }
+        public Action OnAndroidPause = delegate { };
+        public Action OnAndroidResume = delegate { };
 
         public Game(bool istest = false) => IsTest = istest;
 
@@ -40,7 +43,6 @@ namespace qb
             AddFont(Resources, "Resources/PixelFont", pixelfontstore);
 
             var pixeltexturestore = new TextureStore(Textures, true, All.Nearest, true, 1);
-            Textures.AddStore(pixeltexturestore);
             Host.Dependencies.Cache(pixeltexturestore, new CacheInfo("PixelTextureStore"));
 
             var qconfig = new QbConfigManager(Host.Storage);
