@@ -5,6 +5,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osuTK;
 using qb.Animations;
 using qb.Gui;
 using qb.Gui.Menu;
@@ -19,7 +20,8 @@ namespace qb
         [Resolved] Game Game { get; set; } = null!;
 
         public readonly int FieldWidth, FieldHeight;
-        public readonly FieldGrid Playfield, NextGrid;
+        public readonly FieldGrid Playfield;
+        public readonly FieldGrid NextGrid;
         Sprite Bg;
 
         public GameScreen() : this(10, 20) { }
@@ -36,7 +38,7 @@ namespace qb
         }
 
         [BackgroundDependencyLoader]
-        void Load(Game game, PixelScreenStack menus)
+        void Load(Game game, PixelScreenStack menus, QbConfigManager qconfig)
         {
             foreach (var tex in getSkinnedTextures(FieldWidth, FieldHeight))
             {
@@ -48,12 +50,29 @@ namespace qb
                         bg[x, tex.tiles.GetLength(1) - 1 - y] = tex.tiles[x, y];
             }
 
-            AddInternal(new Background(Colour4.Black) { Depth = 9999 });
+            var bc = new BufferedContainer(pixelSnapping: true)
+            {
+                RelativeSizeAxes = Axes.Both,
+                EffectColour = Colour4.Black,
+                DrawOriginal = true,
+                Children = new Drawable[]
+                {
+                    Controller,
+                    Playfield,
+                    NextGrid,
+                    new GameInfo() { Anchor = Anchor.TopRight, Origin = Anchor.TopRight, X = -7, Y = 6 },
+                },
+            };
+            qconfig.GetBindable<bool>("shadows", true).BindValueChanged(e => bc.TransformTo(nameof(bc.BlurSigma), new Vector2(e.NewValue ? 10 : 0), 250, Easing.OutQuad), true);
+
             AddInternal(Bg);
-            AddInternal(Controller);
-            AddInternal(Playfield);
-            AddInternal(NextGrid);
-            AddInternal(new GameInfo() { Anchor = Anchor.TopRight, Origin = Anchor.TopRight, X = -7, Y = 6 });
+            qconfig.GetBindable<bool>("showbg", true).BindValueChanged(e =>
+            {
+                if (e.NewValue) Bg.FadeIn(250, Easing.OutQuad);
+                else Bg.FadeOut(250, Easing.OutQuad);
+            }, true);
+
+            AddInternal(bc);
 
 
             var gameoveranim = new GameOverFillingAnimation();
@@ -162,7 +181,7 @@ namespace qb
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            if (Game.IsTest)
+            if (true || Game.IsTest)
             {
                 var img1 = SixLabors.ImageSharp.Image.Load<SixLabors.ImageSharp.PixelFormats.Rgba32>(System.IO.File.ReadAllBytes("bg.png"));
                 var texture = new osu.Framework.Graphics.Textures.Texture(img1.Width, img1.Height, true, osuTK.Graphics.ES30.All.Nearest);
