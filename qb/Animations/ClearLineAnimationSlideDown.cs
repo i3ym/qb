@@ -1,6 +1,3 @@
-using System.Linq;
-using osu.Framework.Graphics;
-
 namespace qb.Animations
 {
     public class ClearLineAnimationSlideDown : IClearLineAnimation

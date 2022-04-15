@@ -1,5 +1,3 @@
-using System;
-
 namespace qb.Animations
 {
     public interface IGameOverAnimation
