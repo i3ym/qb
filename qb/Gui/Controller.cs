@@ -49,25 +49,33 @@ namespace qb.Gui
         [BackgroundDependencyLoader]
         void Load()
         {
-            AddInternal(createArrow(QbKey.Up, "arrowup", new Vector2(0, 0), Anchor.BottomLeft));
-            AddInternal(createArrow(QbKey.Down, "arrowdown", new Vector2(1, 0), Anchor.BottomLeft));
-            AddInternal(createArrow(QbKey.Left, "arrowleft", new Vector2(2, 0), Anchor.BottomLeft));
-            AddInternal(createArrow(QbKey.Right, "arrowright", new Vector2(3, 0), Anchor.BottomLeft));
+            AddInternal(createButton(QbKey.Up, "arrow", new Vector2(0, 0), Anchor.BottomLeft, 0));
+            AddInternal(createButton(QbKey.Down, "arrow", new Vector2(1, 0), Anchor.BottomLeft, 180));
+            AddInternal(createButton(QbKey.Left, "arrow", new Vector2(2, 0), Anchor.BottomLeft, 270));
+            AddInternal(createButton(QbKey.Right, "arrow", new Vector2(3, 0), Anchor.BottomLeft, 90));
 
-            AddInternal(createText(QbKey.A, "A", new Vector2(0, 0), Anchor.BottomRight));
-            AddInternal(createText(QbKey.B, "B", new Vector2(-1.1f, 0), Anchor.BottomRight));
-            AddInternal(createText(QbKey.Back, ("Back", "Назад"), new Vector2(-.05f, -1.1f), Anchor.BottomRight, fontSize: .4f).With(x => x.Width = 2));
+            AddInternal(createButton(QbKey.A, "A", new Vector2(0, 0), Anchor.BottomRight));
+            AddInternal(createButton(QbKey.B, "B", new Vector2(-1.1f, 0), Anchor.BottomRight));
+            AddInternal(createButton(QbKey.Back, "Pause", new Vector2(-.05f, -1.1f), Anchor.BottomRight).With(x => x.Width = 2));
 
             EditMode = false;
 
 
 
             ControllerButtonData getCfg(QbKey key, Vector2 defaultPos, Anchor defaultAnchor) => ConfigManager.Get("keys." + key, new ControllerButtonData(defaultPos, 1, defaultAnchor));
-            ControllerButton<Sprite> createArrow(QbKey key, string texture, Vector2 defaultPos, Anchor defaultAnchor)
+            ControllerButton<Sprite> createButton(QbKey key, string texture, Vector2 defaultPos, Anchor defaultAnchor, float angle = 0)
             {
+                var sprite = new Sprite()
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Texture = TextureStore.Get("Resources/" + texture),
+                    Rotation = angle,
+                };
+
                 var cfg = getCfg(key, defaultPos, defaultAnchor);
-                return new ControllerButton<Sprite>(key,
-                    new Sprite() { RelativeSizeAxes = Axes.Both, Anchor = Anchor.Centre, Origin = Anchor.Centre, Texture = TextureStore.Get("Resources/" + texture) })
+                return new ControllerButton<Sprite>(key, sprite)
                 {
                     Position = cfg.Position,
                     Scale = new Vector2(cfg.Scale),
@@ -76,21 +84,6 @@ namespace qb.Gui
                     Size = new osuTK.Vector2(1),
                     HandleEvents = false,
                 };
-            }
-            ControllerButton<PixelText> createText(QbKey key, TranslatedString text, Vector2 defaultPos, Anchor defaultAnchor, float fontSize = .9f)
-            {
-                var cfg = getCfg(key, defaultPos, defaultAnchor);
-                return new ControllerButton<PixelText>(key,
-                    new PixelText(text) { Anchor = Anchor.Centre, Origin = Anchor.Centre, Colour = Colour4.Black })
-                {
-                    Position = cfg.Position,
-                    Scale = new Vector2(cfg.Scale),
-                    Anchor = cfg.Anchor,
-                    Origin = cfg.Origin,
-                    Background = Colour4.White,
-                    Size = new osuTK.Vector2(1),
-                    HandleEvents = false,
-                }.With(x => x.Child.Font = x.Child.Font.With(size: fontSize));
             }
         }
 
