@@ -1,5 +1,3 @@
-using System.Collections.Immutable;
-
 namespace qb.Mods
 {
     public abstract class Mod

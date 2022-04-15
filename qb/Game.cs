@@ -1,16 +1,5 @@
-using System;
 using System.Globalization;
-using osu.Framework.Allocation;
-using osu.Framework.Configuration;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Textures;
-using osu.Framework.IO.Stores;
-using osu.Framework.Platform;
 using osuTK.Graphics.ES30;
-using qb.Gui;
-using qb.Gui.Menu;
-using qb.Input;
 
 namespace qb
 {

@@ -1,6 +1,3 @@
-using System.Linq;
-using osu.Framework.Allocation;
-
 namespace qb.Gui.Menu
 {
     public class SkinChooseMenu : ChooseMenu

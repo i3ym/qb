@@ -1,5 +1,3 @@
-using System;
-
 namespace qb.Gui
 {
     public class ValueMenuButton<T> : PixelTextButton

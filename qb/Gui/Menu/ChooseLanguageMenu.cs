@@ -1,6 +1,3 @@
-using osu.Framework.Allocation;
-using osu.Framework.Configuration;
-
 namespace qb.Gui.Menu
 {
     public class ChooseLanguageMenu : ChooseMenu

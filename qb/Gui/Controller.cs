@@ -1,13 +1,3 @@
-using System.Linq;
-using Newtonsoft.Json;
-using osu.Framework.Allocation;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
-using osu.Framework.Input.Events;
-using osuTK;
-
 namespace qb.Gui
 {
     public class Controller : CompositeDrawable
@@ -126,7 +116,7 @@ namespace qb.Gui
 
             public ControllerButtonData(Vector2 position, float scale, Anchor anchor) : this(position, scale, anchor, anchor) { }
 
-            [JsonConstructor]
+            [Newtonsoft.Json.JsonConstructor]
             public ControllerButtonData(Vector2 position, float scale, Anchor anchor, Anchor origin)
             {
                 Position = position;

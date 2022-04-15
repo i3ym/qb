@@ -1,7 +1,3 @@
-using System.Collections.Immutable;
-using osu.Framework.Bindables;
-using osu.Framework.Graphics.Textures;
-using osu.Framework.IO.Stores;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 

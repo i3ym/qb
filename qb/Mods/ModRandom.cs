@@ -1,5 +1,3 @@
-using System;
-
 namespace qb.Mods
 {
     public class ModRandom : Mod

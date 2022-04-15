@@ -1,6 +1,3 @@
-using System;
-using osu.Framework.Graphics;
-
 namespace qb.Mods
 {
     public class ModUpsideDown : Mod

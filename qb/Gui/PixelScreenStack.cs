@@ -1,9 +1,3 @@
-using System.Collections.Generic;
-using osu.Framework.Allocation;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using qb.Gui.Menu;
-
 namespace qb.Gui
 {
     [Cached]
