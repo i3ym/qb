@@ -169,7 +169,7 @@ namespace qb
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            if (true || Game.IsTest)
+            if (Game.IsTest)
             {
                 var img1 = SixLabors.ImageSharp.Image.Load<SixLabors.ImageSharp.PixelFormats.Rgba32>(System.IO.File.ReadAllBytes("bg.png"));
                 var texture = new osu.Framework.Graphics.Textures.Texture(img1.Width, img1.Height, true, osuTK.Graphics.ES30.All.Nearest);
