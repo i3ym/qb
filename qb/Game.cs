@@ -27,7 +27,7 @@ namespace qb
             Resources.AddStore(new DllResourceStore("qb.dll"));
             Textures.AddStore(new TextureStore(Host.CreateTextureLoaderStore(new DllResourceStore("qb"))));
 
-            var pixelfontstore = new FontStore(scaleAdjust: 5, minFilterMode: osuTK.Graphics.ES30.All.Nearest);
+            var pixelfontstore = new FontStore(scaleAdjust: 10, minFilterMode: osuTK.Graphics.ES30.All.Nearest);
             Fonts.AddStore(pixelfontstore);
             AddFont(Resources, "Resources/PixelFont", pixelfontstore);
 
