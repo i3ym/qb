@@ -32,6 +32,6 @@ namespace qb.Gui
 
             return tb;
         }
-        PixelText GetNewText(float y, float fontsize) => new PixelText() { Height = 1, Width = 7, X = 1.5f, Y = y + .5f, }.With(x => x.Font = x.Font.With(size: fontsize));
+        PixelText GetNewText(float y, float fontsize) => new PixelText() { Height = 1, Width = 7, X = 1.5f, Y = y + .5f, FontSize = fontsize };
     }
 }
