@@ -1,9 +1,3 @@
-using System;
-using osu.Framework.Allocation;
-using osu.Framework.Bindables;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-
 namespace qb.Gui
 {
     public class GameInfo : CompositeDrawable

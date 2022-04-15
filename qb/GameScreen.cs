@@ -1,15 +1,3 @@
-using System.Collections.Generic;
-using osu.Framework.Allocation;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input.Bindings;
-using osu.Framework.Input.Events;
-using osuTK;
-using qb.Animations;
-using qb.Gui;
-using qb.Gui.Menu;
-
 namespace qb
 {
     public class GameScreen : CompositeDrawable, IKeyBindingHandler<QbKey>

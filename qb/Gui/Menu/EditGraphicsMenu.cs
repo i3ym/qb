@@ -1,6 +1,3 @@
-using osu.Framework.Allocation;
-using osu.Framework.Graphics;
-
 namespace qb.Gui.Menu
 {
     public class EditGraphicsMenu : MenuScreen

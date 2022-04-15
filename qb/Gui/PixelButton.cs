@@ -1,12 +1,3 @@
-using System;
-using osu.Framework.Allocation;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input;
-using osu.Framework.Input.Events;
-using osuTK.Input;
-
 namespace qb.Gui
 {
     public class PixelButton<T> : PixelButton, IHandleable where T : Drawable

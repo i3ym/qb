@@ -1,8 +1,3 @@
-using osu.Framework.Allocation;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osuTK;
-
 namespace qb.Gui
 {
     public class PixelScrollContainer : ScrollContainer<Drawable>

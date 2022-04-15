@@ -1,8 +1,3 @@
-using osu.Framework.Allocation;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
-
 namespace qb.Gui
 {
     public class PixelBorderScrollContainer : Container // TODO: make not jest pixelscrorl container but for every thing by input

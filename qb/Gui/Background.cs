@@ -1,6 +1,3 @@
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Shapes;
-
 namespace qb.Gui
 {
     public class Background : Box

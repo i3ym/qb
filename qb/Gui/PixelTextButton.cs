@@ -1,6 +1,3 @@
-using System;
-using osu.Framework.Graphics;
-
 namespace qb.Gui
 {
     public class PixelTextButton : PixelButton<PixelText>

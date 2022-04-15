@@ -1,5 +1,3 @@
-using System.Collections.Immutable;
-
 namespace qb
 {
     public static class Shapes
