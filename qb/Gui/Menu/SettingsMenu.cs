@@ -18,6 +18,7 @@ namespace qb.Gui.Menu
                     new PixelTextButton(("Skin", "Скин"), Push<SkinChooseMenu>),
                     new PixelTextButton(("Language", "Язык"), Push<ChooseLanguageMenu>),
                     new PixelTextButton(("Controls", "Управление"), Push<EditControlsMenu>),
+                    new PixelTextButton(("Visuals", "Графика"), Push<EditGraphicsMenu>),
                     new PixelTextButton(("Back", "Назад"), Back),
                 },
             };
