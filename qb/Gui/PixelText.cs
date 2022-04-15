@@ -5,10 +5,12 @@ namespace qb.Gui
         public TranslatedString TranslatedText { get => TranslatedTextBindable.Value; set => TranslatedTextBindable.Value = value; }
         readonly Bindable<TranslatedString> TranslatedTextBindable = new Bindable<TranslatedString>();
 
+        public float FontSize { set => Font = Font.With(family: "PixelFont", size: value / 2f); }
+
         public PixelText()
         {
             Current.BindValueChanged(e => Text = e.NewValue?.ToUpperInvariant() ?? string.Empty);
-            Font = Font.With(family: "PixelFont", size: 1);
+            FontSize = 1;
 
             Truncate = true;
             EllipsisString = "-";
