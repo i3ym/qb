@@ -1,7 +1,13 @@
 namespace qb.Gui
 {
-    public class ChooseMenuButton<T> : ValueMenuButton<T>
+    public interface IChooseMenuButton
     {
+        bool IsActive { get; }
+    }
+    public class ChooseMenuButton<T> : ValueMenuButton<T>, IChooseMenuButton
+    {
+        public bool IsActive => EqualityComparer<T>.Default.Equals(Source.Value, Value);
+
         readonly Bindable<T> Source;
 
         public ChooseMenuButton(T value, Bindable<T> source) : base(value) => Source = source;

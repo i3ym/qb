@@ -6,7 +6,7 @@ namespace qb.Gui
 
         public PixelButton(T child) => AddInternal(Child = child);
     }
-    public class PixelButton : CompositeDrawable, IHandleable
+    public class PixelButton : CompositeDrawable, IHandleable, INavigatableButton
     {
         public bool IsMouseOverPressed
         {
@@ -47,8 +47,11 @@ namespace qb.Gui
                 BackgroundBox.Colour = value;
             }
         }
+
         Box? BackgroundBox;
         InputManager? InputManager;
+
+        public bool Focusable { get; set; } = true;
 
 
         public PixelButton() => Height = 2;
@@ -87,6 +90,12 @@ namespace qb.Gui
         {
             MouseUp();
             base.OnTouchUp(e);
+        }
+
+        void INavigatableButton.OnEvent(QbKey action)
+        {
+            if (action == QbKey.A)
+                Action();
         }
     }
 }

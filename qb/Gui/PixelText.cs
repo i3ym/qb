@@ -10,7 +10,7 @@ namespace qb.Gui
         public PixelText()
         {
             Current.BindValueChanged(e => Text = e.NewValue?.ToUpperInvariant() ?? string.Empty);
-            FontSize = 1;
+            FontSize = 1f;
 
             Truncate = true;
             EllipsisString = "-";

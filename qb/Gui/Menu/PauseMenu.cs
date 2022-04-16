@@ -1,26 +1,15 @@
 namespace qb.Gui.Menu
 {
-    public class PauseMenu : MenuScreen, IKeyBindingHandler<QbKey>
+    public class PauseMenu : ControllableMenuScreen, IKeyBindingHandler<QbKey>
     {
         [Resolved] GameScreen GameScreen { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         void Load()
         {
-            var buttons = new MenuButtonContainer()
-            {
-                AutoSizeAxes = Axes.Both,
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Children = new[]
-                {
-                    new PixelTextButton(("Continue", "Продолжить"), ContinueGame),
-                    new PixelTextButton(("Settings", "Настройки"), Push<SettingsMenu>),
-                    new PixelTextButton(("Exit", "Выйти"), Push<MainMenu>),
-                },
-            };
-
-            AddInternal(buttons);
+            AddButton(new PixelTextButton(("Continue", "Продолжить"), ContinueGame));
+            AddButton(new PixelTextButton(("Settings", "Настройки"), Push<SettingsMenu>));
+            AddButton(new PixelTextButton(("Exit", "Выйти"), Push<MainMenu>));
         }
         void ContinueGame()
         {
