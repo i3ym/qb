@@ -1,26 +1,15 @@
 namespace qb.Gui.Menu
 {
-    public class SettingsMenu : MenuScreen
+    public class SettingsMenu : ControllableMenuScreen
     {
         [BackgroundDependencyLoader]
-        void Load(GameScreen gamesc)
+        void Load()
         {
-            var buttons = new MenuButtonContainer()
-            {
-                AutoSizeAxes = Axes.Both,
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Children = new[]
-                {
-                    new PixelTextButton(("Skin", "Скин"), Push<SkinChooseMenu>),
-                    new PixelTextButton(("Language", "Язык"), Push<ChooseLanguageMenu>),
-                    new PixelTextButton(("Controls", "Управление"), Push<EditControlsMenu>),
-                    new PixelTextButton(("Visuals", "Графика"), Push<EditGraphicsMenu>),
-                    new PixelTextButton(("Back", "Назад"), Back),
-                },
-            };
-
-            AddInternal(buttons);
+            AddButton(new PixelTextButton(("Skin", "Скин"), Push<SkinChooseMenu>));
+            AddButton(new PixelTextButton(("Language", "Язык"), Push<ChooseLanguageMenu>));
+            AddButton(new PixelTextButton(("Controls", "Управление"), Push<EditControlsMenu>));
+            AddButton(new PixelTextButton(("Visuals", "Графика"), Push<EditGraphicsMenu>));
+            AddButton(new PixelTextButton(("Back", "Назад"), Back));
         }
     }
 }

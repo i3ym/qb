@@ -1,6 +1,6 @@
 namespace qb.Gui.Menu
 {
-    public class MainMenu : MenuScreen
+    public class MainMenu : ControllableMenuScreen
     {
         [Resolved] GameScreen GameScreen { get; set; } = null!;
         [Resolved] BackgroundController BackgroundGameController { get; set; } = null!;
@@ -9,20 +9,9 @@ namespace qb.Gui.Menu
         [BackgroundDependencyLoader]
         void Load(GameHost host)
         {
-            var buttons = new MenuButtonContainer()
-            {
-                AutoSizeAxes = Axes.Both,
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Children = new[]
-                {
-                    new PixelTextButton(("Start", "Начать"), Push<StartGameMenu>),
-                    new PixelTextButton(("Settings", "Настройки"), Push<SettingsMenu>),
-                    new PixelTextButton(("Quit", "Выйти"), host.Exit),
-                },
-            };
-
-            AddInternal(buttons);
+            AddButton(new PixelTextButton(("Start", "Начать"), Push<StartGameMenu>));
+            AddButton(new PixelTextButton(("Settings", "Настройки"), Push<SettingsMenu>));
+            AddButton(new PixelTextButton(("Quit", "Выйти"), host.Exit));
         }
 
 

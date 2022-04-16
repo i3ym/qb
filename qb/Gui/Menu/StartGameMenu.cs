@@ -1,6 +1,6 @@
 namespace qb.Gui.Menu
 {
-    public class StartGameMenu : MenuScreen
+    public class StartGameMenu : ControllableMenuScreen
     {
         [Resolved] Storage Storage { get; set; } = null!;
 
@@ -19,6 +19,7 @@ namespace qb.Gui.Menu
                     new PixelTextButton(("+"), levelup) { Width = 2 },
                 },
             };
+
             var mods = new ToggleMenuButtonContainer<Mod>()
             {
                 AutoSizeAxes = Axes.Both,
@@ -28,22 +29,23 @@ namespace qb.Gui.Menu
                 Children = Mod.Mods.Select(x => new ValueMenuButton<Mod>(x, x.Name)).ToArray(),
             };
 
-            var ffc = new PixelFlowContainer()
+            AddButton(new PixelTextButton(("Start", "Начать"), start));
+            AddButtonContainer(level);
+            AddButtonContainer(mods);
+
+            /*foreach (var mod in Mod.Mods)
             {
-                AutoSizeAxes = Axes.Both,
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                ChildAxes = Anchor.TopCentre,
-                Direction = FillDirection.Vertical,
-                Children = new Drawable[]
+                var clickfunc = (bool enabled) =>
                 {
-                    new PixelTextButton(("Start", "Начать"), start),
-                    level,
-                    mods,
-                    new PixelTextButton(("Back", "Назад"), Back),
-                },
-            };
-            AddInternal(ffc);
+                    if (enabled) { mod.OnAdd(gamesc); gamesc.Controller.Mods.Add(mod); }
+                    else { mod.OnRemove(gamesc); gamesc.Controller.Mods.Remove(mod); }
+                };
+
+                AddButton(new PixelSwitchButton(mod.Name, () => gamesc.Controller.Mods.Contains(mod), clickfunc));
+            }*/
+
+            AddButton(new PixelTextButton(("Back", "Назад"), Back));
+
 
 
             void start()

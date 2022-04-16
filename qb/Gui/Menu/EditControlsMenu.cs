@@ -1,26 +1,15 @@
 namespace qb.Gui.Menu
 {
-    public class EditControlsMenu : MenuScreen
+    public class EditControlsMenu : ControllableMenuScreen
     {
         [Resolved] Controller Controller { get; set; } = null!;
 
         [BackgroundDependencyLoader]
         void Load()
         {
-            var buttons = new MenuButtonContainer()
-            {
-                AutoSizeAxes = Axes.Both,
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Children = new Drawable[]
-                {
-                    new PixelTextButton(("move padla", "двигай ало")),
-                    new PixelSliderBar(("Scale", "Размер"), 1, 5, e => Controller.ChildrenScale = e.NewValue) { RelativeSizeAxes = Axes.X, Height = 2, Current = { Value = Controller.ChildrenScale } },
-                    new PixelTextButton(("Back", "Назад"), Back),
-                },
-            };
-
-            AddInternal(buttons);
+            AddButton(new PixelTextButton(("move padla", "двигай ало")) { Focusable = false });
+            AddButton(new PixelSliderBar(("Scale", "Размер"), 1, 5, e => Controller.ChildrenScale = e.NewValue) { RelativeSizeAxes = Axes.X, Height = 2, Current = { Value = Controller.ChildrenScale } });
+            AddButton(new PixelTextButton(("Back", "Назад"), Back));
         }
 
         public override void OnShow(MenuScreen? last)
