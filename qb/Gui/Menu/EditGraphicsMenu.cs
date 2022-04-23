@@ -5,7 +5,7 @@ namespace qb.Gui.Menu
         [BackgroundDependencyLoader]
         void Load(QbConfigManager qconfig)
         {
-            Background.Alpha = 0;
+            Background.Alpha = .1f;
 
             AddButton(new PixelSwitchButton(("Shadows", "Тени"), qconfig.GetBindable<bool>("shadows", true)));
             AddButton(new PixelSwitchButton(("Background", "Фон"), qconfig.GetBindable<bool>("showbg", true)));
