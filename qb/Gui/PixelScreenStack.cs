@@ -15,15 +15,18 @@ namespace qb.Gui
             base.Add(drawable);
         }
 
+        static float FadeDuration => 250;
+        static Easing FadeEasing => Easing.OutQuad;
+
 
         public void Push<T>() where T : MenuScreen, new() => Push(new T());
         void Push(MenuScreen screen)
         {
             Add(screen);
 
-            screen.Show();
+            screen.FadeInFromZero(FadeDuration, FadeEasing);
             ScreensPushed.TryPeek(out var last);
-            last?.Hide();
+            last?.FadeOutFromOne(FadeDuration, FadeEasing);
 
             Schedule(() => screen.OnShow(last));
             ScreensPushed.Push(screen);
@@ -31,11 +34,11 @@ namespace qb.Gui
         public void Pop()
         {
             if (!ScreensPushed.TryPop(out var screen)) return;
-            Remove(screen);
+            screen.FadeOutFromOne(FadeDuration, FadeEasing).Expire();
             Schedule(screen.OnRemove);
 
             if (!ScreensPushed.TryPeek(out var newscreen)) return;
-            newscreen.Show();
+            newscreen.FadeInFromZero(FadeDuration, FadeEasing);
         }
         public void Set(MenuScreen screen)
         {
