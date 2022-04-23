@@ -1,0 +1,18 @@
+{
+    "Resolution": 16,
+    "AtlasFile": "atlas.png",
+    "Skins": [
+        { "NameEn": "Classic",          "NameRu": "Классический",       "AtlasIndex": 0,  "BackgroundFile": "classic.png" },
+        { "NameEn": "Sadness",          "NameRu": "Печаль",             "AtlasIndex": 1,  "BackgroundFile": "sadness.png" },
+        { "NameEn": "Forest",           "NameRu": "Лес",                "AtlasIndex": 2,  "BackgroundFile": "forest.png" },
+        { "NameEn": "Lines",            "NameRu": "Линии",              "AtlasIndex": 3,  "BackgroundFile": null },
+        { "NameEn": "Faces",            "NameRu": "Лица",               "AtlasIndex": 4,  "BackgroundFile": null },
+        { "NameEn": "Neon",             "NameRu": "Неон",               "AtlasIndex": 5,  "BackgroundFile": null },
+        { "NameEn": "Leaf Fall",        "NameRu": "Листопад",           "AtlasIndex": 6,  "BackgroundFile": "leaf_fall.png" },
+        { "NameEn": "Hot Dog",          "NameRu": "Хот дог",            "AtlasIndex": 7,  "BackgroundFile": null },
+        { "NameEn": "Vending Machine",  "NameRu": "Торговый автомат",   "AtlasIndex": 8,  "BackgroundFile": "vending_machine.png" },
+        { "NameEn": "Winter",           "NameRu": "Зима",               "AtlasIndex": 9,  "BackgroundFile": "winter.png" },
+        { "NameEn": "Beach",            "NameRu": "Пляж",               "AtlasIndex": 10, "BackgroundFile": "beach.png" },
+        { "NameEn": "Electronics-60",   "NameRu": "Electronics-60",     "AtlasIndex": 11, "BackgroundFile": "electronics-60.png" }
+    ]
+}

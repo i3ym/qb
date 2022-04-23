@@ -37,7 +37,7 @@ namespace qb
             var qconfig = new QbConfigManager(Host.Storage);
             Host.Dependencies.Cache(qconfig);
 
-            Host.Dependencies.Cache(new SkinManager(Textures, qconfig.GetBindable("skin", 0)));
+            Host.Dependencies.Cache(new SkinManager(Host.Storage, Resources, qconfig.GetBindable("skin", 0)));
             Host.Dependencies.Cache(new BackgroundController());
 
 

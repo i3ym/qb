@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 
@@ -5,33 +6,64 @@ namespace qb.Gui
 {
     public class SkinManager
     {
+        [Resolved] Storage Storage { get; init; } = null!;
+
         public readonly Bindable<Skin> SelectedSkin = new Bindable<Skin>();
-        public readonly ImmutableArray<Skin> Skins;
+        public ImmutableArray<Skin> Skins { get; private set; }
+        readonly ImmutableArray<Skin> BaseSkins;
 
-        public SkinManager(TextureStore store, Bindable<int> selectedSkinBindable)
+        public SkinManager(Storage storage, ResourceStore<byte[]> store, Bindable<int> selectedSkinBindable)
         {
-            using var upload = ((ResourceStore<TextureUpload>) store).Get("Resources/Atlas16");
-            using var atlas16 = Image<Rgba32>.LoadPixelData(upload.Data, upload.Width, upload.Height);
-
-            Skins = new[]
-            {
-                new Skin(atlas16, 16, 0,  ("Classic",               "Классический")),
-                new Skin(atlas16, 16, 1,  ("Sadness",               "Печаль")),
-                new Skin(atlas16, 16, 2,  ("Forest",                "Лес")),
-                new Skin(atlas16, 16, 3,  ("Lines",                 "Линии")),
-                new Skin(atlas16, 16, 4,  ("Faces",                 "Лица")),
-                new Skin(atlas16, 16, 5,  ("Neon",                  "Неон")),
-                new Skin(atlas16, 16, 6,  ("Leaf Fall",             "Листопад")),
-                new Skin(atlas16, 16, 7,  ("Hot Dog",               "Хот дог")),
-                new Skin(atlas16, 16, 8,  ("Vending Machine",       "Торговый автомат")),
-                new Skin(atlas16, 16, 9,  ("Medicine",              "Аптечка")),
-                new Skin(atlas16, 16, 10, ("New Year",              "Новый год")),
-                new Skin(atlas16, 16, 11, ("Beach",                 "Пляж")),
-            }.ToImmutableArray();
-
+            Skins = BaseSkins = LoadSkins("Resources/BaseSkins/", store.GetStream).ToImmutableArray();
+            ReloadCustomSkins(storage);
 
             SelectedSkin.BindValueChanged(e => selectedSkinBindable.Value = Skins.IndexOf(e.NewValue));
-            selectedSkinBindable.BindValueChanged(e => SelectedSkin.Value = Skins[e.NewValue], true);
+            selectedSkinBindable.BindValueChanged(e => SelectedSkin.Value = Skins[e.NewValue % Skins.Length], true);
         }
+
+        public void ReloadCustomSkins() => ReloadCustomSkins(Storage);
+        void ReloadCustomSkins(Storage storage)
+        {
+            Skins = BaseSkins.Concat(LoadSkins(storage, "skins")).ToImmutableArray();
+            SelectedSkin.TriggerChange();
+        }
+
+
+        IEnumerable<Skin> LoadSkins(Storage storage, string path)
+        {
+            try { return storage.GetDirectories(path).SelectMany(path => LoadSkins(path, path => storage.GetStream(path, FileAccess.Read, FileMode.Open))); }
+            catch { return Enumerable.Empty<Skin>(); }
+        }
+        IEnumerable<Skin> LoadSkins(string basepath, Func<string, Stream> openfilefunc)
+        {
+            try
+            {
+                SkinsData data;
+                using (var jsons = openfilefunc(Path.Combine(basepath, "skins.json")))
+                    data = new JsonSerializer().Deserialize<SkinsData>(new JsonTextReader(new StreamReader(jsons)));
+
+                Image<Rgba32> atlas;
+                using (var atlass = openfilefunc(Path.Combine(basepath, data.AtlasFile)))
+                    atlas = SixLabors.ImageSharp.Image.Load<Rgba32>(atlass);
+
+                return data.Skins.Select((skin) =>
+                {
+                    Image<Rgba32>? background = null;
+                    try
+                    {
+                        using (var backgrounds = openfilefunc(Path.Combine(basepath, skin.BackgroundFile)))
+                            background = SixLabors.ImageSharp.Image.Load<Rgba32>(backgrounds);
+                    }
+                    catch { }
+
+                    return new Skin(new TranslatedString(skin.NameEn, skin.NameRu), atlas, background, data.Resolution, skin.AtlasIndex);
+                });
+            }
+            catch { return Enumerable.Empty<Skin>(); }
+        }
+
+
+        readonly record struct SkinsData(int Resolution, string AtlasFile, ImmutableArray<SkinData> Skins);
+        readonly record struct SkinData(string NameRu, string NameEn, string BackgroundFile, int AtlasIndex);
     }
 }

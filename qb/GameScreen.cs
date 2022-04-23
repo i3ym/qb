@@ -54,6 +54,15 @@ namespace qb
             qconfig.GetBindable<bool>("shadows", true).BindValueChanged(e => bc.TransformTo(nameof(bc.BlurSigma), new Vector2(e.NewValue ? 10 : 0), 250, Easing.OutQuad), true);
 
             AddInternal(Bg);
+            SkinManager.SelectedSkin.BindValueChanged(e =>
+            {
+                Bg.FadeOut(250, Easing.OutQuad)
+                    .Finally(s =>
+                    {
+                        s.Texture = e.NewValue.Background;
+                        s.FadeIn(250, Easing.OutQuad);
+                    });
+            }, true);
             qconfig.GetBindable<bool>("showbg", true).BindValueChanged(e =>
             {
                 if (e.NewValue) Bg.FadeIn(250, Easing.OutQuad);
@@ -166,25 +175,5 @@ namespace qb
             return false;
         }
         public void OnReleased(KeyBindingReleaseEvent<QbKey> e) { }
-
-        protected override bool OnMouseDown(MouseDownEvent e)
-        {
-            if (Game.IsTest)
-            {
-                var img1 = SixLabors.ImageSharp.Image.Load<SixLabors.ImageSharp.PixelFormats.Rgba32>(System.IO.File.ReadAllBytes("bg.png"));
-                var texture = new osu.Framework.Graphics.Textures.Texture(img1.Width, img1.Height, true, osuTK.Graphics.ES30.All.Nearest);
-                texture.SetData(new osu.Framework.Graphics.Textures.TextureUpload(img1));
-
-                Bg.Texture = texture;
-
-
-                var img2 = SixLabors.ImageSharp.Image.Load<SixLabors.ImageSharp.PixelFormats.Rgba32>(System.IO.File.ReadAllBytes("atlas.png"));
-                foreach (var skin in SkinManager.Skins)
-                    skin.SetAtlas(img2);
-                SkinManager.SelectedSkin.TriggerChange();
-            }
-
-            return base.OnMouseDown(e);
-        }
     }
 }
