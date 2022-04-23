@@ -6,8 +6,14 @@ namespace qb.Gui.Menu
         MenuButtonContainer ButtonContainer = null!;
 
         [BackgroundDependencyLoader]
-        void Load(SkinManager skinmgr)
+        void Load()
         {
+            AddInternal(new PixelTextButton(Title) { RelativeSizeAxes = Axes.X, Height = 2, Background = Colour4.Black });
+
+            var backb = new PixelTextButton(("Back", "Назад"), Back) { RelativeSizeAxes = Axes.X, Height = 2, Anchor = Anchor.BottomLeft, Origin = Anchor.BottomLeft, Background = Colour4.Black };
+            AddInternal(backb);
+            AddButton(backb, false);
+
             var buttons = new PixelBorderScrollContainer()
             {
                 RelativeSizeAxes = Axes.X,
@@ -23,16 +29,9 @@ namespace qb.Gui.Menu
                     ChildrenAnchor = Anchor.TopLeft,
                 },
             };
-
-
-            AddInternal(new PixelTextButton(Title) { RelativeSizeAxes = Axes.X, Height = 2, Background = Colour4.Black });
-
             AddInternal(buttons);
             AddButtonContainer(ButtonContainer, false);
 
-            var backb = new PixelTextButton(("Back", "Назад"), Back) { RelativeSizeAxes = Axes.X, Height = 2, Anchor = Anchor.BottomLeft, Origin = Anchor.BottomLeft, Background = Colour4.Black };
-            AddInternal(backb);
-            AddButton(backb, false);
 
             ScheduleAfterChildren(() =>
             {
