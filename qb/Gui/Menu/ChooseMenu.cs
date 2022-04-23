@@ -4,6 +4,7 @@ namespace qb.Gui.Menu
     {
         protected abstract TranslatedString Title { get; }
         MenuButtonContainer ButtonContainer = null!;
+        PixelBorderScrollContainer ScrollContainer = null!;
 
         [BackgroundDependencyLoader]
         void Load()
@@ -14,7 +15,7 @@ namespace qb.Gui.Menu
             AddInternal(backb);
             AddButton(backb, false);
 
-            var buttons = new PixelBorderScrollContainer()
+            ScrollContainer = new PixelBorderScrollContainer()
             {
                 RelativeSizeAxes = Axes.X,
                 Y = 2,
@@ -29,9 +30,15 @@ namespace qb.Gui.Menu
                     ChildrenAnchor = Anchor.TopLeft,
                 },
             };
-            AddInternal(buttons);
+            AddInternal(ScrollContainer);
             AddButtonContainer(ButtonContainer, false);
 
+
+            SelectionIndex.BindValueChanged(e =>
+            {
+                if (e.NewValue != 0)
+                    ScrollContainer.ScrollIntoView(ButtonContainer[e.NewValue - 1]);
+            }, true);
 
             ScheduleAfterChildren(() =>
             {

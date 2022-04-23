@@ -85,8 +85,15 @@ namespace qb.Gui.Menu
 
         public override bool OnPressed(KeyBindingPressEvent<QbKey> e)
         {
-            if (e.Action == QbKey.Down) SelectionIndex.Value++;
-            else if (e.Action == QbKey.Up) SelectionIndex.Value--;
+            if (e.Action == QbKey.Down)
+                SelectionIndex.Value = (SelectionIndex.Value + 1) % Buttons.Count;
+            else if (e.Action == QbKey.Up)
+            {
+                var val = SelectionIndex.Value - 1;
+                while (val < 0) val += Buttons.Count;
+
+                SelectionIndex.Value = val;
+            }
             else (Buttons[SelectionIndex.Value % Buttons.Count] as INavigatableButton)?.OnEvent(e.Action);
 
             return base.OnPressed(e);
