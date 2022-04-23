@@ -26,6 +26,6 @@ namespace qb.Gui
             AddInternal(container);
         }
 
-        // public void ScrollTo(Drawable drawable) => ScrollContainer.ScrollTo(drawable)
+        public void ScrollIntoView(Drawable drawable, bool animated = true) => ScrollContainer.ScrollIntoView(drawable, animated);
     }
 }
