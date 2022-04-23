@@ -10,9 +10,9 @@ namespace qb.Gui
 
         readonly Bindable<T> Source;
 
-        public ChooseMenuButton(T value, Bindable<T> source) : base(value) => Source = source;
-        public ChooseMenuButton(T value, Bindable<T> source, TranslatedString text) : base(value, text) => Source = source;
-        public ChooseMenuButton(T value, Bindable<T> source, TranslatedString text, Action action) : base(value, text, action) => Source = source;
+        public ChooseMenuButton(T value, Bindable<T> source) : base(value) => Source = source.GetBoundCopy();
+        public ChooseMenuButton(T value, Bindable<T> source, TranslatedString text) : base(value, text) => Source = source.GetBoundCopy();
+        public ChooseMenuButton(T value, Bindable<T> source, TranslatedString text, Action action) : base(value, text, action) => Source = source.GetBoundCopy();
 
         [BackgroundDependencyLoader]
         void Load()
