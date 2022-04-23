@@ -40,19 +40,24 @@ namespace qb.Gui.Menu
             });
 
 
-            SelectionIndex.BindValueChanged(_ => updateCursorPosition());
-            ScheduleAfterChildren(() => updateCursorPosition(0));
+            ScheduleAfterChildren(() => UpdateCursorPosition(0));
+        }
 
-            void updateCursorPosition(float duration = 180)
-            {
-                if (Buttons.Count == 0) return;
-                while (SelectionIndex.Value < 0) SelectionIndex.Value += Buttons.Count;
+        protected override void Update()
+        {
+            base.Update();
+            UpdateCursorPosition();
+        }
+        protected void UpdateCursorPosition(float duration = 180)
+        {
+            if (Buttons.Count == 0) return;
+            while (SelectionIndex.Value < 0)
+                SelectionIndex.Value += Buttons.Count;
 
-                var btn = Buttons[SelectionIndex.Value % Buttons.Count];
-                SelectionDrawable
-                    .MoveTo(btn.ToSpaceOfOtherDrawable(default(Vector2), this), duration, Easing.OutQuad)
-                    .ResizeTo(((Drawable) btn).LayoutSize, duration, Easing.OutQuad);
-            }
+            var btn = Buttons[SelectionIndex.Value % Buttons.Count];
+            SelectionDrawable
+                .MoveTo(btn.ToSpaceOfOtherDrawable(default(Vector2), this), duration, Easing.OutQuad)
+                .ResizeTo(((Drawable) btn).LayoutSize, duration, Easing.OutQuad);
         }
 
         protected void AddButtonContainer<T>(Container<T> container, bool addToContainer = true) where T : Drawable
