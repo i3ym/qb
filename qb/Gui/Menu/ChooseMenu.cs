@@ -34,11 +34,14 @@ namespace qb.Gui.Menu
             AddInternal(backb);
             AddButton(backb, false);
 
-            ScheduleAfterChildren(() => SelectionIndex.Value = ButtonContainer.OfType<IChooseMenuButton>().TakeWhile(x => !x.IsActive).Count() + 1);
+            ScheduleAfterChildren(() =>
+            {
+                SelectionIndex.Value = ButtonContainer.OfType<IChooseMenuButton>().TakeWhile(x => !x.IsActive).Count() + 1;
+                UpdateCursorPosition(0);
+            });
         }
 
-        protected void AddButtons(params PixelTextButton[] buttons) => AddButtons(buttons.AsEnumerable());
-        protected void AddButtons(IEnumerable<PixelTextButton> buttons)
+        protected void AddButtons(params PixelTextButton[] buttons)
         {
             ButtonContainer.AddRange(buttons);
 
