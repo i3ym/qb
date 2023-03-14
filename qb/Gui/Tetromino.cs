@@ -1,4 +1,4 @@
-using osuTK.Graphics.ES30;
+using osu.Framework.Graphics.Rendering;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 
@@ -6,7 +6,7 @@ namespace qb.Gui
 {
     public class Tetromino : Sprite
     {
-        static readonly ImmutableDictionary<Shape, Texture> CachedTextures;
+        static readonly Dictionary<Shape, Texture> CachedTextures = new();
 
         public Shape Shape { get => ShapeBindable.Value; set => ShapeBindable.Value = value; }
         public new Colour4? Colour { get => ColourBindable.Value; set => ColourBindable.Value = value; }
@@ -14,32 +14,34 @@ namespace qb.Gui
         public readonly Bindable<Shape> ShapeBindable = new Bindable<Shape>();
         public readonly Bindable<Colour4?> ColourBindable = new Bindable<Colour4?>();
 
-        static Tetromino()
-        {
-            CachedTextures = Shapes.ShapesList.ToImmutableDictionary(x => x, createTexture);
-
-
-            Texture createTexture(Shape shape)
-            {
-                var matrix = shape.Matrix;
-                var image = new Image<Rgba32>(matrix.Width, matrix.Height, Color.Transparent);
-
-                var white = (Rgba32) Color.White;
-                for (int y = 0; y < matrix.Height; y++)
-                    for (int x = 0; x < matrix.Width; x++)
-                        if (matrix[x, y])
-                            image[x, y] = white;
-
-                var texture = new Texture(image.Width, image.Height, true, All.Nearest);
-                texture.SetData(new TextureUpload(image));
-
-                return texture;
-            }
-        }
-
         [BackgroundDependencyLoader]
-        void Load()
+        void Load(IRenderer renderer)
         {
+            if (CachedTextures.Count == 0)
+            {
+                foreach (var shape in Shapes.ShapesList)
+                    CachedTextures[shape] = createTexture(shape);
+
+
+                Texture createTexture(Shape shape)
+                {
+                    var matrix = shape.Matrix;
+                    var image = new Image<Rgba32>(matrix.Width, matrix.Height, Color.Transparent);
+
+                    var white = (Rgba32) Color.White;
+                    for (int y = 0; y < matrix.Height; y++)
+                        for (int x = 0; x < matrix.Width; x++)
+                            if (matrix[x, y])
+                                image[x, y] = white;
+
+                    var texture = renderer.CreateTexture(image.Width, image.Height, true, TextureFilteringMode.Nearest);
+                    texture.SetData(new TextureUpload(image));
+
+                    return texture;
+                }
+            }
+
+
             ShapeBindable.BindValueChanged(_ => RegenerateDrawable(), true);
             ColourBindable.BindValueChanged(e =>
             {

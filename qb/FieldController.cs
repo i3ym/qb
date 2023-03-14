@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using osu.Framework.Timing;
 
 namespace qb
@@ -100,11 +101,13 @@ namespace qb
         {
             new Thread(() =>
             {
-                var tfc = new ThrottledFrameClock() { MaximumUpdateHz = MaxFps };
+                var sw = new Stopwatch();
                 while (true)
                 {
-                    tfc.ProcessFrame();
+                    sw.Restart();
                     Schedule(UpdateField);
+
+                    Thread.Sleep((int) (1000d / MaxFps - sw.ElapsedMilliseconds));
                 }
             })
             { IsBackground = true }.Start();
@@ -315,7 +318,7 @@ namespace qb
 
                 CurrentY++;
             }
-            end:;
+        end:;
 
             NextShape = RandomPieceGetter.Get();
 

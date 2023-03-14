@@ -1,5 +1,4 @@
 using System.Globalization;
-using osuTK.Graphics.ES30;
 
 namespace qb
 {
@@ -25,13 +24,13 @@ namespace qb
             }
 
             Resources.AddStore(new DllResourceStore("qb.dll"));
-            Textures.AddStore(new TextureStore(Host.CreateTextureLoaderStore(new DllResourceStore("qb"))));
+            Textures.AddStore(new TextureStore(Host.Renderer, Host.CreateTextureLoaderStore(new DllResourceStore("qb"))));
 
-            var pixelfontstore = new FontStore(scaleAdjust: 10, minFilterMode: osuTK.Graphics.ES30.All.Nearest);
+            var pixelfontstore = new FontStore(Host.Renderer, scaleAdjust: 10, minFilterMode: TextureFilteringMode.Nearest);
             Fonts.AddStore(pixelfontstore);
             AddFont(Resources, "Resources/PixelFont", pixelfontstore);
 
-            var pixeltexturestore = new TextureStore(Textures, true, All.Nearest, true, 1);
+            var pixeltexturestore = new TextureStore(Host.Renderer, Host.CreateTextureLoaderStore(Resources), true, TextureFilteringMode.Nearest, true, 1);
             Host.Dependencies.Cache(pixeltexturestore, new CacheInfo("PixelTextureStore"));
 
             var qconfig = new QbConfigManager(Host.Storage);

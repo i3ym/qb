@@ -1,3 +1,4 @@
+using osu.Framework.Graphics.Rendering;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
@@ -7,9 +8,12 @@ namespace qb
     public class Skin
     {
         public readonly TranslatedString Name;
-        public readonly Texture? Background;
+        public Texture? Background { get; private set; }
         public ImmutableArray<Texture> Textures { get; private set; }
         readonly int Resolution, Index;
+
+        Image<Rgba32> AtlasImage;
+        Image<Rgba32>? BackgroundImage;
 
         public Skin(TranslatedString name, Image<Rgba32> atlas, Image<Rgba32>? background, int resolution, int index)
         {
@@ -17,30 +21,37 @@ namespace qb
             Resolution = resolution;
             Index = index;
 
-            if (background is not null)
-            {
-                Background = new Texture(background.Width, background.Height, true, osuTK.Graphics.ES30.All.Nearest);
-                Background.SetData(new TextureUpload(background));
-            }
+            BackgroundImage = background;
+            AtlasImage = atlas;
 
-            SetAtlas(atlas);
         }
 
-        public void SetAtlas(Image<Rgba32> atlas)
+        public void Load(IRenderer renderer)
         {
-            Textures =
-                Enumerable.Range(0, atlas.Width / Resolution)
-                .Select(x =>
-                {
-                    var img = atlas.Clone();
-                    img.Mutate(ctx => ctx.Crop(new Rectangle(x * Resolution, Index * Resolution, Resolution, Resolution)));
+            if (BackgroundImage is not null)
+            {
+                Background = renderer.CreateTexture(BackgroundImage.Width, BackgroundImage.Height, true, TextureFilteringMode.Nearest);
+                Background.SetData(new TextureUpload(BackgroundImage));
 
-                    var texture = new Texture(img.Width, img.Height, true, osuTK.Graphics.ES30.All.Nearest);
-                    texture.SetData(new TextureUpload(img));
+                BackgroundImage = null;
+            }
 
-                    return texture;
-                })
-                .ToImmutableArray();
+            if (Textures.IsDefaultOrEmpty)
+            {
+                Textures =
+                    Enumerable.Range(0, AtlasImage.Width / Resolution)
+                    .Select(x =>
+                    {
+                        var img = AtlasImage.Clone();
+                        img.Mutate(ctx => ctx.Crop(new Rectangle(x * Resolution, Index * Resolution, Resolution, Resolution)));
+
+                        var texture = renderer.CreateTexture(img.Width, img.Height, true, TextureFilteringMode.Nearest);
+                        texture.SetData(new TextureUpload(img));
+
+                        return texture;
+                    })
+                    .ToImmutableArray();
+            }
         }
     }
 }
