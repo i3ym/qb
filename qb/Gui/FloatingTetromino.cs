@@ -14,7 +14,7 @@ namespace qb.Gui
         void Spawn()
         {
             var tetro = new Tetromino() { RelativePositionAxes = Axes.Both, X = (float) Random.NextDouble(), Y = 1.2f, Shape = Shapes.ShapesList[Random.Next(Shapes.ShapesList.Length)] };
-            Schedule(() => tetro.MoveToY(-.2f, Random.NextDouble() * 10000 + 5000).Finally(t => { RemoveInternal(t); Spawn(); }));
+            Schedule(() => tetro.MoveToY(-.2f, Random.NextDouble() * 10000 + 5000).Finally(t => { RemoveInternal(t, true); Spawn(); }));
 
             AddInternal(tetro);
         }
