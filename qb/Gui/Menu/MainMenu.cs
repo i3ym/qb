@@ -1,6 +1,6 @@
 namespace qb.Gui.Menu
 {
-    public class MainMenu : ControllableMenuScreen
+    public partial class MainMenu : ControllableMenuScreen
     {
         [Resolved] GameScreen GameScreen { get; set; } = null!;
         [Resolved] BackgroundController BackgroundGameController { get; set; } = null!;
@@ -11,7 +11,7 @@ namespace qb.Gui.Menu
         {
             AddButton(new PixelTextButton(("Start", "Начать"), Push<StartGameMenu>));
             AddButton(new PixelTextButton(("Settings", "Настройки"), Push<SettingsMenu>));
-            AddButton(new PixelTextButton(("Quit", "Выйти"), host.Exit));
+            AddButton(new PixelTextButton(("Quit", "Выйти"), host.CanExit ? host.Exit : () => host.SuspendToBackground()));
         }
 
 

@@ -1,6 +1,6 @@
 namespace qb.Gui.Menu
 {
-    public class StartGameMenu : ControllableMenuScreen
+    public partial class StartGameMenu : ControllableMenuScreen
     {
         [Resolved] Storage Storage { get; set; } = null!;
 

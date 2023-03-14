@@ -1,6 +1,6 @@
 namespace qb.Gui
 {
-    public class PixelBorderScrollContainer : Container // TODO: make not jest pixelscrorl container but for every thing by input
+    public partial class PixelBorderScrollContainer : Container // TODO: make not jest pixelscrorl container but for every thing by input
     {
         readonly PixelScrollContainer ScrollContainer = new PixelScrollContainer() { RelativeSizeAxes = Axes.Both };
         protected override Container<Drawable> Content => ScrollContainer;

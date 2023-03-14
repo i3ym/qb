@@ -1,6 +1,6 @@
 namespace qb.Gui
 {
-    public class ControllerButtonsBase : CompositeDrawable
+    public partial class ControllerButtonsBase : CompositeDrawable
     {
         [Resolved] osu.Framework.Game Game { get; set; } = null!;
         [Resolved] GameScreen GameScreen { get; set; } = null!;

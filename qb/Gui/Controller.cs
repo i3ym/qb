@@ -1,6 +1,6 @@
 namespace qb.Gui
 {
-    public class Controller : CompositeDrawable
+    public partial class Controller : CompositeDrawable
     {
         [Resolved] QbConfigManager ConfigManager { get; set; } = null!;
         [Resolved(name: "PixelTextureStore")] TextureStore TextureStore { get; set; } = null!;

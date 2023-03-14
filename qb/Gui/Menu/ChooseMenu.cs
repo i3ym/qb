@@ -1,6 +1,6 @@
 namespace qb.Gui.Menu
 {
-    public abstract class ChooseMenu : ControllableMenuScreen
+    public abstract partial class ChooseMenu : ControllableMenuScreen
     {
         protected abstract TranslatedString Title { get; }
         MenuButtonContainer ButtonContainer = null!;

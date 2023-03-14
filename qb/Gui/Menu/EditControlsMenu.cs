@@ -1,6 +1,6 @@
 namespace qb.Gui.Menu
 {
-    public class EditControlsMenu : ControllableMenuScreen
+    public partial class EditControlsMenu : ControllableMenuScreen
     {
         [Resolved] Controller Controller { get; set; } = null!;
 

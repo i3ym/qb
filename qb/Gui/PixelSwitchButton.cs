@@ -1,6 +1,6 @@
 namespace qb.Gui
 {
-    public class PixelSwitchButton : PixelTextButton
+    public partial class PixelSwitchButton : PixelTextButton
     {
         public PixelSwitchButton(TranslatedString text, Bindable<bool> bindable) : base(text)
         {

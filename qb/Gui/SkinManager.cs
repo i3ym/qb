@@ -6,7 +6,7 @@ namespace qb.Gui
 {
     public class SkinManager
     {
-        [Resolved] Storage Storage { get; init; } = null!;
+        [Resolved] Storage Storage { get; set; } = null!;
 
         public readonly Bindable<Skin> SelectedSkin = new Bindable<Skin>();
         public ImmutableArray<Skin> Skins { get; private set; }

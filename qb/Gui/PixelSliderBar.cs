@@ -1,6 +1,6 @@
 namespace qb.Gui
 {
-    public class PixelSliderBar : BasicSliderBar<float>, INavigatableButton
+    public partial class PixelSliderBar : BasicSliderBar<float>, INavigatableButton
     {
         bool INavigatableButton.Focusable => true;
         public new BindableNumber<float> CurrentNumber => base.CurrentNumber;

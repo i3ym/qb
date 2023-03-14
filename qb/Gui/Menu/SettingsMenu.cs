@@ -1,6 +1,6 @@
 namespace qb.Gui.Menu
 {
-    public class SettingsMenu : ControllableMenuScreen
+    public partial class SettingsMenu : ControllableMenuScreen
     {
         [BackgroundDependencyLoader]
         void Load()

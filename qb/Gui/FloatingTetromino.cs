@@ -1,6 +1,6 @@
 namespace qb.Gui
 {
-    public class FloatingTetromino : CompositeDrawable
+    public partial class FloatingTetromino : CompositeDrawable
     {
         readonly Random Random = new Random();
 
