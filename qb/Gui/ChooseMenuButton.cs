@@ -4,7 +4,7 @@ namespace qb.Gui
     {
         bool IsActive { get; }
     }
-    public class ChooseMenuButton<T> : ValueMenuButton<T>, IChooseMenuButton
+    public partial class ChooseMenuButton<T> : ValueMenuButton<T>, IChooseMenuButton
     {
         public bool IsActive => EqualityComparer<T>.Default.Equals(Source.Value, Value);
 

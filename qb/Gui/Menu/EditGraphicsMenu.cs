@@ -1,6 +1,6 @@
 namespace qb.Gui.Menu
 {
-    public class EditGraphicsMenu : ControllableMenuScreen
+    public partial class EditGraphicsMenu : ControllableMenuScreen
     {
         [BackgroundDependencyLoader]
         void Load(QbConfigManager qconfig)

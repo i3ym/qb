@@ -1,6 +1,6 @@
 namespace qb.Gui
 {
-    public class GameInfo : CompositeDrawable
+    public partial class GameInfo : CompositeDrawable
     {
         [BackgroundDependencyLoader]
         void Load(FieldController controller)

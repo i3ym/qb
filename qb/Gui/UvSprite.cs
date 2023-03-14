@@ -3,11 +3,11 @@ using osu.Framework.Graphics.Rendering;
 
 namespace qb.Gui
 {
-    public class UvSprite : Sprite
+    public partial class UvSprite : Sprite
     {
         static readonly Random Random = new Random();
 
-        [Resolved, AllowNull] IRenderer Renderer { get; init; }
+        [Resolved, AllowNull] IRenderer Renderer { get; set; }
 
         public readonly BindableInt Tile = new BindableInt(0);
 

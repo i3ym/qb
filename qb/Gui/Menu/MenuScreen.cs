@@ -1,6 +1,6 @@
 namespace qb.Gui.Menu
 {
-    public class MenuScreen : CompositeDrawable, IKeyBindingHandler<QbKey>
+    public partial class MenuScreen : CompositeDrawable, IKeyBindingHandler<QbKey>
     {
         [Resolved] protected PixelScreenStack PixelScreenStack { get; private set; } = null!;
         protected readonly Background Background = new Background(Colour4.Black.MultiplyAlpha(.7f));
@@ -20,7 +20,7 @@ namespace qb.Gui.Menu
         public virtual bool OnPressed(KeyBindingPressEvent<QbKey> e) => IsAlive && Alpha != 0;
         public virtual void OnReleased(KeyBindingReleaseEvent<QbKey> e) { }
     }
-    public class ControllableMenuScreen : MenuScreen
+    public partial class ControllableMenuScreen : MenuScreen
     {
         Selection SelectionDrawable = null!;
         MenuButtonContainer ButtonContainer = null!;
@@ -99,8 +99,7 @@ namespace qb.Gui.Menu
             return base.OnPressed(e);
         }
 
-
-        class Selection : CompositeDrawable
+        partial class Selection : CompositeDrawable
         {
             [BackgroundDependencyLoader]
             void Load()

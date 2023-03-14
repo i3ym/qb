@@ -3,7 +3,7 @@ using System.Globalization;
 namespace qb
 {
     [Cached]
-    public class Game : osu.Framework.Game
+    public partial class Game : osu.Framework.Game
     {
         public bool IsTest { get; private set; }
         public Action OnAndroidPause = delegate { };

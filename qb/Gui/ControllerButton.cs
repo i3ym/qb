@@ -4,7 +4,7 @@ namespace qb.Gui
     {
         QbKey Key { get; }
     }
-    public class ControllerButton<T> : PixelButton<T>, IControllerButton where T : Drawable
+    public partial class ControllerButton<T> : PixelButton<T>, IControllerButton where T : Drawable
     {
         [Resolved] KeyboardController KeyboardController { get; set; } = null!;
 

@@ -1,6 +1,6 @@
 namespace qb.Gui
 {
-    public class ValueMenuButton<T> : PixelTextButton
+    public partial class ValueMenuButton<T> : PixelTextButton
     {
         public readonly T Value;
 

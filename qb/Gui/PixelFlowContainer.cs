@@ -1,7 +1,7 @@
 namespace qb.Gui
 {
-    public class PixelFlowContainer : PixelFlowContainer<Drawable> { }
-    public class PixelFlowContainer<T> : FillFlowContainer<T> where T : Drawable
+    public partial class PixelFlowContainer : PixelFlowContainer<Drawable> { }
+    public partial class PixelFlowContainer<T> : FillFlowContainer<T> where T : Drawable
     {
         public Anchor ChildAxes { get => ChildAxesBindable.Value; set => ChildAxesBindable.Value = value; }
         public readonly Bindable<Anchor> ChildAxesBindable = new Bindable<Anchor>(Anchor.TopCentre);

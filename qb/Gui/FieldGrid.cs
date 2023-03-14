@@ -1,6 +1,6 @@
 namespace qb.Gui
 {
-    public class FieldGrid : CompositeDrawable
+    public partial class FieldGrid : CompositeDrawable
     {
         public ReadOnlyGameMatrix<UvSprite> GameObjects => _GameObjects;
         readonly GameMatrix<UvSprite> _GameObjects;

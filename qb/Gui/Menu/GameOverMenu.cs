@@ -1,6 +1,6 @@
 namespace qb.Gui.Menu
 {
-    public class GameOverMenu : ControllableMenuScreen, IKeyBindingHandler<QbKey>
+    public partial class GameOverMenu : ControllableMenuScreen, IKeyBindingHandler<QbKey>
     {
         [BackgroundDependencyLoader]
         void Load(GameScreen gamesc)

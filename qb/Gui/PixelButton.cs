@@ -1,12 +1,12 @@
 namespace qb.Gui
 {
-    public class PixelButton<T> : PixelButton, IHandleable where T : Drawable
+    public partial class PixelButton<T> : PixelButton, IHandleable where T : Drawable
     {
         public readonly T Child;
 
         public PixelButton(T child) => AddInternal(Child = child);
     }
-    public class PixelButton : CompositeDrawable, IHandleable, INavigatableButton
+    public partial class PixelButton : CompositeDrawable, IHandleable, INavigatableButton
     {
         public bool IsMouseOverPressed
         {

@@ -1,6 +1,6 @@
 namespace qb.Gui.Menu
 {
-    public class SkinChooseMenu : ChooseMenu
+    public partial class SkinChooseMenu : ChooseMenu
     {
         protected override TranslatedString Title => ("Skin", "Скин");
 

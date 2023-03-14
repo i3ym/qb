@@ -1,7 +1,7 @@
 namespace qb.Gui
 {
-    public class MenuButtonContainer : MenuButtonContainer<Drawable> { }
-    public class MenuButtonContainer<T> : Container<T> where T : Drawable
+    public partial class MenuButtonContainer : MenuButtonContainer<Drawable> { }
+    public partial class MenuButtonContainer<T> : Container<T> where T : Drawable
     {
         public Anchor ChildrenAnchor { get => PixelContent.ChildAxes; set => PixelContent.ChildAxes = value; }
 

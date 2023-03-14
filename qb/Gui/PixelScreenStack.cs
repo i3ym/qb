@@ -1,7 +1,7 @@
 namespace qb.Gui
 {
     [Cached]
-    public class PixelScreenStack : Container<MenuScreen>
+    public partial class PixelScreenStack : Container<MenuScreen>
     {
         public bool IsScreenVisible => ScreensPushed.TryPeek(out var screen) && screen.Alpha != 0;
         readonly Stack<MenuScreen> ScreensPushed = new Stack<MenuScreen>();

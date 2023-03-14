@@ -1,6 +1,6 @@
 namespace qb.Gui
 {
-    public class ToggleMenuButtonContainer<T> : MenuButtonContainer<ValueMenuButton<T>>
+    public partial class ToggleMenuButtonContainer<T> : MenuButtonContainer<ValueMenuButton<T>>
     {
         public Action<T> OnEnable = delegate { };
         public Action<T> OnDisable = delegate { };

@@ -1,6 +1,6 @@
 namespace qb.Gui
 {
-    public class PixelTextButton : PixelButton<PixelText>
+    public partial class PixelTextButton : PixelButton<PixelText>
     {
         public PixelText PixelText => Child!;
         public TranslatedString Text { get => PixelText.TranslatedText; set => PixelText.TranslatedText = value; }

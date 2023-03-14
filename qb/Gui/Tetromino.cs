@@ -4,7 +4,7 @@ using SixLabors.ImageSharp.PixelFormats;
 
 namespace qb.Gui
 {
-    public class Tetromino : Sprite
+    public partial class Tetromino : Sprite
     {
         static readonly Dictionary<Shape, Texture> CachedTextures = new();
 

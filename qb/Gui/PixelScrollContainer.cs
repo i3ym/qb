@@ -1,14 +1,13 @@
 namespace qb.Gui
 {
-    public class PixelScrollContainer : ScrollContainer<Drawable>
+    public partial class PixelScrollContainer : ScrollContainer<Drawable>
     {
         [BackgroundDependencyLoader]
         void Load() => ScrollDistance = 2f;
 
         protected override ScrollbarContainer CreateScrollbar(Direction direction) => new PixelScrollbar(direction);
 
-
-        class PixelScrollbar : ScrollbarContainer
+        partial class PixelScrollbar : ScrollbarContainer
         {
             public PixelScrollbar(Direction direction) : base(direction) { }
 

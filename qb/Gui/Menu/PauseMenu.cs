@@ -1,6 +1,6 @@
 namespace qb.Gui.Menu
 {
-    public class PauseMenu : ControllableMenuScreen, IKeyBindingHandler<QbKey>
+    public partial class PauseMenu : ControllableMenuScreen, IKeyBindingHandler<QbKey>
     {
         [Resolved] GameScreen GameScreen { get; set; } = null!;
 

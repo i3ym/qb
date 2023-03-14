@@ -1,6 +1,6 @@
 namespace qb.Input
 {
-    public class KeyboardController : KeyBindingContainer<QbKey>, IController
+    public partial class KeyboardController : KeyBindingContainer<QbKey>, IController
     {
         public override IEnumerable<IKeyBinding> DefaultKeyBindings { get; } = new IKeyBinding[]
         {

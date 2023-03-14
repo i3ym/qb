@@ -1,6 +1,6 @@
 namespace qb
 {
-    public class GameScreen : CompositeDrawable, IKeyBindingHandler<QbKey>
+    public partial class GameScreen : CompositeDrawable, IKeyBindingHandler<QbKey>
     {
         [Cached] public readonly FieldController Controller;
         [Resolved] PixelScreenStack ScreenStack { get; set; } = null!;
@@ -76,7 +76,7 @@ namespace qb
             var clearlineanim = new ClearLineAnimationSlideDown();
 
             game.OnAndroidPause += () => Schedule(() => Controller.IsPaused.Value = true);
-            game.OnAndroidResume += () => Schedule(() => Controller.IsPaused.Value = false);
+            // game.OnAndroidResume += () => Schedule(() => Controller.IsPaused.Value = false);
             Controller.OnGameOver += () => gameoveranim.Animation(this, menus.Push<GameOverMenu>);
             Controller.OnLineClear += lines => clearlineanim.Animation(lines, this);
             Controller.OnFieldUpdate += UpdateField;

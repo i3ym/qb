@@ -3,7 +3,7 @@ using osu.Framework.Timing;
 
 namespace qb
 {
-    public class FieldController : Drawable
+    public partial class FieldController : Drawable
     {
         public const int MaxFps = 60;
         public const double FrameInterval = 1000d / MaxFps;
