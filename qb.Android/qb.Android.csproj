@@ -9,7 +9,10 @@
     <ApplicationVersion>1</ApplicationVersion>
     <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
     <NullabilityInfoContextSupport>true</NullabilityInfoContextSupport>
+
+    <JavaSdkDirectory>/usr/lib/jvm/java-11-openjdk</JavaSdkDirectory>
   </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="ppy.osu.Framework.Android" Version="2023.314.0" />
   </ItemGroup>
