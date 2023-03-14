@@ -1,6 +1,4 @@
-using Android.App;
 using Android.Content.PM;
-using Android.OS;
 using Android.Views;
 using osu.Framework.Android;
 
@@ -13,7 +11,7 @@ namespace qb.Android
 
         protected override osu.Framework.Game CreateGame() => Game = new GameAndroid();
 
-        protected override void OnCreate(Bundle savedInstanceState)
+        protected override void OnCreate(Bundle? savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
 
