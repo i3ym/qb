@@ -26,7 +26,7 @@ namespace qb
         }
 
         [BackgroundDependencyLoader]
-        void Load(Game game, PixelScreenStack menus, QbConfigManager qconfig)
+        void Load(Game game, PixelScreenStack menus, QbConfigManager qconfig, KeyboardController kcontroller)
         {
             foreach (var tex in getSkinnedTextures(FieldWidth, FieldHeight))
             {
@@ -75,8 +75,7 @@ namespace qb
             var gameoveranim = new GameOverFillingAnimation();
             var clearlineanim = new ClearLineAnimationSlideDown();
 
-            game.OnAndroidPause += () => Schedule(() => Controller.IsPaused.Value = true);
-            // game.OnAndroidResume += () => Schedule(() => Controller.IsPaused.Value = false);
+            game.OnAndroidPause += () => Schedule(Pause);
             Controller.OnGameOver += () => gameoveranim.Animation(this, menus.Push<GameOverMenu>);
             Controller.OnLineClear += lines => clearlineanim.Animation(lines, this);
             Controller.OnFieldUpdate += UpdateField;
@@ -164,16 +163,23 @@ namespace qb
 
         public bool OnPressed(KeyBindingPressEvent<QbKey> e)
         {
-            if (e.Action == QbKey.Back)
+            if (e.Action == QbKey.Pause)
             {
-                Controller.IsPaused.Value = true;
-                ScreenStack.Push<PauseMenu>();
-
+                Pause();
                 return true;
             }
 
             return false;
         }
         public void OnReleased(KeyBindingReleaseEvent<QbKey> e) { }
+
+        void Pause()
+        {
+            if (Controller.Controller is not KeyboardController) return;
+            if (Controller.IsPaused.Value) return;
+
+            Controller.IsPaused.Value = true;
+            ScreenStack.Push<PauseMenu>();
+        }
     }
 }

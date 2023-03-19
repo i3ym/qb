@@ -19,6 +19,12 @@ namespace qb.Android
             Window?.AddFlags(WindowManagerFlags.KeepScreenOn);
         }
 
+
+        public override void OnBackPressed()
+        {
+            base.OnBackPressed();
+            Game?.OnAndroidPause();
+        }
         protected override void OnPause()
         {
             base.OnPause();

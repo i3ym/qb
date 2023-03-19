@@ -16,16 +16,5 @@ namespace qb.Gui.Menu
                 Push<MainMenu>();
             }
         }
-
-        public override bool OnPressed(KeyBindingPressEvent<QbKey> e)
-        {
-            if (e.Action == QbKey.Back)
-            {
-                Back();
-                return true;
-            }
-
-            return base.OnPressed(e);
-        }
     }
 }
