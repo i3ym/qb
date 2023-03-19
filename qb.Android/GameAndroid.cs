@@ -1,6 +1,6 @@
 namespace qb.Android
 {
-    public class GameAndroid : qb.Game
+    public partial class GameAndroid : qb.Game
     {
         
     }
