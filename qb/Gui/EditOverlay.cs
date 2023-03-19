@@ -59,6 +59,13 @@ public partial class EditOverlay : CompositeDrawable
 
         protected override bool Handle(UIEvent e) => true;
 
+        protected override bool OnTouchDown(TouchDownEvent e) => true;
+        protected override void OnTouchMove(TouchMoveEvent e)
+        {
+            Target.MoveToOffset(Parent.ToSpaceOfOtherDrawable(e.Delta, Target.Parent));
+            base.OnTouchMove(e);
+        }
+
         protected override bool OnDragStart(DragStartEvent e) => true;
         protected override void OnDrag(DragEvent e)
         {
