@@ -8,31 +8,10 @@ namespace qb.Gui
     }
     public partial class PixelButton : CompositeDrawable, IHandleable, INavigatableButton
     {
-        public bool IsMouseOverPressed
-        {
-            get
-            {
-                InputManager ??= GetContainingInputManager();
-
-                var state = InputManager.CurrentState;
-                if (state.Mouse.IsPressed(MouseButton.Left) && Contains(state.Mouse.Position))
-                    return true;
-
-                foreach (var source in state.Touch.ActiveSources)
-                {
-                    var pos = state.Touch.GetTouchPosition(source);
-                    if (pos.HasValue && Contains(pos.Value))
-                        return true;
-                }
-
-                return false;
-            }
-        }
         public Action MouseDown = delegate { };
         public Action MouseUp = delegate { };
         public Action Action = delegate { };
 
-        public bool HandleEvents { get; set; } = true;
         public Colour4 Background
         {
             get => BackgroundBox?.Colour ?? Colour4.Transparent;
@@ -64,14 +43,13 @@ namespace qb.Gui
         }
 
 
-        protected override bool Handle(UIEvent e) => HandleEvents;
+        protected override bool Handle(UIEvent e) => e is MouseEvent or TouchEvent;
         protected override bool OnMouseDown(MouseDownEvent e)
         {
             MouseDown();
             Action();
-            base.OnMouseDown(e);
 
-            return Handle(e);
+            return base.OnMouseDown(e);
         }
         protected override void OnMouseUp(MouseUpEvent e)
         {
@@ -82,9 +60,8 @@ namespace qb.Gui
         {
             MouseDown();
             Action();
-            base.OnTouchDown(e);
 
-            return Handle(e);
+            return base.OnTouchDown(e);
         }
         protected override void OnTouchUp(TouchUpEvent e)
         {

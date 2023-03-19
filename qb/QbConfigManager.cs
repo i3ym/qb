@@ -51,7 +51,14 @@ namespace qb
                 using (var stream = Storage.GetStream(Filename, FileAccess.Write, FileMode.OpenOrCreate))
                 using (var writer = new StreamWriter(stream))
                 using (var jwriter = new JsonTextWriter(writer))
+                {
                     JsonData.WriteTo(jwriter);
+
+                    jwriter.Flush();
+                    writer.Flush();
+
+                    stream.SetLength(stream.Position);
+                }
             };
 
             try

@@ -5,11 +5,11 @@ namespace qb.Gui
         bool INavigatableButton.Focusable => true;
         public new BindableNumber<float> CurrentNumber => base.CurrentNumber;
 
-        public PixelSliderBar(TranslatedString text, float min, float max, Action<ValueChangedEvent<float>> func)
+        public PixelSliderBar(TranslatedString text, float min, float max, Action<ValueChangedEvent<float>>? func = null)
         {
             CurrentNumber.MinValue = min;
             CurrentNumber.MaxValue = max;
-            Current.ValueChanged += func;
+            if (func is not null) Current.ValueChanged += func;
 
             SelectionColour = Colour4.White;
             BackgroundColour = Colour4.White.MultiplyAlpha(.5f);
