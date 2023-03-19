@@ -402,10 +402,10 @@ namespace qb
 
         static int GetScoreForLine(int linesCount, int minHeight, int level)
         {
-            if (linesCount == 1) return (minHeight + 1) * 40 * level;
-            else if (linesCount == 2) return (minHeight + 1) * 100 * level;
-            else if (linesCount == 3) return (minHeight + 1) * 300 * level;
-            else if (linesCount == 4) return (minHeight + 1) * 1200 * level;
+            if (linesCount == 1) return (minHeight + 1) * 40 * (level + 1);
+            else if (linesCount == 2) return (minHeight + 1) * 100 * (level + 1);
+            else if (linesCount == 3) return (minHeight + 1) * 300 * (level + 1);
+            else if (linesCount == 4) return (minHeight + 1) * 1200 * (level + 1);
 
             return 0;
         }
