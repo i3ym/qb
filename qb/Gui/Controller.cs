@@ -1,59 +1,47 @@
 namespace qb.Gui
 {
-    public partial class Controller : CompositeDrawable
+    public partial class Controller : CompositeDrawable, IEditableDrawable
     {
         [Resolved] QbConfigManager ConfigManager { get; set; } = null!;
         [Resolved(name: "PixelTextureStore")] TextureStore TextureStore { get; set; } = null!;
 
-        public bool EditMode
+        IEnumerable<Drawable> IEditableDrawable.EditableChildren => InternalChildren.OfType<ControllerButton<Sprite>>();
+
+        public readonly Bindable<float> ChildrenScale = new(1);
+        static readonly ImmutableDictionary<QbKey, ControllerButtonData> DefaultButtons;
+
+        static Controller()
         {
-            get => _EditMode;
-            set
+            DefaultButtons = new Dictionary<QbKey, (Vector2, Anchor)>()
             {
-                _EditMode = value;
+                [QbKey.Up] = (new Vector2(0, 0), Anchor.BottomLeft),
+                [QbKey.Down] = (new Vector2(1, 0), Anchor.BottomLeft),
+                [QbKey.Left] = (new Vector2(2, 0), Anchor.BottomLeft),
+                [QbKey.Right] = (new Vector2(3, 0), Anchor.BottomLeft),
 
-                if (!value)
-                {
-                    foreach (var child in InternalChildren.OfType<IControllerButton>())
-                    {
-                        var dc = (Drawable) child;
-                        var data = new ControllerButtonData(dc.Position, dc.Scale.X, dc.Anchor, dc.Origin);
-
-                        ConfigManager.Set("keys." + child.Key, data);
-                    }
-                }
-            }
-        }
-        bool _EditMode;
-
-        public float ChildrenScale
-        {
-            get => ((Drawable) InternalChildren.OfType<IHandleable>().First()).Scale.X;
-            set
-            {
-                foreach (var child in InternalChildren.OfType<IHandleable>())
-                    ((Drawable) child).Scale = new Vector2(value);
-            }
+                [QbKey.A] = (new Vector2(0, 0), Anchor.BottomRight),
+                [QbKey.B] = (new Vector2(-1.1f, 0), Anchor.BottomRight),
+                [QbKey.Back] = (new Vector2(-.05f, -1.1f), Anchor.BottomRight),
+            }.ToImmutableDictionary(k => k.Key, k => new ControllerButtonData(k.Value.Item1, 1, k.Value.Item2, k.Value.Item2));
         }
 
         [BackgroundDependencyLoader]
         void Load()
         {
-            AddInternal(createButton(QbKey.Up, "arrow", new Vector2(0, 0), Anchor.BottomLeft, 0));
-            AddInternal(createButton(QbKey.Down, "arrow", new Vector2(1, 0), Anchor.BottomLeft, 180));
-            AddInternal(createButton(QbKey.Left, "arrow", new Vector2(2, 0), Anchor.BottomLeft, 270));
-            AddInternal(createButton(QbKey.Right, "arrow", new Vector2(3, 0), Anchor.BottomLeft, 90));
+            addButton(QbKey.Up, "arrow", 0);
+            addButton(QbKey.Down, "arrow", 180);
+            addButton(QbKey.Left, "arrow", 270);
+            addButton(QbKey.Right, "arrow", 90);
 
-            AddInternal(createButton(QbKey.A, "A", new Vector2(0, 0), Anchor.BottomRight));
-            AddInternal(createButton(QbKey.B, "B", new Vector2(-1.1f, 0), Anchor.BottomRight));
-            AddInternal(createButton(QbKey.Back, "Pause", new Vector2(-.05f, -1.1f), Anchor.BottomRight).With(x => x.Width = 2));
+            addButton(QbKey.A, "A");
+            addButton(QbKey.B, "B");
+            addButton(QbKey.Back, "Pause").With(x => x.Width = 2);
 
-            EditMode = false;
+            ChildrenScale.Value = this.InternalChildren.OfType<ControllerButton<Sprite>>().First().Scale.X;
 
 
-
-            ControllerButtonData getCfg(QbKey key, Vector2 defaultPos, Anchor defaultAnchor) => ConfigManager.Get("keys." + key, new ControllerButtonData(defaultPos, 1, defaultAnchor));
-            ControllerButton<Sprite> createButton(QbKey key, string texture, Vector2 defaultPos, Anchor defaultAnchor, float angle = 0)
+            ControllerButton<Sprite> addButton(QbKey key, string texture, float angle = 0) => createButton(key, texture, angle).With(AddInternal);
+            ControllerButton<Sprite> createButton(QbKey key, string texture, float angle = 0)
             {
                 var sprite = new Sprite()
                 {
@@ -64,65 +52,38 @@ namespace qb.Gui
                     Rotation = angle,
                 };
 
-                var cfg = getCfg(key, defaultPos, defaultAnchor);
-                return new ControllerButton<Sprite>(key, sprite)
-                {
-                    Position = cfg.Position,
-                    Scale = new Vector2(cfg.Scale),
-                    Anchor = cfg.Anchor,
-                    Origin = cfg.Origin,
-                    Size = new osuTK.Vector2(1),
-                    HandleEvents = false,
-                };
+                var btn = new ControllerButton<Sprite>(key, sprite);
+                GetConfigBindable(key).Value.SetToDrawable(btn);
+                ChildrenScale.BindValueChanged(e => btn.Scale = new(e.NewValue));
+
+                return btn;
             }
         }
 
-        Drawable? CurrentlyMoving;
-        protected override bool OnMouseDown(MouseDownEvent e)
-        {
-            if (EditMode)
-            {
-                foreach (var child in InternalChildren)
-                    if (child.IsHovered)
-                    {
-                        CurrentlyMoving = child;
-                        break;
-                    }
-            }
+        Bindable<ControllerButtonData> GetConfigBindable(QbKey key) => ConfigManager.GetBindable<ControllerButtonData>($"keys.{key}", DefaultButtons[key]);
 
-            return base.OnMouseDown(e);
-        }
-        protected override void OnMouseUp(MouseUpEvent e)
+        public void ResetConfig()
         {
-            CurrentlyMoving = null;
-            base.OnMouseUp(e);
+            ChildrenScale.Value = 1;
+            foreach (var btn in this.InternalChildren.OfType<ControllerButton<Sprite>>())
+                DefaultButtons[btn.Key].SetToDrawable(btn);
         }
-        protected override bool OnMouseMove(MouseMoveEvent e)
+        public void Save()
         {
-            if (CurrentlyMoving is { })
-            {
-                CurrentlyMoving.Position += e.Delta;
-            }
-
-            return base.OnMouseMove(e);
+            foreach (var child in this.InternalChildren.OfType<ControllerButton<Sprite>>())
+                GetConfigBindable(child.Key).Value = ControllerButtonData.FromDrawable(child);
         }
 
 
-        public readonly struct ControllerButtonData
+        readonly record struct ControllerButtonData(Vector2 Position, float Scale, Anchor Anchor, Anchor Origin)
         {
-            public readonly Vector2 Position;
-            public readonly float Scale;
-            public readonly Anchor Anchor, Origin;
-
-            public ControllerButtonData(Vector2 position, float scale, Anchor anchor) : this(position, scale, anchor, anchor) { }
-
-            [Newtonsoft.Json.JsonConstructor]
-            public ControllerButtonData(Vector2 position, float scale, Anchor anchor, Anchor origin)
+            public static ControllerButtonData FromDrawable(Drawable target) => new ControllerButtonData(target.Position, target.Scale.X, target.Anchor, target.Origin);
+            public void SetToDrawable(Drawable target)
             {
-                Position = position;
-                Scale = scale;
-                Anchor = anchor;
-                Origin = origin;
+                target.Position = Position;
+                target.Scale = new Vector2(Scale);
+                target.Anchor = Anchor;
+                target.Origin = Origin;
             }
         }
     }

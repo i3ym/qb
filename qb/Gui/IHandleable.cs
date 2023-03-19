@@ -1,7 +1,4 @@
 namespace qb.Gui
 {
-    public interface IHandleable : IDrawable
-    {
-        bool HandleEvents { get; set; }
-    }
+    public interface IHandleable : IDrawable { }
 }
