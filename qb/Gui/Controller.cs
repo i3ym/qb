@@ -21,7 +21,7 @@ namespace qb.Gui
 
                 [QbKey.A] = (new Vector2(0, 0), Anchor.BottomRight),
                 [QbKey.B] = (new Vector2(-1.1f, 0), Anchor.BottomRight),
-                [QbKey.Back] = (new Vector2(-.05f, -1.1f), Anchor.BottomRight),
+                [QbKey.Pause] = (new Vector2(-.05f, -1.1f), Anchor.BottomRight),
             }.ToImmutableDictionary(k => k.Key, k => new ControllerButtonData(k.Value.Item1, 1, k.Value.Item2, k.Value.Item2));
         }
 
@@ -35,7 +35,7 @@ namespace qb.Gui
 
             addButton(QbKey.A, "A");
             addButton(QbKey.B, "B");
-            addButton(QbKey.Back, "Pause").With(x => x.Width = 2);
+            addButton(QbKey.Pause, "Pause").With(x => x.Width = 2);
 
             ChildrenScale.Value = this.InternalChildren.OfType<ControllerButton<Sprite>>().First().Scale.X;
 

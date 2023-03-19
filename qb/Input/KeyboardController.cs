@@ -16,7 +16,7 @@ namespace qb.Input
 
             new KeyBinding(InputKey.E, QbKey.A),
             new KeyBinding(InputKey.Q, QbKey.B),
-            new KeyBinding(InputKey.Escape, QbKey.Back),
+            new KeyBinding(InputKey.Escape, QbKey.Pause),
         };
 
         public KeyboardController() : base(SimultaneousBindingMode.Unique) { }

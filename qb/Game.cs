@@ -72,10 +72,7 @@ namespace qb
                         // new ControllerButtons() { Anchor = Anchor.BottomRight, Origin = Anchor.BottomRight, Size = new Vector2(1) },
                     },
                 }
-            };
-
-            Host.Dependencies.Cache(kb);
-            Add(kb);
+            }.With(Host.Dependencies.Cache).With(Add);
         }
     }
 }
