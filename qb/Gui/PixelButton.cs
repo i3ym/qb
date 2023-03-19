@@ -28,8 +28,6 @@ namespace qb.Gui
         }
 
         Box? BackgroundBox;
-        InputManager? InputManager;
-
         public bool Focusable { get; set; } = true;
 
 

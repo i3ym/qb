@@ -4,7 +4,7 @@ public interface IEditableDrawable : IDrawable
 {
     IEnumerable<Drawable> EditableChildren { get; }
 }
-public class EditOverlay : CompositeDrawable
+public partial class EditOverlay : CompositeDrawable
 {
     IEditableDrawable? Drawable;
 
