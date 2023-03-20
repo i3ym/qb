@@ -6,6 +6,8 @@ project.lock.json
 nupkg/
 **/default.profraw
 
+build/
+
 # Rider
 .idea
 
