@@ -36,7 +36,7 @@ namespace qb
         public event Action OnClearLineAnimationStop = delegate { };
 
         public int Seed => RandomPieceGetter.Seed;
-        int LevelSpeed => Level.Value > Levels.Length ? 1 : Levels[Level.Value];
+        int LevelSpeed => Level.Value >= Levels.Length ? 1 : Levels[Level.Value];
 
         public int CurrentX { get; private set; }
         public int CurrentY { get; private set; }
