@@ -177,6 +177,27 @@ namespace qb
             NextShape = RandomPieceGetter.Get();
             SpawnBlock();
         }
+        public void StartGame(IController controller, Storage storage)
+        {
+            Controller = controller;
+            RestartOnDeath = false;
+
+            StartGame();
+            Recorder = new ReplayRecorder(Seed);
+            OnGameOver += () =>
+            {
+                if (Recorder is null) return;
+
+                try
+                {
+                    using var stream = storage.GetStream(ReplayController.ReplayPath, FileAccess.Write, FileMode.Create);
+                    stream.Write(Recorder.AsReplay().Serialize(0));
+                }
+                catch { }
+
+                Recorder = null;
+            };
+        }
 
         void Rotate()
         {
