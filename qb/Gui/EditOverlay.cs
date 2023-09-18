@@ -31,7 +31,7 @@ public partial class EditOverlay : CompositeDrawable
 
 
 
-    protected class EditSelection : CompositeDrawable
+    protected partial class EditSelection : CompositeDrawable
     {
         readonly Drawable Target;
 
