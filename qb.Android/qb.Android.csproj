@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <ApplicationId>com.izor.qb</ApplicationId>
-    <ApplicationVersion>51</ApplicationVersion>
+    <ApplicationVersion>53</ApplicationVersion>
     <ApplicationDisplayVersion>1.0-of</ApplicationDisplayVersion>
     <NullabilityInfoContextSupport>true</NullabilityInfoContextSupport>
 

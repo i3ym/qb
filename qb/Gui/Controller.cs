@@ -14,15 +14,15 @@ namespace qb.Gui
         {
             DefaultButtons = new Dictionary<QbKey, (Vector2, Anchor)>()
             {
-                [QbKey.Up] = (new Vector2(0, 0), Anchor.BottomLeft),
-                [QbKey.Down] = (new Vector2(1, 0), Anchor.BottomLeft),
-                [QbKey.Left] = (new Vector2(2, 0), Anchor.BottomLeft),
-                [QbKey.Right] = (new Vector2(3, 0), Anchor.BottomLeft),
+                [QbKey.Up] = (new Vector2(0.059448004f, -3.5520165f), Anchor.BottomLeft),
+                [QbKey.Down] = (new Vector2(7.0339622f, -0.029702783f), Anchor.BottomLeft),
+                [QbKey.Left] = (new Vector2(0.053079598f, -0.029722711f), Anchor.BottomLeft),
+                [QbKey.Right] = (new Vector2(3.535028f, -0.029724002f), Anchor.BottomLeft),
 
-                [QbKey.A] = (new Vector2(0, 0), Anchor.BottomRight),
-                [QbKey.B] = (new Vector2(-1.1f, 0), Anchor.BottomRight),
-                [QbKey.Pause] = (new Vector2(-.05f, -1.1f), Anchor.BottomRight),
-            }.ToImmutableDictionary(k => k.Key, k => new ControllerButtonData(k.Value.Item1, 1, k.Value.Item2, k.Value.Item2));
+                [QbKey.A] = (new Vector2(-0.044585988f, -0.02972399f), Anchor.BottomRight),
+                [QbKey.B] = (new Vector2(-3.5373669f, -0.044585988f), Anchor.BottomRight),
+                [QbKey.Pause] = (new Vector2(-0.06486198f, -3.5819511f), Anchor.BottomRight),
+            }.ToImmutableDictionary(k => k.Key, k => new ControllerButtonData(k.Value.Item1, 3.4494848f, k.Value.Item2, k.Value.Item2));
         }
 
         [BackgroundDependencyLoader]
