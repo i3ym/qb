@@ -9,7 +9,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/qb.Desktop/bin/Debug/net7.0/qb.Desktop.dll",
+            "program": "${workspaceFolder}/qb.Desktop/bin/Debug/net8.0/qb.Desktop.dll",
             "args": [],
             "cwd": "${workspaceFolder}/qb.Desktop",
             "console": "internalConsole",

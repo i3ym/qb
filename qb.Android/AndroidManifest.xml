@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="ru.izorofficial.qb" android:installLocation="auto">
 	<application android:allowBackup="true" android:icon="@mipmap/ic_launcher" android:label="qb" android:roundIcon="@mipmap/ic_launcher_round" android:supportsRtl="true"/>
-	<uses-sdk android:minSdkVersion="21" android:targetSdkVersion="33" />
+	<uses-sdk android:minSdkVersion="21" android:targetSdkVersion="34" />
 
 	<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
