@@ -1,10 +1,9 @@
-namespace qb.Gui.Menu
-{
-    public partial class SkinChooseMenu : ChooseMenu
-    {
-        protected override TranslatedString Title => ("Skin", "Скин");
+namespace qb.Gui.Menu;
 
-        [BackgroundDependencyLoader]
-        void Load(SkinManager skinmgr) => AddButtons(skinmgr.Skins.Select(s => new ChooseMenuButton<Skin>(s, skinmgr.SelectedSkin, s.Name)).ToArray());
-    }
+public partial class SkinChooseMenu : ChooseMenu
+{
+    protected override TranslatedString Title => ("Skin", "Скин");
+
+    [BackgroundDependencyLoader]
+    void Load(SkinManager skinmgr) => AddButtons(skinmgr.Skins.Select(s => new ChooseMenuButton<Skin>(s, skinmgr.SelectedSkin, s.Name)).ToArray());
 }

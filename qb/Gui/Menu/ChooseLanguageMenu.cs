@@ -1,18 +1,17 @@
-namespace qb.Gui.Menu
+namespace qb.Gui.Menu;
+
+public partial class ChooseLanguageMenu : ChooseMenu
 {
-    public partial class ChooseLanguageMenu : ChooseMenu
+    protected override TranslatedString Title => ("Language", "Язык");
+
+    [BackgroundDependencyLoader]
+    void Load(FrameworkConfigManager config)
     {
-        protected override TranslatedString Title => ("Language", "Язык");
+        var langbindable = config.GetBindable<string>(FrameworkSetting.Locale);
 
-        [BackgroundDependencyLoader]
-        void Load(FrameworkConfigManager config)
-        {
-            var langbindable = config.GetBindable<string>(FrameworkSetting.Locale);
-
-            AddButtons(
-                new ChooseMenuButton<string>("ru-RU", langbindable, "Русский"),
-                new ChooseMenuButton<string>("en-US", langbindable, "English")
-            );
-        }
+        AddButtons(
+            new ChooseMenuButton<string>("ru-RU", langbindable, "Русский"),
+            new ChooseMenuButton<string>("en-US", langbindable, "English")
+        );
     }
 }

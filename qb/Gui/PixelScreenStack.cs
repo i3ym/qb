@@ -1,66 +1,65 @@
-namespace qb.Gui
+namespace qb.Gui;
+
+[Cached]
+public partial class PixelScreenStack : Container<MenuScreen>
 {
-    [Cached]
-    public partial class PixelScreenStack : Container<MenuScreen>
+    public bool IsScreenVisible => ScreensPushed.TryPeek(out var screen) && screen.Alpha != 0;
+    readonly Stack<MenuScreen> ScreensPushed = new Stack<MenuScreen>();
+
+    [BackgroundDependencyLoader]
+    void Load() => RelativeSizeAxes = Axes.Both;
+
+    public override void Add(MenuScreen drawable)
     {
-        public bool IsScreenVisible => ScreensPushed.TryPeek(out var screen) && screen.Alpha != 0;
-        readonly Stack<MenuScreen> ScreensPushed = new Stack<MenuScreen>();
+        drawable.Hide();
+        base.Add(drawable);
+    }
 
-        [BackgroundDependencyLoader]
-        void Load() => RelativeSizeAxes = Axes.Both;
+    static float FadeDuration => 250;
+    static Easing FadeEasing => Easing.OutQuad;
 
-        public override void Add(MenuScreen drawable)
+
+    public void Push<T>() where T : MenuScreen, new() => Push(new T());
+    void Push(MenuScreen screen)
+    {
+        Add(screen);
+
+        screen.FadeInFromZero(FadeDuration, FadeEasing);
+        ScreensPushed.TryPeek(out var last);
+        last?.FadeOutFromOne(FadeDuration, FadeEasing);
+
+        Schedule(() => screen.OnShow(last));
+        ScreensPushed.Push(screen);
+    }
+    public void Pop()
+    {
+        if (!ScreensPushed.TryPop(out var screen)) return;
+        screen.FadeOutFromOne(FadeDuration, FadeEasing).Expire();
+        Schedule(screen.OnRemove);
+
+        if (!ScreensPushed.TryPeek(out var newscreen)) return;
+        newscreen.FadeInFromZero(FadeDuration, FadeEasing);
+    }
+    public void Set(MenuScreen screen)
+    {
+        if (ScreensPushed.Contains(screen))
+            PopTo(null);
+
+        Push(screen);
+    }
+    public void PopTo(MenuScreen? screen)
+    {
+        if (screen is null)
         {
-            drawable.Hide();
-            base.Add(drawable);
+            ScreensPushed.Clear();
+            Clear();
+
+            return;
         }
 
-        static float FadeDuration => 250;
-        static Easing FadeEasing => Easing.OutQuad;
+        if (!ScreensPushed.Contains(screen)) return;
 
-
-        public void Push<T>() where T : MenuScreen, new() => Push(new T());
-        void Push(MenuScreen screen)
-        {
-            Add(screen);
-
-            screen.FadeInFromZero(FadeDuration, FadeEasing);
-            ScreensPushed.TryPeek(out var last);
-            last?.FadeOutFromOne(FadeDuration, FadeEasing);
-
-            Schedule(() => screen.OnShow(last));
-            ScreensPushed.Push(screen);
-        }
-        public void Pop()
-        {
-            if (!ScreensPushed.TryPop(out var screen)) return;
-            screen.FadeOutFromOne(FadeDuration, FadeEasing).Expire();
-            Schedule(screen.OnRemove);
-
-            if (!ScreensPushed.TryPeek(out var newscreen)) return;
-            newscreen.FadeInFromZero(FadeDuration, FadeEasing);
-        }
-        public void Set(MenuScreen screen)
-        {
-            if (ScreensPushed.Contains(screen))
-                PopTo(null);
-
-            Push(screen);
-        }
-        public void PopTo(MenuScreen? screen)
-        {
-            if (screen is null)
-            {
-                ScreensPushed.Clear();
-                Clear();
-
-                return;
-            }
-
-            if (!ScreensPushed.Contains(screen)) return;
-
-            while (ScreensPushed.Peek() != screen)
-                Pop();
-        }
+        while (ScreensPushed.Peek() != screen)
+            Pop();
     }
 }

@@ -1,4 +1,3 @@
-namespace qb.Gui
-{
-    public interface IHandleable : IDrawable { }
-}
+namespace qb.Gui;
+
+public interface IHandleable : IDrawable { }

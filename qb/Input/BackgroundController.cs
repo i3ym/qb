@@ -1,9 +1,8 @@
-namespace qb.Input
-{
-    public class BackgroundController : IController
-    {
-        public IController Controller = new RandomController();
+namespace qb.Input;
 
-        public ControllerState GetState() => Controller.GetState();
-    }
+public class BackgroundController : IController
+{
+    public IController Controller = new RandomController();
+
+    public ControllerState GetState() => Controller.GetState();
 }

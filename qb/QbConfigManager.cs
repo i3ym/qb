@@ -1,103 +1,102 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace qb
+namespace qb;
+
+public class QbConfigManager
 {
-    public class QbConfigManager
+    const string Filename = "game.json";
+
+    readonly Dictionary<string, IBindable> LoadedBindables = new Dictionary<string, IBindable>();
+    readonly Storage Storage;
+    readonly JObject JsonData;
+
+    public QbConfigManager(Storage storage)
     {
-        const string Filename = "game.json";
+        Storage = storage;
 
-        readonly Dictionary<string, IBindable> LoadedBindables = new Dictionary<string, IBindable>();
-        readonly Storage Storage;
-        readonly JObject JsonData;
-
-        public QbConfigManager(Storage storage)
+        using var stream = storage.GetStream(Filename);
+        if (stream is null)
         {
-            Storage = storage;
+            JsonData = new JObject();
+            return;
+        }
 
-            using var stream = storage.GetStream(Filename);
-            if (stream is null)
+        using var reader = new StreamReader(stream);
+        using var jreader = new JsonTextReader(reader);
+
+        JsonData = JObject.Load(jreader);
+    }
+
+    public void Set<T>(string path, T value)
+    {
+        var bindable = GetBindable<T>(path, value);
+        bindable.Value = value;
+    }
+    public T Get<T>(string path, T defaultValue) => GetBindable<T>(path, defaultValue).Value;
+    public Bindable<T> GetBindable<T>(string path, T defaultValue)
+    {
+        if (LoadedBindables.TryGetValue(path, out var loaded) && loaded is Bindable<T> lb) return lb;
+
+        var bindable = new Bindable<T>(defaultValue);
+        bindable.ValueChanged += e =>
+        {
+            var token = JsonData.SelectToken(path);
+
+            var jobj = e.NewValue is { } ? JToken.FromObject(e.NewValue) : (JToken) JValue.CreateNull();
+            if (token is { }) token.Replace(jobj);
+            else replaceNested(JsonData, path, jobj);
+
+
+            using (var stream = Storage.GetStream(Filename, FileAccess.Write, FileMode.OpenOrCreate))
+            using (var writer = new StreamWriter(stream))
+            using (var jwriter = new JsonTextWriter(writer))
             {
-                JsonData = new JObject();
-                return;
+                JsonData.WriteTo(jwriter);
+
+                jwriter.Flush();
+                writer.Flush();
+
+                stream.SetLength(stream.Position);
             }
+        };
 
-            using var reader = new StreamReader(stream);
-            using var jreader = new JsonTextReader(reader);
-
-            JsonData = JObject.Load(jreader);
-        }
-
-        public void Set<T>(string path, T value)
+        try
         {
-            var bindable = GetBindable<T>(path, value);
-            bindable.Value = value;
+            if (JsonData.SelectToken(path) is { } token && token.ToObject<T>() is { } obj)
+                bindable.Value = obj;
         }
-        public T Get<T>(string path, T defaultValue) => GetBindable<T>(path, defaultValue).Value;
-        public Bindable<T> GetBindable<T>(string path, T defaultValue)
-        {
-            if (LoadedBindables.TryGetValue(path, out var loaded) && loaded is Bindable<T> lb) return lb;
+        catch { }
 
-            var bindable = new Bindable<T>(defaultValue);
-            bindable.ValueChanged += e =>
+        LoadedBindables[path] = bindable;
+        return bindable;
+
+
+
+
+        static void replaceNested(JObject self, string path, JToken value)
+        {
+            var pathParts = path.Split('.');
+            JToken currentNode = self;
+
+            for (int i = 0; i < pathParts.Length; i++)
             {
-                var token = JsonData.SelectToken(path);
+                var pathPart = pathParts[i];
+                var isLast = i == pathParts.Length - 1;
+                var partNode = currentNode.SelectToken(pathPart);
 
-                var jobj = e.NewValue is { } ? JToken.FromObject(e.NewValue) : (JToken) JValue.CreateNull();
-                if (token is { }) token.Replace(jobj);
-                else replaceNested(JsonData, path, jobj);
-
-
-                using (var stream = Storage.GetStream(Filename, FileAccess.Write, FileMode.OpenOrCreate))
-                using (var writer = new StreamWriter(stream))
-                using (var jwriter = new JsonTextWriter(writer))
+                if (partNode is null)
                 {
-                    JsonData.WriteTo(jwriter);
-
-                    jwriter.Flush();
-                    writer.Flush();
-
-                    stream.SetLength(stream.Position);
+                    var nodeToAdd = isLast ? value : new JObject();
+                    ((JObject) currentNode).Add(pathPart, nodeToAdd);
+                    currentNode = currentNode.SelectToken(pathPart)!;
                 }
-            };
-
-            try
-            {
-                if (JsonData.SelectToken(path) is { } token && token.ToObject<T>() is { } obj)
-                    bindable.Value = obj;
-            }
-            catch { }
-
-            LoadedBindables[path] = bindable;
-            return bindable;
-
-
-
-
-            static void replaceNested(JObject self, string path, JToken value)
-            {
-                var pathParts = path.Split('.');
-                JToken currentNode = self;
-
-                for (int i = 0; i < pathParts.Length; i++)
+                else
                 {
-                    var pathPart = pathParts[i];
-                    var isLast = i == pathParts.Length - 1;
-                    var partNode = currentNode.SelectToken(pathPart);
+                    currentNode = partNode;
 
-                    if (partNode is null)
-                    {
-                        var nodeToAdd = isLast ? value : new JObject();
-                        ((JObject) currentNode).Add(pathPart, nodeToAdd);
-                        currentNode = currentNode.SelectToken(pathPart)!;
-                    }
-                    else
-                    {
-                        currentNode = partNode;
-
-                        if (isLast)
-                            currentNode.Replace(value);
-                    }
+                    if (isLast)
+                        currentNode.Replace(value);
                 }
             }
         }

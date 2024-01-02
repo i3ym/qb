@@ -1,7 +1,6 @@
-namespace qb.Input
+namespace qb.Input;
+
+public interface IController
 {
-    public interface IController
-    {
-        ControllerState GetState();
-    }
+    ControllerState GetState();
 }

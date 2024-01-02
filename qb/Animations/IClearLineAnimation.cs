@@ -1,7 +1,6 @@
-namespace qb.Animations
+namespace qb.Animations;
+
+public interface IClearLineAnimation
 {
-    public interface IClearLineAnimation
-    {
-        void Animation(int[] lines, GameScreen field);
-    }
+    void Animation(int[] lines, GameScreen field);
 }

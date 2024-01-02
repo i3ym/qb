@@ -1,9 +1,8 @@
-namespace qb
-{
-    public interface INavigatableButton : IDrawable
-    {
-        bool Focusable { get; }
+namespace qb;
 
-        void OnEvent(QbKey action);
-    }
+public interface INavigatableButton : IDrawable
+{
+    bool Focusable { get; }
+
+    void OnEvent(QbKey action);
 }

@@ -1,28 +1,27 @@
-namespace qb.Gui
+namespace qb.Gui;
+
+public partial class PixelSliderBar : BasicSliderBar<float>, INavigatableButton
 {
-    public partial class PixelSliderBar : BasicSliderBar<float>, INavigatableButton
+    bool INavigatableButton.Focusable => true;
+    public new BindableNumber<float> CurrentNumber => base.CurrentNumber;
+
+    public PixelSliderBar(TranslatedString text, float min, float max, Action<ValueChangedEvent<float>>? func = null)
     {
-        bool INavigatableButton.Focusable => true;
-        public new BindableNumber<float> CurrentNumber => base.CurrentNumber;
+        CurrentNumber.MinValue = min;
+        CurrentNumber.MaxValue = max;
+        if (func is not null) Current.ValueChanged += func;
 
-        public PixelSliderBar(TranslatedString text, float min, float max, Action<ValueChangedEvent<float>>? func = null)
-        {
-            CurrentNumber.MinValue = min;
-            CurrentNumber.MaxValue = max;
-            if (func is not null) Current.ValueChanged += func;
+        SelectionColour = Colour4.White;
+        BackgroundColour = Colour4.White.MultiplyAlpha(.5f);
 
-            SelectionColour = Colour4.White;
-            BackgroundColour = Colour4.White.MultiplyAlpha(.5f);
+        AddInternal(new PixelText(text) { Anchor = Anchor.Centre, Origin = Anchor.Centre, Colour = Colour4.Black });
+    }
 
-            AddInternal(new PixelText(text) { Anchor = Anchor.Centre, Origin = Anchor.Centre, Colour = Colour4.Black });
-        }
+    void INavigatableButton.OnEvent(QbKey action)
+    {
+        var diff = (CurrentNumber.MaxValue - CurrentNumber.MinValue) / 10f;
 
-        void INavigatableButton.OnEvent(QbKey action)
-        {
-            var diff = (CurrentNumber.MaxValue - CurrentNumber.MinValue) / 10f;
-
-            if (action == QbKey.Left) CurrentNumber.Value -= diff;
-            else if (action == QbKey.Right) CurrentNumber.Value += diff;
-        }
+        if (action == QbKey.Left) CurrentNumber.Value -= diff;
+        else if (action == QbKey.Right) CurrentNumber.Value += diff;
     }
 }

@@ -1,32 +1,31 @@
 using System.Collections;
 
-namespace qb
+namespace qb;
+
+public readonly struct ReadOnlyGameMatrix<T> : IGameMatrix<T>
 {
-    public readonly struct ReadOnlyGameMatrix<T> : IGameMatrix<T>
-    {
-        public int Width => Matrix.Width;
-        public int Height => Matrix.Height;
+    public int Width => Matrix.Width;
+    public int Height => Matrix.Height;
 
-        readonly GameMatrix<T> Matrix;
+    readonly GameMatrix<T> Matrix;
 
-        public ReadOnlyGameMatrix(GameMatrix<T> matrix) => Matrix = matrix;
-        public ReadOnlyGameMatrix(int width, int height, T defaultValue = default!) : this(new GameMatrix<T>(width, height, defaultValue)) { }
+    public ReadOnlyGameMatrix(GameMatrix<T> matrix) => Matrix = matrix;
+    public ReadOnlyGameMatrix(int width, int height, T defaultValue = default!) : this(new GameMatrix<T>(width, height, defaultValue)) { }
 
-        public T this[int x, int y] => Matrix[x, y];
+    public T this[int x, int y] => Matrix[x, y];
 
-        public T GetWithoutChecks(int x, int y) => Matrix[x, y];
-        public bool Fits<T2>(int x, int y, GameMatrix<T2> matrix) => Matrix.Fits(x, y, matrix);
-        public bool Intersects<T2>(GameMatrix<T2> matrix) => Matrix.Intersects(matrix);
-        public bool IsInBounds(int x, int y) => Matrix.IsInBounds(x, y);
+    public T GetWithoutChecks(int x, int y) => Matrix[x, y];
+    public bool Fits<T2>(int x, int y, GameMatrix<T2> matrix) => Matrix.Fits(x, y, matrix);
+    public bool Intersects<T2>(GameMatrix<T2> matrix) => Matrix.Intersects(matrix);
+    public bool IsInBounds(int x, int y) => Matrix.IsInBounds(x, y);
 
-        public GameMatrix<T> RotateClockwise() => Matrix.RotateClockwise();
-        public GameMatrix<T> RotateAntiClockwise() => Matrix.RotateAntiClockwise();
+    public GameMatrix<T> RotateClockwise() => Matrix.RotateClockwise();
+    public GameMatrix<T> RotateAntiClockwise() => Matrix.RotateAntiClockwise();
 
-        public IEnumerator<T> GetEnumerator() => Matrix.GetEnumerator();
-        IEnumerator IEnumerable.GetEnumerator() => (Matrix as IEnumerable).GetEnumerator();
+    public IEnumerator<T> GetEnumerator() => Matrix.GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator() => (Matrix as IEnumerable).GetEnumerator();
 
-        public static implicit operator ReadOnlyGameMatrix<T>(T[,] matrix) => new ReadOnlyGameMatrix<T>(matrix);
-        public static implicit operator ReadOnlyGameMatrix<T>(GameMatrix<T> matrix) => new ReadOnlyGameMatrix<T>(matrix);
-        public static implicit operator GameMatrix<T>(ReadOnlyGameMatrix<T> matrix) => matrix.Matrix;
-    }
+    public static implicit operator ReadOnlyGameMatrix<T>(T[,] matrix) => new ReadOnlyGameMatrix<T>(matrix);
+    public static implicit operator ReadOnlyGameMatrix<T>(GameMatrix<T> matrix) => new ReadOnlyGameMatrix<T>(matrix);
+    public static implicit operator GameMatrix<T>(ReadOnlyGameMatrix<T> matrix) => matrix.Matrix;
 }

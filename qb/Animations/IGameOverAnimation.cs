@@ -1,7 +1,6 @@
-namespace qb.Animations
+namespace qb.Animations;
+
+public interface IGameOverAnimation
 {
-    public interface IGameOverAnimation
-    {
-        void Animation(GameScreen field, Action after);
-    }
+    void Animation(GameScreen field, Action after);
 }

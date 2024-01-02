@@ -1,34 +1,33 @@
-namespace qb.Input
+namespace qb.Input;
+
+public partial class KeyboardController : KeyBindingContainer<QbKey>, IController
 {
-    public partial class KeyboardController : KeyBindingContainer<QbKey>, IController
+    public override IEnumerable<IKeyBinding> DefaultKeyBindings { get; } = new IKeyBinding[]
     {
-        public override IEnumerable<IKeyBinding> DefaultKeyBindings { get; } = new IKeyBinding[]
-        {
-            new KeyBinding(InputKey.W, QbKey.Up),
-            new KeyBinding(InputKey.S, QbKey.Down),
-            new KeyBinding(InputKey.A, QbKey.Left),
-            new KeyBinding(InputKey.D, QbKey.Right),
+        new KeyBinding(InputKey.W, QbKey.Up),
+        new KeyBinding(InputKey.S, QbKey.Down),
+        new KeyBinding(InputKey.A, QbKey.Left),
+        new KeyBinding(InputKey.D, QbKey.Right),
 
-            new KeyBinding(InputKey.Up, QbKey.Up),
-            new KeyBinding(InputKey.Down, QbKey.Down),
-            new KeyBinding(InputKey.Left, QbKey.Left),
-            new KeyBinding(InputKey.Right, QbKey.Right),
+        new KeyBinding(InputKey.Up, QbKey.Up),
+        new KeyBinding(InputKey.Down, QbKey.Down),
+        new KeyBinding(InputKey.Left, QbKey.Left),
+        new KeyBinding(InputKey.Right, QbKey.Right),
 
-            new KeyBinding(InputKey.E, QbKey.A),
-            new KeyBinding(InputKey.Q, QbKey.B),
-            new KeyBinding(InputKey.Escape, QbKey.Pause),
-        };
+        new KeyBinding(InputKey.E, QbKey.A),
+        new KeyBinding(InputKey.Q, QbKey.B),
+        new KeyBinding(InputKey.Escape, QbKey.Pause),
+    };
 
-        public KeyboardController() : base(SimultaneousBindingMode.Unique) { }
+    public KeyboardController() : base(SimultaneousBindingMode.Unique) { }
 
-        public ControllerState GetState()
-        {
-            var state = new ControllerState();
+    public ControllerState GetState()
+    {
+        var state = new ControllerState();
 
-            foreach (var button in PressedActions)
-                state = state.With(button);
+        foreach (var button in PressedActions)
+            state = state.With(button);
 
-            return state;
-        }
+        return state;
     }
 }

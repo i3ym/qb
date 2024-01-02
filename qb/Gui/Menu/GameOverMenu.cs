@@ -1,26 +1,25 @@
-namespace qb.Gui.Menu
+namespace qb.Gui.Menu;
+
+public partial class GameOverMenu : ControllableMenuScreen, IKeyBindingHandler<QbKey>
 {
-    public partial class GameOverMenu : ControllableMenuScreen, IKeyBindingHandler<QbKey>
+    [BackgroundDependencyLoader]
+    void Load(GameScreen gamesc, KeyboardController maincontroller, Storage storage)
     {
-        [BackgroundDependencyLoader]
-        void Load(GameScreen gamesc, KeyboardController maincontroller, Storage storage)
+        AddButton(new PixelTextButton(("Game over", "Вы проиграли")) { Focusable = false });
+        AddButton(new PixelTextButton() { Focusable = false });
+        AddButton(new PixelTextButton(("Restart", "Начать заново"), restart));
+        AddButton(new PixelTextButton(("Exit", "Выйти"), exit));
+
+
+        void restart()
         {
-            AddButton(new PixelTextButton(("Game over", "Вы проиграли")) { Focusable = false });
-            AddButton(new PixelTextButton() { Focusable = false });
-            AddButton(new PixelTextButton(("Restart", "Начать заново"), restart));
-            AddButton(new PixelTextButton(("Exit", "Выйти"), exit));
-
-
-            void restart()
-            {
-                PixelScreenStack.PopTo(null);
-                gamesc.Controller.StartGame(maincontroller, storage);
-            }
-            void exit()
-            {
-                gamesc.Controller.StartGame();
-                Push<MainMenu>();
-            }
+            PixelScreenStack.PopTo(null);
+            gamesc.Controller.StartGame(maincontroller, storage);
+        }
+        void exit()
+        {
+            gamesc.Controller.StartGame();
+            Push<MainMenu>();
         }
     }
 }
