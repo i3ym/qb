@@ -2,14 +2,15 @@ using System.Collections;
 
 namespace qb
 {
-    public struct ReadOnlyGameMatrix<T> : IGameMatrix<T>
+    public readonly struct ReadOnlyGameMatrix<T> : IGameMatrix<T>
     {
         public int Width => Matrix.Width;
         public int Height => Matrix.Height;
 
-        GameMatrix<T> Matrix;
+        readonly GameMatrix<T> Matrix;
 
-        public ReadOnlyGameMatrix(int width, int height, T defaultValue = default!) => Matrix = new GameMatrix<T>(width, height, defaultValue);
+        public ReadOnlyGameMatrix(GameMatrix<T> matrix) => Matrix = matrix;
+        public ReadOnlyGameMatrix(int width, int height, T defaultValue = default!) : this(new GameMatrix<T>(width, height, defaultValue)) { }
 
         public T this[int x, int y] => Matrix[x, y];
 
@@ -24,8 +25,8 @@ namespace qb
         public IEnumerator<T> GetEnumerator() => Matrix.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => (Matrix as IEnumerable).GetEnumerator();
 
-        public static implicit operator ReadOnlyGameMatrix<T>(T[,] matrix) => new ReadOnlyGameMatrix<T>(matrix.GetLength(0), matrix.GetLength(1)) { Matrix = matrix };
-        public static implicit operator ReadOnlyGameMatrix<T>(GameMatrix<T> matrix) => new ReadOnlyGameMatrix<T>(matrix.Width, matrix.Height) { Matrix = matrix };
+        public static implicit operator ReadOnlyGameMatrix<T>(T[,] matrix) => new ReadOnlyGameMatrix<T>(matrix);
+        public static implicit operator ReadOnlyGameMatrix<T>(GameMatrix<T> matrix) => new ReadOnlyGameMatrix<T>(matrix);
         public static implicit operator GameMatrix<T>(ReadOnlyGameMatrix<T> matrix) => matrix.Matrix;
     }
 }

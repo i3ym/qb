@@ -1,10 +1,9 @@
-using Android.Content.PM;
 using Android.Views;
 using osu.Framework.Android;
 
 namespace qb.Android
 {
-    [Activity(Theme = "@android:style/Theme.NoTitleBar", MainLauncher = true, ScreenOrientation = ScreenOrientation.FullUser, SupportsPictureInPicture = false, ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize, HardwareAccelerated = true)]
+    [Activity(ConfigurationChanges = DEFAULT_CONFIG_CHANGES, Exported = true, LaunchMode = DEFAULT_LAUNCH_MODE, MainLauncher = true)]
     public class GameActivity : AndroidGameActivity
     {
         GameAndroid? Game;
@@ -13,6 +12,9 @@ namespace qb.Android
 
         protected override void OnCreate(Bundle? savedInstanceState)
         {
+            // temporary fix until https://github.com/ppy/osu-framework/pull/6100
+            Directory.CreateDirectory(System.Environment.GetFolderPath(System.Environment.SpecialFolder.Personal));
+
             base.OnCreate(savedInstanceState);
 
             Window?.AddFlags(WindowManagerFlags.Fullscreen);

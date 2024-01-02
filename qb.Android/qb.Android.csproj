@@ -9,7 +9,7 @@
     <!-- This currently causes random lockups during gameplay. https://github.com/mono/mono/issues/18973 -->
     <EnableLLVM>false</EnableLLVM>
 
-    <ApplicationVersion>54</ApplicationVersion>
+    <ApplicationVersion>56</ApplicationVersion>
     <Version>1.0.0-of</Version>
     <ApplicationDisplayVersion>$(Version)</ApplicationDisplayVersion>
     
