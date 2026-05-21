@@ -13,7 +13,7 @@
     <Version>1.0.0-of</Version>
     <ApplicationDisplayVersion>$(Version)</ApplicationDisplayVersion>
     
-    <JavaSdkDirectory>/usr/lib/jvm/java-11-openjdk</JavaSdkDirectory>
+    <JavaSdkDirectory>/usr/lib/jvm/java-21-openjdk</JavaSdkDirectory>
   </PropertyGroup>
 
   <ItemGroup>
