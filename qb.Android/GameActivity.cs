@@ -12,9 +12,6 @@ public class GameActivity : AndroidGameActivity
 
     protected override void OnCreate(Bundle? savedInstanceState)
     {
-        // temporary fix until https://github.com/ppy/osu-framework/pull/6100
-        Directory.CreateDirectory(System.Environment.GetFolderPath(System.Environment.SpecialFolder.Personal));
-
         base.OnCreate(savedInstanceState);
 
         Window?.AddFlags(WindowManagerFlags.Fullscreen);
