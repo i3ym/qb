@@ -2,5 +2,5 @@ namespace qb.Animations;
 
 public interface IClearLineAnimation
 {
-    void Animation(int[] lines, GameScreen field);
+    void Animation(IReadOnlyList<int> lines, GameScreen field);
 }

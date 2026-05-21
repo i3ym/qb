@@ -2,7 +2,7 @@ namespace qb.Animations;
 
 public class ClearLineAnimationSlideDown : IClearLineAnimation
 {
-    public void Animation(int[] lines, GameScreen gamesc)
+    public void Animation(IReadOnlyList<int> lines, GameScreen gamesc)
     {
         const double animationTime = FieldController.MaxFps * FieldController.FrameInterval;
 
@@ -29,7 +29,7 @@ public class ClearLineAnimationSlideDown : IClearLineAnimation
             else if (y > lines[0])
             {
                 int count = 0;
-                for (int i = 0; i < lines.Length; i++)
+                for (int i = 0; i < lines.Count; i++)
                     if (lines[i] < y) count++;
                     else break;
 
